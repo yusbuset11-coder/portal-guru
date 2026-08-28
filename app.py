@@ -17,7 +17,7 @@ st.markdown(
     <style>
         .block-container {
             padding-top: 1.5rem;
-            padding-bottom: 6rem;
+            padding-bottom: 8rem;
         }
     </style>
     """,
@@ -26,6 +26,7 @@ st.markdown(
 
 # ID Master Registry Pusat
 MASTER_REGISTRY_ID = "1mgN63xzrLt__5b9-gBw8dIWYP3RRgNdagUiTurFZdgg"
+
 
 def get_gspread_client():
   scope = [
@@ -46,8 +47,8 @@ def load_master_registry():
     return worksheet.get_all_records()
   except Exception as e:
     st.error(
-        f"❌ Gagal terhubung ke Google Spreadsheet Master Registry. Detail Error:"
-        f" {e}"
+        f"❌ Gagal terhubung ke Google Spreadsheet Master Registry. Detail"
+        f" Error: {e}"
     )
     return None
 
@@ -166,7 +167,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI (Tanpa kata "PORTAL", teks lebih besar, ada identitas pengembang) ---
+# --- HEADER UTAMA PORTAL PASTI ---
 st.markdown(
     """
     <div class="main-header-card">
@@ -181,72 +182,70 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HALAMAN LOGIN / VERIFIKASI ---
+# --- HALAMAN LOGIN / VERIFIKASI (Melebar Penuh / Full Width) ---
 if not st.session_state.logged_in:
-  col1, col2, col3 = st.columns([1, 2, 1])
-  with col2:
-    with st.form("form_login"):
-      st.markdown(
-          "<h3 style='color: #38bdf8; margin-top:0;'>🔐 Login Akses Portal</h3>",
-          unsafe_allow_html=True,
-      )
-      st.write(
-          "Silakan masukkan **Email** terdaftar atau **Token Unik** Anda untuk"
-          " masuk ke sistem."
-      )
-      user_input = st.text_input(
-          "Email / Token Unik Guru",
-          placeholder=(
-              "Contoh: yustinussetyanta08@dinas.belajar.id atau TOKEN300869"
-          ),
-      )
-      btn_login = st.form_submit_button("🚀 Masuk Portal")
+  with st.form("form_login"):
+    st.markdown(
+        "<h3 style='color: #38bdf8; margin-top:0;'>🔐 Login Akses Portal</h3>",
+        unsafe_allow_html=True,
+    )
+    st.write(
+        "Silakan masukkan **Email** terdaftar atau **Token Unik** Anda untuk"
+        " masuk ke sistem."
+    )
+    user_input = st.text_input(
+        "Email / Token Unik Guru",
+        placeholder=(
+            "Contoh: yustinussetyanta08@dinas.belajar.id atau TOKEN300869"
+        ),
+    )
+    btn_login = st.form_submit_button("🚀 Masuk Portal")
 
-      if btn_login:
-        if not user_input:
-          st.warning("⚠️ Mohon masukkan Email atau Token Unik Anda.")
-        else:
-          with st.spinner("Memeriksa kredensial ke Master Registry..."):
-            data_registry = load_master_registry()
+    if btn_login:
+      if not user_input:
+        st.warning("⚠️ Mohon masukkan Email atau Token Unik Anda.")
+      else:
+        with st.spinner("Memeriksa kredensial ke Master Registry..."):
+          data_registry = load_master_registry()
 
-          if data_registry:
-            df_registry = pd.DataFrame(data_registry)
-            # Normalisasi nama kolom agar aman dari spasi
-            df_registry.columns = df_registry.columns.str.strip()
+        if data_registry:
+          df_registry = pd.DataFrame(data_registry)
+          # Normalisasi nama kolom agar aman dari spasi
+          df_registry.columns = df_registry.columns.str.strip()
 
-            # Cari berdasarkan Email atau Token_Unik
-            matched = df_registry[
-                (
-                    df_registry["Email"]
-                    .astype(str)
-                    .str.strip()
-                    .str.lower()
-                    == user_input.strip().lower()
-                )
-                | (
-                    df_registry["Token_Unik"].astype(str).str.strip()
-                    == user_input.strip()
-                )
-            ]
-
-            if not matched.empty:
-              st.session_state.logged_in = True
-              st.session_state.guru_nama = matched.iloc[0]["Nama_Guru"]
-              st.session_state.spreadsheet_id = matched.iloc[0]["Spreadsheet_ID"]
-              st.success(
-                  f"🎉 Selamat datang, {st.session_state.guru_nama}! Berhasil"
-                  " masuk."
+          # Cari berdasarkan Email atau Token_Unik
+          matched = df_registry[
+              (
+                  df_registry["Email"]
+                  .astype(str)
+                  .str.strip()
+                  .str.lower()
+                  == user_input.strip().lower()
               )
-              st.rerun()
-            else:
-              st.error(
-                  "❌ Email atau Token Unik tidak ditemukan di Master Registry."
+              | (
+                  df_registry["Token_Unik"].astype(str).str.strip()
+                  == user_input.strip()
               )
+          ]
+
+          if not matched.empty:
+            st.session_state.logged_in = True
+            st.session_state.guru_nama = matched.iloc[0]["Nama_Guru"]
+            st.session_state.spreadsheet_id = matched.iloc[0]["Spreadsheet_ID"]
+            st.success(
+                f"🎉 Selamat datang, {st.session_state.guru_nama}! Berhasil"
+                " masuk."
+            )
+            st.rerun()
           else:
             st.error(
-                "❌ Database Master Registry kosong atau gagal diakses. Periksa"
-                " koneksi spreadsheet Anda."
+                "❌ Email atau Token Unik tidak ditemukan di Master Registry."
             )
+        else:
+          st.error(
+              "❌ Database Master Registry kosong atau gagal diakses. Periksa"
+              " koneksi spreadsheet Anda."
+          )
 else:
   # --- SIDEBAR PROFESIONAL SETELAH LOGIN ---
   with st.sidebar:
@@ -273,7 +272,7 @@ else:
       st.session_state.spreadsheet_id = ""
       st.rerun()
 
-  # --- TAMPILAN BERANDA UTAMA SETELAH LOGIN (Mengganti kotak hijau dengan gaya elegan) ---
+  # --- TAMPILAN BERANDA UTAMA SETELAH LOGIN ---
   st.markdown(
       f"""
         <div class="user-welcome-card">
