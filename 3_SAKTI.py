@@ -574,7 +574,7 @@ elif menu == "📈 Rekap Nilai Siswa":
         "Nilai Siswa", min_value=0, max_value=100, value=80
     )
 
-  if st.button("💾 Simpan Nilai ke Google Sheets", width="stretch):
+  if st.button("💾 Simpan Nilai ke Google Sheets", width="stretch"):
     if not r_mapel or not r_nama_siswa:
       st.warning(
           "Mohon lengkapi Mata Pelajaran dan pastikan Nama Siswa terpilih."
@@ -704,7 +704,7 @@ elif menu == "📈 Rekap Nilai Siswa":
         " dipilih."
     )
     if not df_final_dl.empty:
-      st.dataframe(df_final_dl, width="stretch)
+      st.dataframe(df_final_dl, width="stretch")
 
       output_excel = BytesIO()
       with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
