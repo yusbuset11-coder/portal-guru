@@ -246,6 +246,7 @@ def generate_professional_word_document(
 
 
 # ---- HEADER APLIKASI ----
+guru_nama = st.session_state.get("guru_nama", "")
 st.markdown(
     f"""
     <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 25px 30px; border-radius: 14px; border: 1px solid #334155; margin-bottom: 25px;">
