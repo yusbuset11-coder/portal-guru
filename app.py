@@ -120,7 +120,7 @@ if "guru_nama" not in st.session_state:
 # =====================================================================
 # HALAMAN 1: PORTAL UTAMA (PASTI) & LOGIN
 # =====================================================================
-if menu == "Portal Utama (PASTI)":
+st.title("PASTI - Portal Akademik Siswa Terintegrasi")
   st.markdown(
       """
         <div class="header-card" style="text-align: center;">
