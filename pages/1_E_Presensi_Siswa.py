@@ -9,7 +9,8 @@ st.set_page_config(
     page_icon="📋",
     layout="wide",
 )
-st.markdown("""
+st.markdown(
+    """
     <style>
         .block-container {
             padding-top: 1.5rem;
@@ -17,7 +18,10 @@ st.markdown("""
         }
     </style>
     
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
+
 # Styling CSS Universal (Background Gelap Seragam & Kartu Profesional ala DIGMA)
 st.markdown(
     """
@@ -28,27 +32,27 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 25px 30px;
-        border-radius: 14px;
+        padding: 20px 25px;
+        border-radius: 12px;
         border: 1px solid #334155;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        margin-bottom: 20px;
+        box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.4);
     }
     .main-title {
         color: #38bdf8;
-        font-size: 28px;
-        font-weight: 800;
-        margin: 0 0 8px 0;
+        font-size: 20px; /* Font diperkecil agar pas, rapi, dan tidak terlalu besar */
+        font-weight: 700;
+        margin: 0 0 6px 0;
     }
     .sub-desc {
         color: #94a3b8;
-        font-size: 14px;
+        font-size: 13px;
         margin: 0;
     }
     .stat-card {
         background: #111827;
-        padding: 20px;
-        border-radius: 12px;
+        padding: 18px;
+        border-radius: 10px;
         border: 1px solid #1f2937;
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
@@ -75,10 +79,10 @@ st.markdown(
     <div class="main-header-card">
         <h2 class="main-title">📋 E Presensi Siswa: Sistem Informasi Presensi Harian</h2>
         <p class="sub-desc">Selamat Datang, {guru_nama} di Modul E Presensi Siswa</p>
-        <p class="sub-desc" style="margin-top: 5px;">Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata Pelajaran.</p>
+        <p class="sub-desc" style="margin-top: 4px;">Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata Pelajaran.</p>
     </div>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 # Kartu Statistik / Status (Gaya ala DIGMA)
@@ -87,8 +91,8 @@ with col1_stat:
   st.markdown(
       """
         <div class="stat-card">
-            <div style="color: #94a3b8; font-size: 13px; font-weight: 600; margin-bottom: 8px;">TOTAL SESI PRESENSI</div>
-            <div style="color: #f8fafc; font-size: 24px; font-weight: 700;">Data Tercatat Aktif</div>
+            <div style="color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 6px;">TOTAL SESI PRESENSI</div>
+            <div style="color: #f8fafc; font-size: 20px; font-weight: 700;">Data Tercatat Aktif</div>
         </div>
         """,
       unsafe_allow_html=True,
@@ -97,8 +101,8 @@ with col2_stat:
   st.markdown(
       """
         <div class="stat-card">
-            <div style="color: #94a3b8; font-size: 13px; font-weight: 600; margin-bottom: 8px;">STATUS KONEKSI DATABASE</div>
-            <div style="color: #22c55e; font-size: 20px; font-weight: 700;">Terhubung Aktif ✅</div>
+            <div style="color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 6px;">STATUS KONEKSI DATABASE</div>
+            <div style="color: #22c55e; font-size: 18px; font-weight: 700;">Terhubung Aktif ✅</div>
         </div>
         """,
       unsafe_allow_html=True,
@@ -544,6 +548,6 @@ elif menu == "📂 Manajemen Data Sekolah & Siswa":
   st.subheader("📋 Data Siswa yang Tersimpan di Spreadsheet Anda")
   df_existing, _ = load_data_from_sheet("Data Kelas-Siswa")
   if not df_existing.empty:
-    st.dataframe(df_rekap, use_container_width=True)
+    st.dataframe(df_existing, use_container_width=True)
   else:
     st.info("Belum ada data tersimpan.")
