@@ -330,7 +330,7 @@ elif menu == "✨ Generator Asesmen AI":
   else:
     aturan_opsi = "5 opsi (A sampai E)"
 
-  if st.button("✨ Buat Instrumen Asesmen dengan Gemini AI 🚀", width="stretch):
+  if st.button("✨ Buat Instrumen Asesmen dengan Gemini AI 🚀", width="stretch"):
     if jenjang == "-- Pilih Jenjang --" or not mapel or not materi:
       st.warning(
           "Mohon lengkapi Mata Pelajaran, Materi, dan pilih Jenjang terlebih"
