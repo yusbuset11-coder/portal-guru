@@ -16,8 +16,8 @@ st.markdown(
     """
     <style>
         .block-container {
-            padding-top: 1.5rem;
-            padding-bottom: 8rem;
+            padding-top: 1rem;
+            padding-bottom: 10rem;
         }
     </style>
     """,
@@ -61,7 +61,7 @@ if "guru_nama" not in st.session_state:
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
 
-# --- STYLING CSS KHUSUS UI MODERN & PROFESSIONAL (E-Modul Ajar PM STYLE) ---
+# --- STYLING CSS (HEADER LEBIH RINGKAS & JARAK DIPERSEMPIT) ---
 st.markdown(
     """
     <style>
@@ -71,76 +71,76 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 30px 25px;
-        border-radius: 14px;
+        padding: 16px 20px; /* Diperkecil agar kotak tidak terlalu tinggi */
+        border-radius: 12px;
         border: 1px solid #334155;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        margin-bottom: 15px; /* Jarak bawah dipersempit */
+        box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.4);
         text-align: center;
     }
     .main-title {
         color: #38bdf8;
-        font-size: 40px;
+        font-size: 32px; /* Ukuran font judul sedikit diringkas */
         font-weight: 800;
         margin: 0;
-        letter-spacing: 1.5px;
-        text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        letter-spacing: 1.2px;
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
     }
     .sub-title-1 {
         color: #f8fafc;
-        font-size: 20px;
+        font-size: 16px; /* Jarak antar baris dipersempit */
         font-weight: 700;
-        margin-top: 10px;
-        margin-bottom: 5px;
+        margin-top: 4px;
+        margin-bottom: 2px;
     }
     .sub-title-2 {
         color: #94a3b8;
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 500;
         margin-top: 0;
-        margin-bottom: 15px;
+        margin-bottom: 8px;
     }
     .dev-badge {
         display: inline-block;
         background: rgba(56, 189, 248, 0.1);
         color: #38bdf8;
-        padding: 6px 18px;
-        border-radius: 20px;
-        font-size: 13px;
+        padding: 4px 14px;
+        border-radius: 15px;
+        font-size: 12px;
         font-weight: 600;
         border: 1px solid rgba(56, 189, 248, 0.3);
     }
     .user-welcome-card {
         background: linear-gradient(135deg, #1e293b 0%, #111827 100%);
-        padding: 16px 20px;
+        padding: 14px 18px;
         border-radius: 10px;
         border-left: 4px solid #38bdf8;
         border: 1px solid #334155;
         color: #e2e8f0;
-        font-size: 15px;
-        margin-bottom: 15px;
+        font-size: 14px;
+        margin-bottom: 12px;
     }
     .info-notice-card {
         background: #111827;
-        padding: 14px 20px;
+        padding: 12px 18px;
         border-radius: 10px;
         border: 1px solid #1f2937;
         color: #cbd5e1;
-        font-size: 14px;
-        margin-bottom: 25px;
+        font-size: 13px;
+        margin-bottom: 15px;
     }
     .module-card {
         background: #111827;
-        padding: 22px;
-        border-radius: 12px;
+        padding: 18px;
+        border-radius: 10px;
         border: 1px solid #1f2937;
         height: 100%;
         transition: all 0.3s ease;
     }
     .module-card:hover {
         border-color: #38bdf8;
-        box-shadow: 0 6px 20px rgba(56, 189, 248, 0.15);
-        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.15);
+        transform: translateY(-2px);
     }
     .stButton > button {
         width: 100%;
@@ -149,7 +149,7 @@ st.markdown(
         background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
         color: white;
         border: none;
-        padding: 0.65rem 1rem;
+        padding: 0.6rem 1rem;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
         transition: all 0.3s ease;
     }
@@ -167,7 +167,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI ---
+# --- HEADER UTAMA PORTAL PASTI (Lebih Kompak / Kecil) ---
 st.markdown(
     """
     <div class="main-header-card">
@@ -182,7 +182,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HALAMAN LOGIN / VERIFIKASI (Melebar Penuh / Full Width) ---
+# --- HALAMAN LOGIN / VERIFIKASI (Melebar Penuh & Tidak Terpotong) ---
 if not st.session_state.logged_in:
   with st.form("form_login"):
     st.markdown(
@@ -210,10 +210,8 @@ if not st.session_state.logged_in:
 
         if data_registry:
           df_registry = pd.DataFrame(data_registry)
-          # Normalisasi nama kolom agar aman dari spasi
           df_registry.columns = df_registry.columns.str.strip()
 
-          # Cari berdasarkan Email atau Token_Unik
           matched = df_registry[
               (
                   df_registry["Email"]
@@ -251,17 +249,17 @@ else:
   with st.sidebar:
     st.markdown(
         f"""
-            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 15px; border-radius: 10px; border: 1px solid #334155; text-align: center; margin-bottom: 15px;">
-                <div style="font-size: 24px; margin-bottom: 5px;">👨‍🏫</div>
-                <div style="color: #38bdf8; font-weight: 700; font-size: 15px;">{st.session_state.guru_nama}</div>
-                <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">Sesi Aktif & Terverifikasi</div>
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 12px; border-radius: 8px; border: 1px solid #334155; text-align: center; margin-bottom: 12px;">
+                <div style="font-size: 22px; margin-bottom: 2px;">👨‍🏫</div>
+                <div style="color: #38bdf8; font-weight: 700; font-size: 14px;">{st.session_state.guru_nama}</div>
+                <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">Sesi Aktif & Terverifikasi</div>
             </div>
         """,
         unsafe_allow_html=True,
     )
     st.markdown("---")
     st.markdown(
-        "<p style='color: #94a3b8; font-size: 12px; font-weight: 600;"
+        "<p style='color: #94a3b8; font-size: 11px; font-weight: 600;"
         " letter-spacing: 0.5px;'>NAVIGASI MODUL</p>",
         unsafe_allow_html=True,
     )
@@ -292,8 +290,8 @@ else:
     st.markdown(
         """
             <div class="module-card">
-                <h4 style="color: #facc15; margin-top: 0;">Generator Modul Ajar (E-Modul Ajar PM)</h4>
-                <p style="color: #94a3b8; font-size: 13px;">Otomatisasi perancangan Modul Ajar Pembelajaran Mendalam (Deep Learning) lengkap dengan LKM, Rubrik, dan Instrumen Formatif berformat Word (.docx).</p>
+                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar PM)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar Pembelajaran Mendalam (Deep Learning) lengkap dengan LKM, Rubrik, dan Instrumen Formatif berformat Word (.docx).</p>
             </div>
             """,
         unsafe_allow_html=True,
@@ -302,8 +300,8 @@ else:
     st.markdown(
         """
             <div class="module-card">
-                <h4 style="color: #38bdf8; margin-top: 0;">Modul Lainnya (E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM)</h4>
-                <p style="color: #94a3b8; font-size: 13px;">Persiapan modul tambahan untuk sistem penilaian siswa, manajemen data pembelajaran, dan administrasi pendukung profesional lainnya.</p>
+                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem penilaian siswa, manajemen data pembelajaran, dan administrasi pendukung profesional lainnya.</p>
             </div>
             """,
         unsafe_allow_html=True,
