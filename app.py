@@ -118,28 +118,6 @@ if "guru_nama" not in st.session_state:
   st.session_state.guru_nama = ""
 
 # =====================================================================
-# SIDEBAR NAVIGATION
-# =====================================================================
-st.sidebar.markdown(
-    "### 🧭 Navigasi Portal",
-    help="Pilih menu navigasi sistem di bawah ini",
-)
-menu = st.sidebar.radio(
-    "Pilih Menu",
-    [
-        "Portal Utama (PASTI)",
-        "E Presensi Siswa",
-        "E Jurnal Mengajar",
-        "E Asesmen PM",
-        "E Modul Ajar PM",
-    ],
-    label_visibility="collapsed",
-)
-
-st.sidebar.markdown("---")
-st.sidebar.caption("© 2026 - Cabdin Bangkalan")
-
-# =====================================================================
 # HALAMAN 1: PORTAL UTAMA (PASTI) & LOGIN
 # =====================================================================
 if menu == "Portal Utama (PASTI)":
