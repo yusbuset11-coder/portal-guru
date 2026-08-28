@@ -5,7 +5,7 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="Digitalisasi Presensi Harian Siswa",
+    page_title="E Presensi Siswa - Sistem Informasi Presensi Harian",
     page_icon="📋",
     layout="wide",
 )
@@ -40,7 +40,7 @@ st.markdown(
     }
     .main-title {
         color: #38bdf8;
-        font-size: 16px; /* Font diperkecil lagi agar lebih proporsional dan rapi */
+        font-size: 16px; /* Font diperkecil agar proporsional, rapi, dan tidak terlalu besar */
         font-weight: 700;
         margin: 0 0 6px 0;
         line-height: 1.4;
@@ -78,7 +78,7 @@ guru_nama = st.session_state.get("guru_nama", "Yusbuset")
 st.markdown(
     f"""
     <div class="main-header-card">
-        <h2 class="main-title">📋 Digitalisasi Presensi Harian Siswa</h2>
+        <h2 class="main-title">📋 E Presensi Siswa: Sistem Informasi Presensi Harian</h2>
         <p class="sub-desc">Selamat Datang, {guru_nama} di Modul E Presensi Siswa</p>
         <p class="sub-desc" style="margin-top: 4px;">Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata Pelajaran.</p>
     </div>
