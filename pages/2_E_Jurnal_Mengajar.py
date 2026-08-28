@@ -94,7 +94,17 @@ def load_guru_database(sheet_id):
         return None
 
 
-sh_guru = load_guru_database(st.session_state.spreadsheet_id)
+# Ambil spreadsheet_id dengan aman agar tidak error jika belum ada
+spreadsheet_id = st.session_state.get("spreadsheet_id", "")
+
+if not spreadsheet_id:
+  st.warning(
+      "⚠️ Spreadsheet ID belum dikonfigurasi. Silakan kembali ke Halaman"
+      " Utama untuk mengatur konfigurasi terlebih dahulu."
+  )
+  st.stop()
+
+sh_guru = load_guru_database(spreadsheet_id)
 
 if sh_guru is None:
     st.error(
