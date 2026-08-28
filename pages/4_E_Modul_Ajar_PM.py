@@ -109,7 +109,7 @@ st.markdown(
     """
     <div class="header-card">
         <h2 class="header-title" style="color: white; text-align: center;">
-            E-Modul Ajar Pembelajaran Mendalam
+            Generator Modul Ajar Pembelajaran Mendalam
         </h2>
         <div class="header-subtitle" style="text-align: center;">
             <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;&nbsp;
