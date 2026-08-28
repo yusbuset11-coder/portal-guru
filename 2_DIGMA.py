@@ -102,22 +102,23 @@ else:
 
     # Styling Banner ala SIPENSIS / SAKTI
     st.markdown(
-    """
-    <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 20px; border-radius: 12px; border: 1px solid #38bdf8; margin-bottom: 20px;">
-        <h2 style="color: #38bdf8; margin: 0 0 10px 0; font-size: 24px; font-family: sans-serif;">📖 DIGMA: Digitalisasi Jurnal Mengajar</h2>
-        <p style="color: #e2e8f0; font-size: 14px; margin: 0 0 5px 0;">Selamat Datang, Yusbuset di Modul DIGMA</p>
-        <p style="color: #94a3b8; font-size: 13px; margin: 0;">Catat kegiatan pembelajaran harian, ketercapaian materi, serta catatan kelas secara digital dan terstruktur.</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+        """
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 20px; border-radius: 12px; border: 1px solid #38bdf8; margin-bottom: 20px;">
+            <h2 style="color: #38bdf8; margin: 0 0 10px 0; font-size: 24px; font-family: sans-serif;">📖 DIGMA: Digitalisasi Jurnal Mengajar</h2>
+            <p style="color: #e2e8f0; font-size: 14px; margin: 0 0 5px 0;">Selamat Datang, Yusbuset di Modul DIGMA</p>
+            <p style="color: #94a3b8; font-size: 13px; margin: 0;">Catat kegiatan pembelajaran harian, ketercapaian materi, serta catatan kelas secara digital dan terstruktur.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-            try:
-                ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
-                data_jurnal = ws_jurnal.get_all_records()
-                total_jurnal = len(data_jurnal)
-            except Exception:
-                total_jurnal = 0
+    if menu_digma == "🏠 Beranda DIGMA":
+        try:
+            ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
+            data_jurnal = ws_jurnal.get_all_records()
+            total_jurnal = len(data_jurnal)
+        except Exception:
+            total_jurnal = 0
 
         col1, col2 = st.columns(2)
         with col1:
@@ -190,7 +191,7 @@ else:
                 )
 
                 btn_simpan_jurnal = st.form_submit_button(
-                    "💾 **Simpan Jurnal Mengajar**", width="stretch"
+                    "💾 **Simpan Jurnal Mengajar**"
                 )
 
                 if btn_simpan_jurnal:
@@ -307,7 +308,7 @@ else:
                     ]
 
                 with st.container(border=True):
-                    st.dataframe(df_filtered_j, width="stretch")
+                    st.dataframe(df_filtered_j, use_container_width=True)
 
                 # Tombol Download Excel Jurnal
                 output_jurnal = io.BytesIO()
@@ -324,7 +325,7 @@ else:
                     mime=(
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     ),
-                    width="stretch",
+                    use_container_width=True,
                 )
         except Exception:
             st.info(
