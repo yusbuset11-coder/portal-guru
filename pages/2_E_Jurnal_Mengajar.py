@@ -11,14 +11,7 @@ st.set_page_config(
     page_icon="📖",
     layout="wide",
 )
-st.markdown("""
-<style>
-.block-container {
-    padding-top: 1.5rem;
-    padding-bottom: 1rem;
-}
-</style>
-""", unsafe_allow_html=True)
+st.markdown('<style>.block-container { padding-top: 1.5rem; padding-bottom: 1rem; }</style>', unsafe_allow_html=True)
 
 # Cek apakah guru sudah login melalui portal utama (app.py)
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
