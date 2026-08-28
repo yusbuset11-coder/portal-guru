@@ -55,7 +55,7 @@ st.markdown(
     }
     .header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 16px 20px;
+        padding: 20px 25px;
         border-radius: 12px;
         border: 1px solid #334155;
         margin-bottom: 20px;
@@ -63,10 +63,11 @@ st.markdown(
     }
     .header-title {
         color: #f8fafc;
-        font-size: 15px;
+        font-size: 22px;
         font-weight: 700;
         margin: 0;
         letter-spacing: 0.3px;
+        text-align: center;
     }
     @keyframes blink-animation {
         0% { opacity: 1; color: #facc15; }
@@ -74,12 +75,10 @@ st.markdown(
         100% { opacity: 1; color: #facc15; }
     }
     .header-subtitle {
-        font-size: 11.5px;
-        margin-top: 6px;
+        font-size: 13px;
+        margin-top: 8px;
         margin-bottom: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        text-align: center;
         animation: blink-animation 1.6s infinite ease-in-out;
         font-weight: 600;
     }
@@ -90,7 +89,7 @@ st.markdown(
         background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
         color: white;
         border: none;
-        padding: 0.65rem 1rem;
+        padding: 0.75rem 1rem;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
         transition: all 0.3s ease;
     }
@@ -129,7 +128,6 @@ def generate_docx(
 ):
   doc = docx.Document()
 
-  # Pengaturan margin halaman
   for section in doc.sections:
     section.top_margin = Inches(1)
     section.bottom_margin = Inches(1)
@@ -142,7 +140,6 @@ def generate_docx(
   font.size = Pt(10)
   font.color.rgb = RGBColor(51, 51, 51)
 
-  # Judul Utama Dokumen
   p_title = doc.add_paragraph()
   p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
   p_title.paragraph_format.space_before = Pt(0)
@@ -151,7 +148,7 @@ def generate_docx(
   run_title.font.name = "Arial"
   run_title.font.size = Pt(15)
   run_title.font.bold = True
-  run_title.font.color.rgb = RGBColor(74, 46, 33)  # Coklat Tua
+  run_title.font.color.rgb = RGBColor(74, 46, 33)
 
   def add_section_table(title_text, rows_data):
     table = doc.add_table(rows=len(rows_data) + 1, cols=2)
@@ -176,7 +173,6 @@ def generate_docx(
       row_cells[0].text = label
       row_cells[0].width = Inches(2.3)
       row_cells[1].width = Inches(4.2)
-
       set_cell_background(row_cells[0], "F5EBE0")
 
       for p in row_cells[0].paragraphs:
@@ -228,7 +224,7 @@ def generate_docx(
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-  # 1. Identifikasi dan Informasi Umum
+  # 1. Identifikasi
   tabel_identifikasi = [
       ("Penulis Modul", nama_penulis),
       ("Satuan Pendidikan", nama_sekolah),
@@ -571,24 +567,41 @@ def generate_docx(
 
 
 # =====================================================================
-# STRUKTUR UTAMA DENGAN KOLOM (KIRI & KANAN) DI AREA UTAMA
+# TAMPILAN UTAMA (TERUSUN DI BAWAH BANNER / FULL-WIDTH STACKED)
 # =====================================================================
-col_kiri, col_kanan = st.columns([1.3, 1], gap="large")
 
-# --- 1. KANAN: PARAMETER PEMBELAJARAN & IDENTITAS (PINDAHAN DARI SIDEBAR) ---
-with col_kanan:
-  st.success(f"👤 **{st.session_state.get('guru_nama', 'Guru')}**")
-  st.markdown("---")
-  st.header("⚙️ Parameter Pembelajaran")
-  api_key = st.text_input(
-      "Masukkan Google Gemini API Key",
-      value=api_key_default,
-      type="password",
-  )
+# 1. Info User Login (Posisi atas)
+st.success(f"👤 **{st.session_state.get('guru_nama', 'Guru')}**")
 
+# 2. Header Banner Utama (Full Width)
+st.markdown(
+    """
+    <div class="header-card">
+        <h2 class="header-title">
+            Otomatisasi Penyusunan Modul Ajar PM
+        </h2>
+        <div class="header-subtitle">
+            <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;&nbsp;
+            <em>Aplikasi Otomatisasi Perancangan Pembelajaran Deep Learning</em>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown("---")
+
+# 3. Parameter Pembelajaran (Di bawah banner)
+st.header("⚙️ Parameter Pembelajaran")
+api_key = st.text_input(
+    "Masukkan Google Gemini API Key", value=api_key_default, type="password"
+)
+
+col_param1, col_param2 = st.columns(2)
+
+with col_param1:
   jenjang_pendidikan = st.selectbox(
-      "Pilih Jenjang Pendidikan",
-      ["SD / MI", "SMP / MTs", "SMA / MA", "SMK / MAK"],
+      "Pilih Jenjang Pendidikan", ["SD / MI", "SMP / MTs", "SMA / MA", "SMK / MAK"]
   )
 
   if jenjang_pendidikan == "SD / MI":
@@ -634,6 +647,7 @@ with col_kanan:
   )
   fase_kelas = st.selectbox("Fase / Kelas", fase_options)
 
+with col_param2:
   topik = st.text_input(
       "Topik / Materi Pokok / Elemen",
       (
@@ -642,21 +656,24 @@ with col_kanan:
           else "Contoh: Menyimak Teks Laporan Observasi Secara Kritis"
       ),
   )
-
   st.caption(jp_guidance)
   alokasi_waktu = st.text_input("Alokasi Waktu", "2 JP (2 x 45 Menit)")
   pertemuan_ke = st.text_input("Pertemuan Ke-", "1 (Pertemuan Pertama)")
 
-  st.markdown("---")
+st.markdown("---")
+
+# 4. Identitas Satuan Pendidikan & Pengesahan Dokumen
+col_id1, col_id2 = st.columns(2)
+
+with col_id1:
   st.header("🏫 Identitas Satuan Pendidikan")
   nama_sekolah = st.text_input(
-      "Nama Sekolah",
-      st.session_state.get("sekolah", "SMK Negeri 2 Bangkalan"),
+      "Nama Sekolah", st.session_state.get("sekolah", "SMK Negeri 2 Bangkalan")
   )
   semester = st.selectbox("Semester", ["Ganjil", "Genap"])
   tahun_pelajaran = st.text_input("Tahun Pelajaran", "2026/2027")
 
-  st.markdown("---")
+with col_id2:
   st.header("✍️ Identitas Pengesahan Dokumen")
   nama_kota = st.text_input("Nama Kota", "Bangkalan")
   tanggal_pembuatan = st.text_input(
@@ -668,175 +685,157 @@ with col_kanan:
   )
   nip_penulis = st.text_input("NIP Penulis", "196908302005011003")
 
+st.markdown("---")
 
-# --- 2. KIRI: HEADER, KARTU UTAMA & TOMBOL EKSEKUSI ---
-with col_kiri:
-  # Tampilan Header Modern dalam Card
-  st.markdown(
-      """
-      <div class="header-card">
-          <h2 class="header-title" style="color: white; text-align: center;">
-              Otomatisasi Penyusunan Modul Ajar PM
-          </h2>
-          <div class="header-subtitle" style="text-align: center;">
-              <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;&nbsp;
-              <em>Aplikasi Otomatisasi Perancangan Pembelajaran Deep Learning</em>
-          </div>
-      </div>
-      """,
-      unsafe_allow_html=True,
-  )
+# 5. Tombol Aksi Generator di Bawah Penuh
+st.markdown("### 🚀 Generator Modul Ajar Berbasis Pembelajaran Mendalam")
+st.markdown(
+    "Pastikan parameter dan identitas di atas sudah terisi dengan benar, lalu"
+    " klik tombol di bawah untuk mulai menyusun dokumen secara otomatis"
+    " menggunakan AI."
+)
 
-  st.markdown(
-      "### 🚀 Generator Modul Ajar Berbasis Pembelajaran Mendalam"
-  )
-  st.markdown(
-      "Pastikan parameter pembelajaran di sebelah kanan sudah diisi dengan"
-      " benar, lalu klik tombol di bawah untuk mulai menyusun dokumen"
-      " secara otomatis menggunakan AI."
-  )
+st.markdown("<br>", unsafe_allow_html=True)
 
-  st.markdown("<br>", unsafe_allow_html=True)
+if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=True):
+  if not api_key:
+    st.error("Mohon masukkan Google Gemini API Key terlebih dahulu.")
+  elif not topik:
+    st.warning("Mohon isi topik pembelajaran.")
+  else:
+    with st.spinner(
+        f"{nama_penulis} sedang menyusun Modul Ajar Pembelajaran Mendalam..."
+    ):
+      genai.configure(api_key=api_key)
+      model = genai.GenerativeModel("gemini-3.5-flash")
 
-  # Tombol Eksekusi Generator
-  if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam"):
-    if not api_key:
-      st.error("Mohon masukkan Google Gemini API Key terlebih dahulu.")
-    elif not topik:
-      st.warning("Mohon isi topik pembelajaran.")
-    else:
-      with st.spinner(
-          f"{nama_penulis} sedang menyusun Modul Ajar Pembelajaran Mendalam..."
-      ):
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-3.5-flash")
+      prompt = f"""
+          Bertindaklah sebagai pakar kurikulum profesional. Buatkan konten Modul Ajar Berbasis Pembelajaran Mendalam (Deep Learning) yang **SANGAT LENGKAP, DETAIL, DAN KOMPREHENSIF** untuk:
+          - Jenjang: {jenjang_pendidikan} ({fase_kelas})
+          - Mata Pelajaran: {mata_pelajaran}
+          - Topik / Materi Pokok: {topik}
+          - Alokasi Waktu: {alokasi_waktu}
+          - Pertemuan Ke-: {pertemuan_ke}
 
-        prompt = f"""
-            Bertindaklah sebagai pakar kurikulum profesional. Buatkan konten Modul Ajar Berbasis Pembelajaran Mendalam (Deep Learning) yang **SANGAT LENGKAP, DETAIL, DAN KOMPREHENSIF** untuk:
-            - Jenjang: {jenjang_pendidikan} ({fase_kelas})
-            - Mata Pelajaran: {mata_pelajaran}
-            - Topik / Materi Pokok: {topik}
-            - Alokasi Waktu: {alokasi_waktu}
-            - Pertemuan Ke-: {pertemuan_ke}
+          Ketentuan Penting:
+          1. Dimensi Profil Lulusan: Pilih 2 hingga 4 dimensi yang PALING RELEVAN dari 8 dimensi berikut (Keimanan dan Ketaqwaan terhadap Tuhan Yang Maha Esa, Kewargaan, Penalaran Kritis, Kreativitas, Kolaborasi, Kemandirian, Kesehatan, Komunikasi). **SANGAT PENTING: Tuliskan dan tampilkan HANYA dimensi yang dipilih saja (dengan tanda centang ☑ dan uraian penjelasannya). JANGAN SAMA SEKALI menyebutkan atau menuliskan daftar dimensi lain yang tidak dipilih/tidak digunakan.**
+          2. Praktik Pedagogis: Gunakan format label persis berikut (dengan tanda titik dua):
+             - Model Pembelajaran: [Uraian model seperti Problem Based Learning / Discovery Learning / dll]
+             - Metode Pembelajaran Pendukung: [Uraian metode, misal 1. Studi Kasus Riil: ... 2. Demonstrasi Interaktif: ... dst]
+          3. Kemitraan Pembelajaran: Gunakan format label persis berikut:
+             - Kemitraan Lingkungan Sekolah: [...]
+             - Kemitraan Lingkungan Luar Sekolah: [...]
+          4. Lingkungan Belajar: Gunakan format label persis berikut:
+             - Ruang Fisik: [...]
+             - Ruang Virtual: [...]
+             - Budaya Belajar: [...]
+          5. Pemanfaatan Digital: Gunakan format label persis berikut:
+             - Tahap Perencanaan: [...]
+             - Tahap Pelaksanaan: [...]
+             - Tahap Asesmen: [...]
+          6. Pengalaman Belajar harus terstruktur mencakup Kegiatan Pendahuluan, Kegiatan Inti (Memahami, Mengaplikasi, Merefleksi), dan Kegiatan Penutup (refleksi joyful dan bermakna). Gunakan istilah **LKM (Lembar Kerja Murid)** (BUKAN LKPD atau Lembar Kegiatan Murid) di seluruh uraian.
+          7. Asesmen Pembelajaran mencakup Asesmen Awal, Asesmen Proses (Formatif), dan Asesmen Akhir (Sumatif) beserta Rubrik Penilaian dan Pedoman Penskorannya.
+          8. **Instrumen Asesmen Proses (Formatif)**: Sediakan instrumen asesmen proses/formatif yang mendalam (seperti lembar observasi keaktifan, catatan anekdotal, atau rubrik formatif aktivitas siswa) pada kunci `instrumen_formatif` yang terstruktur dengan sub-bagian penting bertanda titik dua agar mudah disajikan dalam bentuk tabel rapi pada halaman khusus sebelum LKM.
+          9. **LKM (Lembar Kerja Murid)**: Sediakan konten LKM yang mendalam pada kunci `lkm_content` yang mencakup judul, tujuan, petunjuk kerja, serta langkah-langkah tugas/investigasi peserta didik yang terstruktur rapi dengan sub-bagian penting bertanda titik dua agar mudah ditebalkan di halaman terpisah paling akhir.
 
-            Ketentuan Penting:
-            1. Dimensi Profil Lulusan: Pilih 2 hingga 4 dimensi yang PALING RELEVAN dari 8 dimensi berikut (Keimanan dan Ketaqwaan terhadap Tuhan Yang Maha Esa, Kewargaan, Penalaran Kritis, Kreativitas, Kolaborasi, Kemandirian, Kesehatan, Komunikasi). **SANGAT PENTING: Tuliskan dan tampilkan HANYA dimensi yang dipilih saja (dengan tanda centang ☑ dan uraian penjelasannya). JANGAN SAMA SEKALI menyebutkan atau menuliskan daftar dimensi lain yang tidak dipilih/tidak digunakan.**
-            2. Praktik Pedagogis: Gunakan format label persis berikut (dengan tanda titik dua):
-               - Model Pembelajaran: [Uraian model seperti Problem Based Learning / Discovery Learning / dll]
-               - Metode Pembelajaran Pendukung: [Uraian metode, misal 1. Studi Kasus Riil: ... 2. Demonstrasi Interaktif: ... dst]
-            3. Kemitraan Pembelajaran: Gunakan format label persis berikut:
-               - Kemitraan Lingkungan Sekolah: [...]
-               - Kemitraan Lingkungan Luar Sekolah: [...]
-            4. Lingkungan Belajar: Gunakan format label persis berikut:
-               - Ruang Fisik: [...]
-               - Ruang Virtual: [...]
-               - Budaya Belajar: [...]
-            5. Pemanfaatan Digital: Gunakan format label persis berikut:
-               - Tahap Perencanaan: [...]
-               - Tahap Pelaksanaan: [...]
-               - Tahap Asesmen: [...]
-            6. Pengalaman Belajar harus terstruktur mencakup Kegiatan Pendahuluan, Kegiatan Inti (Memahami, Mengaplikasi, Merefleksi), dan Kegiatan Penutup (refleksi joyful dan bermakna). Gunakan istilah **LKM (Lembar Kerja Murid)** (BUKAN LKPD atau Lembar Kegiatan Murid) di seluruh uraian.
-            7. Asesmen Pembelajaran mencakup Asesmen Awal, Asesmen Proses (Formatif), dan Asesmen Akhir (Sumatif) beserta Rubrik Penilaian dan Pedoman Penskorannya.
-            8. **Instrumen Asesmen Proses (Formatif)**: Sediakan instrumen asesmen proses/formatif yang mendalam (seperti lembar observasi keaktifan, catatan anekdotal, atau rubrik formatif aktivitas siswa) pada kunci `instrumen_formatif` yang terstruktur dengan sub-bagian penting bertanda titik dua agar mudah disajikan dalam bentuk tabel rapi pada halaman khusus sebelum LKM.
-            9. **LKM (Lembar Kerja Murid)**: Sediakan konten LKM yang mendalam pada kunci `lkm_content` yang mencakup judul, tujuan, petunjuk kerja, serta langkah-langkah tugas/investigasi peserta didik yang terstruktur rapi dengan sub-bagian penting bertanda titik dua agar mudah ditebalkan di halaman terpisah paling akhir.
-
-            Berikan output HANYA dalam format JSON valid yang memuat kunci-kunci berikut:
-            {{
-              "dimensi_profil_lulusan": "Hanya tuliskan dimensi profil lulusan yang dipilih saja (gunakan tanda ☑) beserta uraian penerapannya. JANGAN menuliskan dimensi yang tidak dipilih.",
-              "tujuan_pembelajaran": "Uraian tujuan pembelajaran yang spesifik, operasional, dan terukur sesuai materi.",
-              "pemahaman_bermakna": "Uraian pemahaman bermakna yang mendalam terkait materi.",
-              "pertanyaan_pemantik": "2 pertanyaan pemantik yang kontekstual dan menantang daya nalar kritis siswa.",
-              "praktik_pedagogis": "Model Pembelajaran: [Isi model]\\nMetode Pembelajaran Pendukung: [Isi metode dengan penomoran]",
-              "kemitraan_pembelajaran": "Kemitraan Lingkungan Sekolah: [Isi]\\nKemitraan Lingkungan Luar Sekolah: [Isi]",
-              "lingkungan_belajar": "Ruang Fisik: [Isi]\\nRuang Virtual: [Isi]\\nBudaya Belajar: [Isi]",
-              "pemanfaatan_digital": "Tahap Perencanaan: [Isi]\\nTahap Pelaksanaan: [Isi]\\nTahap Asesmen: [Isi]",
-              "kegiatan_pendahuluan": "Langkah rinci kegiatan pendahuluan (orientasi, apersepsi, asesmen awal).",
-              "kegiatan_memahami": "Langkah rinci kegiatan inti pada tahap Memahami.",
-              "kegiatan_mengaplikasi": "Langkah rinci kegiatan inti pada tahap Mengaplikasi menggunakan LKM.",
-              "kegiatan_merefleksi": "Langkah rinci kegiatan inti pada tahap Merefleksi dan presentasi.",
-              "kegiatan_penutup": "Langkah rinci kegiatan penutup yang joyful dan bermakna.",
-              "asesmen_awal": "Uraian asesmen awal untuk cek kesiapan belajar.",
-              "asesmen_formatif": "Uraian asesmen proses/formatif pemantauan partisipasi.",
-              "asesmen_sumatif": "Uraian asesmen akhir/sumatif evaluasi unjuk kerja.",
-              "rubrik_penilaian": {{
-                "kriteria_1": {{
-                  "nama_kriteria": "Nama kriteria pertama sesuai kompetensi materi",
-                  "perlu_bimbingan": "Deskripsi tingkat perlu bimbingan",
-                  "cukup": "Deskripsi tingkat cukup",
-                  "baik": "Deskripsi tingkat baik",
-                  "sangat_baik": "Deskripsi tingkat sangat baik"
-                }},
-                "kriteria_2": {{
-                  "nama_kriteria": "Nama kriteria kedua",
-                  "perlu_bimbingan": "Deskripsi...",
-                  "cukup": "Deskripsi...",
-                  "baik": "Deskripsi...",
-                  "sangat_baik": "Deskripsi..."
-                }}
+          Berikan output HANYA dalam format JSON valid yang memuat kunci-kunci berikut:
+          {{
+            "dimensi_profil_lulusan": "Hanya tuliskan dimensi profil lulusan yang dipilih saja (gunakan tanda ☑) beserta uraian penerapannya. JANGAN menuliskan dimensi yang tidak dipilih.",
+            "tujuan_pembelajaran": "Uraian tujuan pembelajaran yang spesifik, operasional, dan terukur sesuai materi.",
+            "pemahaman_bermakna": "Uraian pemahaman bermakna yang mendalam terkait materi.",
+            "pertanyaan_pemantik": "2 pertanyaan pemantik yang kontekstual dan menantang daya nalar kritis siswa.",
+            "praktik_pedagogis": "Model Pembelajaran: [Isi model]\\nMetode Pembelajaran Pendukung: [Isi metode dengan penomoran]",
+            "kemitraan_pembelajaran": "Kemitraan Lingkungan Sekolah: [Isi]\\nKemitraan Lingkungan Luar Sekolah: [Isi]",
+            "lingkungan_belajar": "Ruang Fisik: [Isi]\\nRuang Virtual: [Isi]\\nBudaya Belajar: [Isi]",
+            "pemanfaatan_digital": "Tahap Perencanaan: [Isi]\\nTahap Pelaksanaan: [Isi]\\nTahap Asesmen: [Isi]",
+            "kegiatan_pendahuluan": "Langkah rinci kegiatan pendahuluan (orientasi, apersepsi, asesmen awal).",
+            "kegiatan_memahami": "Langkah rinci kegiatan inti pada tahap Memahami.",
+            "kegiatan_mengaplikasi": "Langkah rinci kegiatan inti pada tahap Mengaplikasi menggunakan LKM.",
+            "kegiatan_merefleksi": "Langkah rinci kegiatan inti pada tahap Merefleksi dan presentasi.",
+            "kegiatan_penutup": "Langkah rinci kegiatan penutup yang joyful dan bermakna.",
+            "asesmen_awal": "Uraian asesmen awal untuk cek kesiapan belajar.",
+            "asesmen_formatif": "Uraian asesmen proses/formatif pemantauan partisipasi.",
+            "asesmen_sumatif": "Uraian asesmen akhir/sumatif evaluasi unjuk kerja.",
+            "rubrik_penilaian": {{
+              "kriteria_1": {{
+                "nama_kriteria": "Nama kriteria pertama sesuai kompetensi materi",
+                "perlu_bimbingan": "Deskripsi tingkat perlu bimbingan",
+                "cukup": "Deskripsi tingkat cukup",
+                "baik": "Deskripsi tingkat baik",
+                "sangat_baik": "Deskripsi tingkat sangat baik"
               }},
-              "pedoman_penskoran": {{
-                "rumus_nilai": "Rumus perhitungan nilai akhir",
-                "kategori_predikat": "Interval nilai dan predikat kelulusan"
-              }},
-              "instrumen_formatif": {{
-                "judul_instrumen": "Judul spesifik instrumen asesmen proses",
-                "tujuan_asesmen": "Tujuan penggunaan lembar asesmen formatif",
-                "aspek_yang_diamati": "Indikator atau aspek keaktifan/proses yang dinilai dengan format sub-bagian berlabel titik dua",
-                "pedoman_pengamatan": "Petunjuk penilaian atau rubrik ceklis observasi singkat"
-              }},
-              "lkm_content": {{
-                "judul_lkm": "Judul spesifik LKM",
-                "tujuan_lkm": "Tujuan pengerjaan LKM bagi peserta didik",
-                "petunjuk_kerja": "Langkah panduan keselamatan dan cara pengerjaan dengan format sub-bagian berlabel titik dua",
-                "tugas_analisis": "Rincian tugas investigasi, pertanyaan kerja, atau tabel isian praktik"
+              "kriteria_2": {{
+                "nama_kriteria": "Nama kriteria kedua",
+                "perlu_bimbingan": "Deskripsi...",
+                "cukup": "Deskripsi...",
+                "baik": "Deskripsi...",
+                "sangat_baik": "Deskripsi..."
               }}
+            }},
+            "pedoman_penskoran": {{
+              "rumus_nilai": "Rumus perhitungan nilai akhir",
+              "kategori_predikat": "Interval nilai dan predikat kelulusan"
+            }},
+            "instrumen_formatif": {{
+              "judul_instrumen": "Judul spesifik instrumen asesmen proses",
+              "tujuan_asesmen": "Tujuan penggunaan lembar asesmen formatif",
+              "aspek_yang_diamati": "Indikator atau aspek keaktifan/proses yang dinilai dengan format sub-bagian berlabel titik dua",
+              "pedoman_pengamatan": "Petunjuk penilaian atau rubrik ceklis observasi singkat"
+            }},
+            "lkm_content": {{
+              "judul_lkm": "Judul spesifik LKM",
+              "tujuan_lkm": "Tujuan pengerjaan LKM bagi peserta didik",
+              "petunjuk_kerja": "Langkah panduan keselamatan dan cara pengerjaan dengan format sub-bagian berlabel titik dua",
+              "tugas_analisis": "Rincian tugas investigasi, pertanyaan kerja, atau tabel isian praktik"
             }}
-            """
+          }}
+          """
 
-        response = model.generate_content(prompt)
-        text_resp = response.text.strip()
+      response = model.generate_content(prompt)
+      text_resp = response.text.strip()
 
-        if text_resp.startswith("```json"):
-          text_resp = text_resp[7:]
-        if text_resp.startswith("```"):
-          text_resp = text_resp[3:]
-        if text_resp.endswith("```"):
-          text_resp = text_resp[:-3]
-        text_resp = text_resp.strip()
+      if text_resp.startswith("```json"):
+        text_resp = text_resp[7:]
+      if text_resp.startswith("```"):
+        text_resp = text_resp[3:]
+      if text_resp.endswith("```"):
+        text_resp = text_resp[:-3]
+      text_resp = text_resp.strip()
 
-        try:
-          data_ai = json.loads(text_resp)
-        except Exception:
-          data_ai = {}
+      try:
+        data_ai = json.loads(text_resp)
+      except Exception:
+        data_ai = {}
 
-        st.success("🎉 Modul Ajar Sesuai Sistematika Baru Berhasil Disusun!")
-        st.info(
-            "Dokumen Word (.docx) siap diunduh lengkap dengan halaman terpisah"
-            " untuk Rubrik & Pedoman Penskoran, Instrumen Asesmen Proses"
-            " (Formatif), dan Lembar Kerja Murid (LKM)."
-        )
+      st.success("🎉 Modul Ajar Sesuai Sistematika Baru Berhasil Disusun!")
+      st.info(
+          "Dokumen Word (.docx) siap diunduh lengkap dengan halaman terpisah"
+          " untuk Rubrik & Pedoman Penskoran, Instrumen Asesmen Proses"
+          " (Formatif), dan Lembar Kerja Murid (LKM)."
+      )
 
-        docx_file = generate_docx(
-            data_ai,
-            nama_sekolah,
-            semester,
-            tahun_pelajaran,
-            mata_pelajaran,
-            fase_kelas,
-            topik,
-            alokasi_waktu,
-            pertemuan_ke,
-            nama_penulis,
-            nama_kota,
-            tanggal_pembuatan,
-            nip_penulis,
-        )
+      docx_file = generate_docx(
+          data_ai,
+          nama_sekolah,
+          semester,
+          tahun_pelajaran,
+          mata_pelajaran,
+          fase_kelas,
+          topik,
+          alokasi_waktu,
+          pertemuan_ke,
+          nama_penulis,
+          nama_kota,
+          tanggal_pembuatan,
+          nip_penulis,
+      )
 
-        st.download_button(
-            label="📥 Unduh Modul Ajar Pembelajaran Mendalam (.docx)",
-            data=docx_file,
-            file_name=f"Modul_Ajar_{topik.replace(' ', '_')}.docx",
-            mime=(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ),
-        )
+      st.download_button(
+          label="📥 Unduh Modul Ajar Pembelajaran Mendalam (.docx)",
+          data=docx_file,
+          file_name=f"Modul_Ajar_{topik.replace(' ', '_')}.docx",
+          mime=(
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          ),
+          use_container_width=True,
+      )
