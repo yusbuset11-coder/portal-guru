@@ -126,7 +126,7 @@ else:
                 st.markdown(
                     f"""
                     <p style="color: #94a3b8; font-size: 12px; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 600;">TOTAL JURNAL TERCATAT</p>
-                    <p style="color: #ffffff; font-size: 18px; margin: 0; font-weight: 600;">{total_jurnal} Kegiatan</p>
+                    <p style="color: #ffffff; font-size: 15px; margin: 0; font-weight: 600;">{total_jurnal} Kegiatan</p>
                     """,
                     unsafe_allow_html=True,
                 )
@@ -135,7 +135,7 @@ else:
                 st.markdown(
                     """
                     <p style="color: #94a3b8; font-size: 12px; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 600;">STATUS KONEKSI DATABASE</p>
-                    <p style="color: #ffffff; font-size: 18px; margin: 0; font-weight: 600;">Terhubung Aktif ✅</p>
+                    <p style="color: #ffffff; font-size: 15px; margin: 0; font-weight: 600;">Terhubung Aktif ✅</p>
                     """,
                     unsafe_allow_html=True,
                 )
