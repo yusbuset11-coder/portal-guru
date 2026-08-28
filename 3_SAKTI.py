@@ -63,7 +63,7 @@ def set_cell_background(cell, fill_color):
   tcPr.append(shd)
 
 
-def set_cell_margins(cell, top=120, bottom=120, left=150, right=150):
+def set_cell_margins(cell, top=80, bottom=80, left=120, right=120):
   tcPr = cell._tc.get_or_add_tcPr()
   tcMar = OxmlElement("w:tcMar")
   for m, val in [
@@ -81,7 +81,7 @@ def set_cell_margins(cell, top=120, bottom=120, left=150, right=150):
 
 # --- FUNGSI PEMBUAT WORD PROFESIONAL ---
 def generate_professional_word_document(
-    mapel, materi, kelas, jenjang, fase, jenis_asesmen, content_text
+    mapel, materi, kelas, jenjang, fase, jenis_asesmen, sub_asesmen, jumlah_soal, jenis_soal, content_text
 ):
   doc = docx.Document()
 
@@ -91,17 +91,19 @@ def generate_professional_word_document(
     section.left_margin = Inches(1)
     section.right_margin = Inches(1)
 
+  # Judul Dokumen Utama
   p_title = doc.add_paragraph()
   p_title.alignment = WD_ALIGN_PARAGRAPH.LEFT
-  run_title = p_title.add_run("INSTRUMEN ASESMEN PEMBELAJARAN")
+  run_title = p_title.add_run(f"INSTRUMEN {jenis_asesmen.upper()}")
   run_title.bold = True
   run_title.font.name = "Cambria"
   run_title.font.size = Pt(14)
-  run_title.font.color.rgb = RGBColor(0, 51, 102)
-  p_title.paragraph_format.space_after = Pt(12)
+  run_title.font.color.rgb = RGBColor(27, 54, 93)
+  p_title.paragraph_format.space_after = Pt(8)
 
-  table = doc.add_table(rows=5, cols=2)
-  table.alignment = WD_TABLE_ALIGNMENT.CENTER
+  # TABEL 1: Informasi / Metadata Instrumen (Jarak Rapat)
+  table_meta = doc.add_table(rows=5, cols=2)
+  table_meta.alignment = WD_TABLE_ALIGNMENT.CENTER
 
   metadata = [
       ("Mata Pelajaran", mapel),
@@ -111,39 +113,99 @@ def generate_professional_word_document(
           "Tingkat Kesulitan",
           "Sedang (Menguji Kemampuan Analisis, Evaluasi, dan Kontekstualisasi)",
       ),
-      ("Bentuk Soal", jenis_asesmen),
+      ("Jenis Asesmen", jenis_asesmen),  # Label diganti dari Bentuk Soal
   ]
 
   for i, (key, val) in enumerate(metadata):
-    row = table.rows[i]
+    row = table_meta.rows[i]
     cell_key, cell_val = row.cells[0], row.cells[1]
     cell_key.width = Inches(2.2)
     cell_val.width = Inches(4.3)
 
     p_k = cell_key.paragraphs[0]
+    p_k.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p_k.paragraph_format.space_before = Pt(2)
+    p_k.paragraph_format.space_after = Pt(2)
+    p_k.paragraph_format.line_spacing = 1.15
     r_k = p_k.add_run(key)
     r_k.bold = True
     r_k.font.name = "Cambria"
     r_k.font.size = Pt(10.5)
 
     p_v = cell_val.paragraphs[0]
+    p_v.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p_v.paragraph_format.space_before = Pt(2)
+    p_v.paragraph_format.space_after = Pt(2)
+    p_v.paragraph_format.line_spacing = 1.15
     r_v = p_v.add_run(str(val))
     r_v.font.name = "Cambria"
     r_v.font.size = Pt(10.5)
 
-    set_cell_margins(cell_key, 120, 120, 150, 150)
-    set_cell_margins(cell_val, 120, 120, 150, 150)
+    set_cell_margins(cell_key, 80, 80, 120, 120)
+    set_cell_margins(cell_val, 80, 80, 120, 120)
     set_cell_background(cell_key, "F2F4F8")
 
-  p_space = doc.add_paragraph()
-  p_space.paragraph_format.space_before = Pt(12)
+  doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
+  # TABEL 2: Spesifikasi Asesmen (Tabel Pengganti Bullet Points)
+  p_sub = doc.add_paragraph()
+  run_sub = p_sub.add_run("SPESIFIKASI ASESMEN")
+  run_sub.bold = True
+  run_sub.font.name = "Cambria"
+  run_sub.font.size = Pt(12)
+  run_sub.font.color.rgb = RGBColor(27, 54, 93)
+  p_sub.paragraph_format.space_after = Pt(4)
+
+  specs = [
+      ("Mata Pelajaran", mapel),
+      ("Fase / Kelas", f"{fase} ({kelas})"),
+      ("Materi/Topik", materi),
+      ("Jumlah Soal", f"{jumlah_soal} Butir"),
+      ("Bentuk Soal", jenis_soal),
+      ("Sub Jenis Asesmen", sub_asesmen),
+  ]
+
+  table_spec = doc.add_table(rows=len(specs), cols=2)
+  table_spec.alignment = WD_TABLE_ALIGNMENT.CENTER
+  for i, (k, v) in enumerate(specs):
+    row = table_spec.rows[i]
+    c0, c1 = row.cells[0], row.cells[1]
+    c0.width = Inches(2.2)
+    c1.width = Inches(4.3)
+    c0.text = k
+    c1.text = v
+    for cell in (c0, c1):
+      for p in cell.paragraphs:
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        p.paragraph_format.space_before = Pt(2)
+        p.paragraph_format.space_after = Pt(2)
+        p.paragraph_format.line_spacing = 1.15
+        for run in p.runs:
+          run.font.name = "Cambria"
+          run.font.size = Pt(10.5)
+    set_cell_margins(c0, 80, 80, 120, 120)
+    set_cell_margins(c1, 80, 80, 120, 120)
+    set_cell_background(c0, "F2F4F8")
+
+  doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
+  # BUTIR SOAL TITLE
+  p_bs_title = doc.add_paragraph()
+  r_bst = p_bs_title.add_run("BUTIR SOAL & PEMBAHASAN")
+  r_bst.bold = True
+  r_bst.font.name = "Cambria"
+  r_bst.font.size = Pt(12)
+  r_bst.font.color.rgb = RGBColor(27, 54, 93)
+  p_bs_title.paragraph_format.space_after = Pt(6)
+
+  # PARSING KONTEN SOAL DENGAN FORMAT RATA KIRI-KANAN (JUSTIFY)
   for line in content_text.split("\n"):
     line_str = line.strip()
     if not line_str:
       continue
 
     p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY  # Otomatis Justify
     p.paragraph_format.space_after = Pt(4)
     p.paragraph_format.line_spacing = 1.15
 
@@ -156,19 +218,21 @@ def generate_professional_word_document(
       run.font.name = "Cambria"
       run.font.size = Pt(11.5)
       run.font.bold = True
-      run.font.color.rgb = RGBColor(0, 51, 102)
-      p.paragraph_format.space_before = Pt(10)
+      run.font.color.rgb = RGBColor(27, 54, 93)
+      p.paragraph_format.space_before = Pt(8)
     elif (
         line_str.startswith("SOAL")
         or line_str.startswith("KUNCI")
         or line_str.startswith("Pertanyaan")
         or line_str.startswith("Pembahasan")
+        or line_str.startswith("Soal")
     ):
       run = p.add_run(line_str)
       run.font.name = "Cambria"
       run.font.size = Pt(10.5)
       run.font.bold = True
       run.font.color.rgb = RGBColor(15, 23, 42)
+      p.paragraph_format.space_before = Pt(4)
     else:
       run = p.add_run(line_str)
       run.font.name = "Cambria"
@@ -330,7 +394,7 @@ elif menu == "✨ Generator Asesmen AI":
   else:
     aturan_opsi = "5 opsi (A sampai E)"
 
-  if st.button("✨ Buat Instrumen Asesmen dengan Gemini AI 🚀", width="stretch"):
+  if st.button("✨ Buat Instrumen Asesmen dengan Gemini AI 🚀", use_container_width=True):
     if jenjang == "-- Pilih Jenjang --" or not mapel or not materi:
       st.warning(
           "Mohon lengkapi Mata Pelajaran, Materi, dan pilih Jenjang terlebih"
@@ -348,7 +412,7 @@ elif menu == "✨ Generator Asesmen AI":
                     2. Jika jenis soal adalah Pilihan Ganda, gunakan {aturan_opsi}.
                     3. Berikan kunci jawaban yang jelas serta pembahasan mendalam untuk setiap soal."""
 
-          model = genai.GenerativeModel("gemini-3.5-flash")
+          model = genai.GenerativeModel("gemini-1.5-flash")
           response = model.generate_content(prompt)
 
           st.session_state.generated_soal = response.text
@@ -359,6 +423,9 @@ elif menu == "✨ Generator Asesmen AI":
           st.session_state.meta_jenjang = jenjang
           st.session_state.meta_fase = fase
           st.session_state.meta_jenis = jenis_asesmen
+          st.session_state.meta_sub_asesmen = sub_asesmen
+          st.session_state.meta_jumlah_soal = jumlah_soal
+          st.session_state.meta_jenis_soal = jenis_soal
 
           st.success("✅ Instrumen Asesmen Berhasil Dibuat!")
 
@@ -380,6 +447,9 @@ elif menu == "✨ Generator Asesmen AI":
           jenjang=st.session_state.get("meta_jenjang", jenjang),
           fase=st.session_state.get("meta_fase", fase),
           jenis_asesmen=st.session_state.get("meta_jenis", jenis_asesmen),
+          sub_asesmen=st.session_state.get("meta_sub_asesmen", sub_asesmen),
+          jumlah_soal=st.session_state.get("meta_jumlah_soal", jumlah_soal),
+          jenis_soal=st.session_state.get("meta_jenis_soal", jenis_soal),
           content_text=st.session_state.generated_soal,
       )
 
@@ -390,11 +460,11 @@ elif menu == "✨ Generator Asesmen AI":
           mime=(
               "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           ),
-          width="stretch",
+          use_container_width=True,
       )
 
     with col_dl2:
-      if st.button("💾 Simpan ke Bank Soal Spreadsheet", width="stretch"):
+      if st.button("💾 Simpan ke Bank Soal Spreadsheet", use_container_width=True):
         if user_spreadsheet_id:
           with st.spinner("Menyimpan ke Google Sheets..."):
             try:
@@ -443,7 +513,7 @@ elif menu == "📊 Bank Soal & Asesmen Tersimpan":
       else:
         df_bank = pd.DataFrame(data_bank)
         with st.container(border=True):
-          st.dataframe(df_bank, width="stretch")
+          st.dataframe(df_bank, use_container_width=True)
     except Exception:
       st.info(
           "Tab 'Bank Soal SAKTI' belum tersedia atau belum ada data di"
@@ -574,7 +644,7 @@ elif menu == "📈 Rekap Nilai Siswa":
         "Nilai Siswa", min_value=0, max_value=100, value=80
     )
 
-  if st.button("💾 Simpan Nilai ke Google Sheets", width="stretch"):
+  if st.button("💾 Simpan Nilai ke Google Sheets", use_container_width=True):
     if not r_mapel or not r_nama_siswa:
       st.warning(
           "Mohon lengkapi Mata Pelajaran dan pastikan Nama Siswa terpilih."
@@ -636,7 +706,7 @@ elif menu == "📈 Rekap Nilai Siswa":
       except Exception as e:
         st.error(f"Gagal menyimpan ke database: {e}")
 
-  # --- BAGIAN MENU UNDUH / EXPORT REKAP NILAI BERDASARKAN SEKOLAH, KELAS, & MAPEL ---
+  # --- BAGIAN MENU UNDUH / EXPORT REKAP NILAI ---
   st.markdown("---")
   st.subheader("📥 Unduh Rekap Nilai Siswa")
   st.markdown(
@@ -704,7 +774,7 @@ elif menu == "📈 Rekap Nilai Siswa":
         " dipilih."
     )
     if not df_final_dl.empty:
-      st.dataframe(df_final_dl, width="stretch")
+      st.dataframe(df_final_dl, use_container_width=True)
 
       output_excel = BytesIO()
       with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
@@ -722,7 +792,7 @@ elif menu == "📈 Rekap Nilai Siswa":
           mime=(
               "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           ),
-          width="stretch",
+          use_container_width=True,
       )
     else:
       st.info(
