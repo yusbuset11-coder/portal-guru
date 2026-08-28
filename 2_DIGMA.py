@@ -112,12 +112,12 @@ else:
     unsafe_allow_html=True,
 )
 
-        try:
-            ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
-            data_jurnal = ws_jurnal.get_all_records()
-            total_jurnal = len(data_jurnal)
-        except Exception:
-            total_jurnal = 0
+            try:
+                ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
+                data_jurnal = ws_jurnal.get_all_records()
+                total_jurnal = len(data_jurnal)
+            except Exception:
+                total_jurnal = 0
 
         col1, col2 = st.columns(2)
         with col1:
