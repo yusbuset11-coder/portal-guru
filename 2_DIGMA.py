@@ -74,8 +74,8 @@ def apply_sheet_formatting(ws, num_rows, num_cols):
         print(f"Gagal menerapkan format sheet: {e}")
 
 
-# Sidebar Profil
-st.sidebar.success(f"👤 **{st.session_state.guru_nama}**")
+# Sidebar Profil (disamakan dengan SIPENSIS tanpa kotak hijau)
+st.sidebar.markdown(f"👤 **{st.session_state.guru_nama}**")
 
 
 @st.cache_resource
@@ -100,11 +100,11 @@ else:
         ["🏠 Beranda DIGMA", "✍️ Input Jurnal Mengajar", "📚 Riwayat & Rekap Jurnal"],
     )
 
-    # Styling Banner ala SIPENSIS / SAKTI
+    # Styling Banner ala SIPENSIS (Judul putih bersih)
     st.markdown(
         """
         <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 20px; border-radius: 12px; border: 1px solid #38bdf8; margin-bottom: 20px;">
-            <h2 style="color: #38bdf8; margin: 0 0 10px 0; font-size: 24px; font-family: sans-serif;">📖 DIGMA: Digitalisasi Jurnal Mengajar</h2>
+            <h2 style="color: #ffffff; margin: 0 0 10px 0; font-size: 24px; font-family: sans-serif;">📖 DIGMA: Digitalisasi Jurnal Mengajar</h2>
             <p style="color: #e2e8f0; font-size: 14px; margin: 0 0 5px 0;">Selamat Datang, Yusbuset di Modul DIGMA</p>
             <p style="color: #94a3b8; font-size: 13px; margin: 0;">Catat kegiatan pembelajaran harian, ketercapaian materi, serta catatan kelas secara digital dan terstruktur.</p>
         </div>
