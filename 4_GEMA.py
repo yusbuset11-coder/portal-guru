@@ -100,7 +100,7 @@ st.markdown(
     """
     <div class="header-card">
         <h2 class="header-title">
-            <marquee behavior="scroll" direction="left" scrollamount="7" style="color: #38bdf8; text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);">📚 GENERATOR: MODUL AJAR PEMBELAJARAN MENDALAM</marquee>
+            <marquee behavior="scroll" direction="left" scrollamount="7" style="color: #38bdf8; text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);">📚 GEMA: GENERATOR MODUL AJAR PEMBELAJARAN MENDALAM</marquee>
         </h2>
         <div class="header-subtitle">
             <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;|&nbsp; 
