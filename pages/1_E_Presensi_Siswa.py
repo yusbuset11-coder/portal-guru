@@ -32,7 +32,7 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 20px 25px;
+        padding: 18px 22px;
         border-radius: 12px;
         border: 1px solid #334155;
         margin-bottom: 20px;
@@ -40,9 +40,10 @@ st.markdown(
     }
     .main-title {
         color: #38bdf8;
-        font-size: 20px; /* Font diperkecil agar pas, rapi, dan tidak terlalu besar */
+        font-size: 16px; /* Font diperkecil lagi agar lebih proporsional dan rapi */
         font-weight: 700;
         margin: 0 0 6px 0;
+        line-height: 1.4;
     }
     .sub-desc {
         color: #94a3b8;
