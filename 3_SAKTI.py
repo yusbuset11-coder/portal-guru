@@ -394,7 +394,7 @@ elif menu == "✨ Generator Asesmen AI":
       )
 
     with col_dl2:
-      if st.button("💾 Simpan ke Bank Soal Spreadsheet", width="stretch):
+      if st.button("💾 Simpan ke Bank Soal Spreadsheet", width="stretch"):
         if user_spreadsheet_id:
           with st.spinner("Menyimpan ke Google Sheets..."):
             try:
