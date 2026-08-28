@@ -74,7 +74,7 @@ def apply_sheet_formatting(ws, num_rows, num_cols):
         print(f"Gagal menerapkan format sheet: {e}")
 
 
-# Sidebar Profil (disamakan dengan SIPENSIS tanpa kotak hijau)
+# Sidebar Profil
 st.sidebar.markdown(f"👤 **{st.session_state.guru_nama}**")
 
 
@@ -100,7 +100,7 @@ else:
         ["🏠 Beranda DIGMA", "✍️ Input Jurnal Mengajar", "📚 Riwayat & Rekap Jurnal"],
     )
 
-    # Styling Banner ala SIPENSIS (Judul putih bersih)
+    # Styling Banner ala SIPENSIS
     st.markdown(
         """
         <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 20px; border-radius: 12px; border: 1px solid #38bdf8; margin-bottom: 20px;">
@@ -123,10 +123,22 @@ else:
         col1, col2 = st.columns(2)
         with col1:
             with st.container(border=True):
-                st.metric("TOTAL JURNAL TERCATAT", f"{total_jurnal} Kegiatan")
+                st.markdown(
+                    f"""
+                    <p style="color: #94a3b8; font-size: 12px; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 600;">TOTAL JURNAL TERCATAT</p>
+                    <p style="color: #ffffff; font-size: 18px; margin: 0; font-weight: 600;">{total_jurnal} Kegiatan</p>
+                    """,
+                    unsafe_allow_html=True,
+                )
         with col2:
             with st.container(border=True):
-                st.metric("STATUS KONEKSI DATABASE", "Terhubung Aktif ✅")
+                st.markdown(
+                    """
+                    <p style="color: #94a3b8; font-size: 12px; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 600;">STATUS KONEKSI DATABASE</p>
+                    <p style="color: #ffffff; font-size: 18px; margin: 0; font-weight: 600;">Terhubung Aktif ✅</p>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
     elif menu_digma == "✍️ Input Jurnal Mengajar":
         st.markdown(
