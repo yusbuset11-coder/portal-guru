@@ -11,7 +11,11 @@ st.set_page_config(
     page_icon="📖",
     layout="wide",
 )
-st.markdown('<style>.block-container { padding-top: 1.5rem; padding-bottom: 1rem; }</style>', unsafe_allow_html=True)
+st.markdown(
+    "<style>.block-container { padding-top: 1.5rem; padding-bottom: 1rem;"
+    " }</style>",
+    unsafe_allow_html=True,
+)
 
 # Cek apakah guru sudah login melalui portal utama (app.py)
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
@@ -70,7 +74,9 @@ def apply_sheet_formatting(ws, num_rows, num_cols):
         }
 
         ws.format(cell_range, {"borders": border_format})
-        ws.format(f"A1:{gspread.utils.rowcol_to_a1(1, num_cols)}", header_format)
+        ws.format(
+            f"A1:{gspread.utils.rowcol_to_a1(1, num_cols)}", header_format
+        )
     except Exception as e:
         print(f"Gagal menerapkan format sheet: {e}")
 
@@ -98,22 +104,26 @@ if sh_guru is None:
 else:
     menu_digma = st.sidebar.selectbox(
         "**Pilih Menu DIGMA**",
-        ["🏠 Beranda DIGMA", "✍️ Input Jurnal Mengajar", "📚 Riwayat & Rekap Jurnal"],
+        [
+            "🏠 Beranda DIGMA",
+            "✍️ Input Jurnal Mengajar",
+            "📚 Riwayat & Rekap Jurnal",
+        ],
     )
 
     # Header Utama E Jurnal Mengajar Guru
-guru_nama = st.session_state.get("guru_nama", "")
+    guru_nama = st.session_state.get("guru_nama", "")
 
-st.markdown(
-    f"""
-    <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 25px 30px; border-radius: 14px; border: 1px solid #334155; margin-bottom: 25px;">
-        <h2 style="color: #ffffff; margin: 0 0 10px 0; font-size: 26px;">📖 E Jurnal Mengajar Guru: Digitalisasi Jurnal</h2>
-        <p style="color: #e2e8f0; font-size: 15px; margin: 0 0 8px 0;">Selamat Datang, {guru_nama} di Modul E Jurnal Mengajar</p>
-        <p style="color: #94a3b8; font-size: 14px; margin: 0;">Catat kegiatan pembelajaran harian, ketercapaian, dan laporan dengan mudah.</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+    st.markdown(
+        f"""
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 25px 30px; border-radius: 14px; border: 1px solid #334155; margin-bottom: 25px;">
+            <h2 style="color: #ffffff; margin: 0 0 10px 0; font-size: 26px;">📖 E Jurnal Mengajar Guru: Digitalisasi Jurnal</h2>
+            <p style="color: #e2e8f0; font-size: 15px; margin: 0 0 8px 0;">Selamat Datang, {guru_nama} di Modul E Jurnal Mengajar</p>
+            <p style="color: #94a3b8; font-size: 14px; margin: 0;">Catat kegiatan pembelajaran harian, ketercapaian, dan laporan dengan mudah.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if menu_digma == "🏠 Beranda DIGMA":
         try:
@@ -221,7 +231,9 @@ st.markdown(
                                 ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
                             except Exception:
                                 ws_jurnal = sh_guru.add_worksheet(
-                                    title="Jurnal Mengajar", rows="1000", cols="8"
+                                    title="Jurnal Mengajar",
+                                    rows="1000",
+                                    cols="8",
                                 )
 
                             existing_data = ws_jurnal.get_all_values()
@@ -294,9 +306,7 @@ st.markdown(
 
                     if sel_sch_j != "Semua Sekolah":
                         classes_j = (
-                            df_jurnal[df_jurnal["Sekolah"] == sel_sch_j][
-                                "Kelas"
-                            ]
+                            df_jurnal[df_jurnal["Sekolah"] == sel_sch_j]["Kelas"]
                             .unique()
                             .tolist()
                             if "Kelas" in df_jurnal.columns
