@@ -16,15 +16,19 @@ st.set_page_config(
     page_icon="📚",
     layout="wide",
 )
+
 # Atur jarak atas agar konten naik dan tidak terpotong di bawah
-st.markdown("""
+st.markdown(
+    """
     <style>
         .block-container {
             padding-top: 1.5rem;
             padding-bottom: 1rem;
         }
     </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # Cek apakah guru sudah login melalui portal utama (app.py)
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
@@ -95,123 +99,10 @@ st.markdown(
         box-shadow: 0 6px 18px rgba(59, 130, 246, 0.5);
         transform: translateY(-2px);
     }
-    [data-testid="stSidebar"] {
-        background-color: #111827;
-        border-right: 1px solid #1f2937;
-    }
     </style>
 """,
     unsafe_allow_html=True,
 )
-
-# Tampilan Header Modern dalam Card (Diperbarui)
-st.markdown(
-    """
-    <div class="header-card">
-        <h2 class="header-title" style="color: white; text-align: center;">
-            Otomatisasi Penyusunan Modul Ajar PM
-        </h2>
-        <div class="header-subtitle" style="text-align: center;">
-            <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;&nbsp;
-            <em>Aplikasi Otomatisasi Perancangan Pembelajaran Deep Learning</em>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# Input Pengguna di Sidebar
-with st.sidebar:
-  st.success(f"👤 **{st.session_state.get('guru_nama', 'Guru')}**")
-  st.markdown("---")
-  st.header("⚙️ Parameter Pembelajaran")
-  api_key = st.text_input(
-      "Masukkan Google Gemini API Key",
-      value=api_key_default,
-      type="password",
-  )
-
-  jenjang_pendidikan = st.selectbox(
-      "Pilih Jenjang Pendidikan",
-      ["SD / MI", "SMP / MTs", "SMA / MA", "SMK / MAK"],
-  )
-
-  if jenjang_pendidikan == "SD / MI":
-    default_mapel = "Tematik / Kelas"
-    jp_guidance = "Panduan: 1 JP = 35 Menit"
-    fase_options = [
-        "Fase A / Kelas 1 SD",
-        "Fase A / Kelas 2 SD",
-        "Fase B / Kelas 3 SD",
-        "Fase B / Kelas 4 SD",
-        "Fase C / Kelas 5 SD",
-        "Fase C / Kelas 6 SD",
-    ]
-  elif jenjang_pendidikan == "SMP / MTs":
-    default_mapel = "Matematika / IPA / IPS"
-    jp_guidance = "Panduan: 1 JP = 40 Menit"
-    fase_options = [
-        "Fase D / Kelas 7 SMP",
-        "Fase D / Kelas 8 SMP",
-        "Fase D / Kelas 9 SMP",
-    ]
-  elif jenjang_pendidikan == "SMA / MA":
-    default_mapel = "Bahasa Indonesia / Matematika"
-    jp_guidance = "Panduan: 1 JP = 45 Menit"
-    fase_options = [
-        "Fase E / Kelas X SMA",
-        "Fase F / Kelas XI SMA",
-        "Fase F / Kelas XII SMA",
-    ]
-  else:
-    default_mapel = (
-        "Dasar-dasar Teknik Otomotif / Produk Kreatif dan Kewirausahaan"
-    )
-    jp_guidance = "Panduan: 1 JP = 45 Menit"
-    fase_options = [
-        "Fase E / Kelas X SMK (Program Dasar Keahlian)",
-        "Fase F / Kelas XI SMK (Konsentrasi Keahlian)",
-        "Fase F / Kelas XII SMK (Konsentrasi Keahlian)",
-    ]
-
-  mata_pelajaran = st.text_input(
-      "Mata Pelajaran / Program Kejuruan", default_mapel
-  )
-  fase_kelas = st.selectbox("Fase / Kelas", fase_options)
-
-  topik = st.text_input(
-      "Topik / Materi Pokok / Elemen",
-      (
-          "Contoh: Pemeliharaan Sistem Rem Kendaraan Ringan"
-          if jenjang_pendidikan == "SMK / MAK"
-          else "Contoh: Menyimak Teks Laporan Observasi Secara Kritis"
-      ),
-  )
-
-  st.caption(jp_guidance)
-  alokasi_waktu = st.text_input("Alokasi Waktu", "2 JP (2 x 45 Menit)")
-  pertemuan_ke = st.text_input("Pertemuan Ke-", "1 (Pertemuan Pertama)")
-
-  st.markdown("---")
-  st.header("🏫 Identitas Satuan Pendidikan")
-  nama_sekolah = st.text_input(
-      "Nama Sekolah",
-      st.session_state.get("sekolah", "SMK Negeri 2 Bangkalan"),
-  )
-  semester = st.selectbox("Semester", ["Ganjil", "Genap"])
-  tahun_pelajaran = st.text_input("Tahun Pelajaran", "2026/2027")
-
-  st.markdown("---")
-  st.header("✍️ Identitas Pengesahan Dokumen")
-  nama_kota = st.text_input("Nama Kota", "Bangkalan")
-  tanggal_pembuatan = st.text_input(
-      "Tanggal / Bulan / Tahun", datetime.today().strftime("%d %B %Y")
-  )
-  nama_penulis = st.text_input(
-      "Nama Penulis Modul",
-      st.session_state.get("guru_nama", "Yustinus Budi Setyanta, S.Pd., M.Pd."),
-  )
-  nip_penulis = st.text_input("NIP Penulis", "196908302005011003")
 
 
 # Fungsi pembantu warna latar belakang sel tabel Word
@@ -519,14 +410,10 @@ def generate_docx(
   run_name.font.bold = True
   p_sign.add_run(f"\nNIP. {nip_penulis}")
 
-  # ====================================================
-  # HALAMAN TERPISAH 1: RUBRIK PENILAIAN & PEDOMAN PENSKORAN
-  # ====================================================
+  # Halaman Terpisah 1: Rubrik Penilaian
   doc.add_page_break()
-
   p_rubrik_title = doc.add_paragraph()
   p_rubrik_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-  p_rubrik_title.paragraph_format.space_before = Pt(0)
   p_rubrik_title.paragraph_format.space_after = Pt(12)
   r_rub_t = p_rubrik_title.add_run("RUBRIK PENILAIAN & PEDOMAN PENSKORAN")
   r_rub_t.font.name = "Arial"
@@ -537,7 +424,6 @@ def generate_docx(
   table_id_rubrik = doc.add_table(rows=3, cols=2)
   table_id_rubrik.style = "Table Grid"
   table_id_rubrik.alignment = WD_TABLE_ALIGNMENT.CENTER
-
   table_id_rubrik.rows[0].cells[0].text = "Nama Guru / Pengamat:"
   table_id_rubrik.rows[0].cells[1].text = f"{nama_penulis}"
   table_id_rubrik.rows[1].cells[0].text = "Kelas / Fase:"
@@ -558,15 +444,11 @@ def generate_docx(
           run.font.bold = True
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
-
   rubrik_data = data_ai.get("rubrik_penilaian", "")
   p_sub = doc.add_paragraph()
-  p_sub.paragraph_format.space_before = Pt(6)
-  p_sub.paragraph_format.space_after = Pt(4)
   run_sub = p_sub.add_run("A. Rubrik Penilaian Kinerja / Kompetensi")
   run_sub.font.bold = True
   run_sub.font.size = Pt(10)
-  run_sub.font.color.rgb = RGBColor(51, 51, 51)
 
   if isinstance(rubrik_data, dict):
     for k, v in rubrik_data.items():
@@ -578,8 +460,6 @@ def generate_docx(
         sb = v.get("sangat_baik", "")
 
         p_crit = doc.add_paragraph()
-        p_crit.paragraph_format.space_before = Pt(4)
-        p_crit.paragraph_format.space_after = Pt(2)
         p_crit.paragraph_format.left_indent = Inches(0.2)
         r_nama = p_crit.add_run(f"• {nama}")
         r_nama.font.bold = True
@@ -593,124 +473,17 @@ def generate_docx(
         ]:
           if level_desc:
             p_lvl = doc.add_paragraph()
-            p_lvl.paragraph_format.space_before = Pt(1)
-            p_lvl.paragraph_format.space_after = Pt(2)
             p_lvl.paragraph_format.left_indent = Inches(0.4)
-            p_lvl.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             r_l_name = p_lvl.add_run(f"- {level_name}: ")
             r_l_name.font.bold = True
             r_l_name.font.size = Pt(9.5)
-            r_l_desc = p_lvl.add_run(
-                f"{str(level_desc).replace('LKPD', 'LKM').replace('Lembar Kegiatan Murid', 'Lembar Kerja Murid')}"
-            )
-            r_l_desc.font.bold = False
+            r_l_desc = p_lvl.add_run(str(level_desc))
             r_l_desc.font.size = Pt(9.5)
-  else:
-    p_rubrik = doc.add_paragraph()
-    p_rubrik.paragraph_format.space_before = Pt(4)
-    p_rubrik.paragraph_format.space_after = Pt(4)
-    p_rubrik.paragraph_format.left_indent = Inches(0.2)
-    p_rubrik.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    r_desc = p_rubrik.add_run(
-        str(rubrik_data)
-        .replace("LKPD", "LKM")
-        .replace("Lembar Kegiatan Murid", "Lembar Kerja Murid")
-    )
-    r_desc.font.bold = False
-    r_desc.font.size = Pt(10)
 
-  p_score_title = doc.add_paragraph()
-  p_score_title.paragraph_format.space_before = Pt(8)
-  p_score_title.paragraph_format.space_after = Pt(4)
-  r_stitle = p_score_title.add_run("B. Pedoman Penskoran & Perhitungan Nilai")
-  r_stitle.font.bold = True
-  r_stitle.font.size = Pt(10)
-  r_stitle.font.color.rgb = RGBColor(51, 51, 51)
-
-  p_rumus = doc.add_paragraph()
-  p_rumus.paragraph_format.space_before = Pt(2)
-  p_rumus.paragraph_format.space_after = Pt(4)
-  p_rumus.paragraph_format.left_indent = Inches(0.2)
-  r_r1 = p_rumus.add_run("• Rumus Nilai: ")
-  r_r1.font.bold = True
-  r_r1.font.size = Pt(9.5)
-  r_r2 = p_rumus.add_run(
-      "Nilai Akhir = ((Skor Kriteria 1 + Skor Kriteria 2) / 8) x 100"
-  )
-  r_r2.font.size = Pt(9.5)
-
-  p_kat_title = doc.add_paragraph()
-  p_kat_title.paragraph_format.space_before = Pt(2)
-  p_kat_title.paragraph_format.space_after = Pt(4)
-  p_kat_title.paragraph_format.left_indent = Inches(0.2)
-  r_k1 = p_kat_title.add_run("• Kategori Predikat:")
-  r_k1.font.bold = True
-  r_k1.font.size = Pt(9.5)
-
-  table_score = doc.add_table(rows=5, cols=2)
-  table_score.style = "Table Grid"
-  table_score.alignment = WD_TABLE_ALIGNMENT.CENTER
-
-  hdr_score = table_score.rows[0].cells
-  hdr_score[0].text = "Skor"
-  hdr_score[1].text = "Kategori"
-  set_cell_background(hdr_score[0], "5A3825")
-  set_cell_background(hdr_score[1], "5A3825")
-  for cell in hdr_score:
-    for p in cell.paragraphs:
-      p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-      for r in p.runs:
-        r.font.bold = True
-        r.font.color.rgb = RGBColor(255, 255, 255)
-        r.font.size = Pt(9.5)
-
-  score_rows_data = [
-      ("90 - 100", "Sangat Baik (A)"),
-      ("80 - 89", "Baik (B)"),
-      ("70 - 79", "Cukup (C)"),
-      ("< 70", "Perlu Bimbingan (D)"),
-  ]
-  for idx, (skor_val, kat_val) in enumerate(score_rows_data):
-    row_c = table_score.rows[idx + 1].cells
-    row_c[0].text = skor_val
-    row_c[1].text = kat_val
-    row_c[0].width = Inches(2.0)
-    row_c[1].width = Inches(4.5)
-    set_cell_background(row_c[0], "F5EBE0")
-    for c_idx, cell in enumerate(row_c):
-      for p in cell.paragraphs:
-        p.paragraph_format.space_before = Pt(3)
-        p.paragraph_format.space_after = Pt(3)
-        if c_idx == 0:
-          p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        else:
-          p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        for r in p.runs:
-          r.font.size = Pt(9.5)
-
-  p_catatan = doc.add_paragraph()
-  p_catatan.paragraph_format.space_before = Pt(6)
-  p_catatan.paragraph_format.space_after = Pt(6)
-  p_catatan.paragraph_format.left_indent = Inches(0.2)
-  r_c1 = p_catatan.add_run("Catatan:\n")
-  r_c1.font.bold = True
-  r_c1.font.size = Pt(9.5)
-  r_c2 = p_catatan.add_run(
-      "Murid dinyatakan tuntas/mencapai tujuan pembelajaran jika memperoleh"
-      " nilai minimal 70 (Predikat Baik)."
-  )
-  r_c2.font.size = Pt(9.5)
-
-  doc.add_paragraph().paragraph_format.space_after = Pt(6)
-
-  # ====================================================
-  # HALAMAN TERPISAH 2: INSTRUMEN ASESMEN PROSES (FORMATIF)
-  # ====================================================
+  # Halaman Terpisah 2: Instrumen Asesmen Proses (Formatif)
   doc.add_page_break()
-
   p_inst_title = doc.add_paragraph()
   p_inst_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-  p_inst_title.paragraph_format.space_before = Pt(0)
   p_inst_title.paragraph_format.space_after = Pt(12)
   r_inst_t = p_inst_title.add_run("INSTRUMEN ASESMEN PROSES (FORMATIF)")
   r_inst_t.font.name = "Arial"
@@ -721,7 +494,6 @@ def generate_docx(
   table_id_inst = doc.add_table(rows=3, cols=2)
   table_id_inst.style = "Table Grid"
   table_id_inst.alignment = WD_TABLE_ALIGNMENT.CENTER
-
   table_id_inst.rows[0].cells[0].text = "Nama Guru / Pengamat:"
   table_id_inst.rows[0].cells[1].text = f"{nama_penulis}"
   table_id_inst.rows[1].cells[0].text = "Kelas / Fase:"
@@ -742,42 +514,18 @@ def generate_docx(
           run.font.bold = True
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
-
   instrumen_data = data_ai.get("instrumen_formatif", {})
   if isinstance(instrumen_data, dict) and instrumen_data:
     inst_rows = []
     for inst_k, inst_v in instrumen_data.items():
-      label_text = (
-          inst_k.replace("_", " ")
-          .title()
-          .replace("Instrumen", "Instrumen Asesmen")
-          .replace("Tujuan", "Tujuan Asesmen")
-      )
+      label_text = inst_k.replace("_", " ").title()
       inst_rows.append((label_text, str(inst_v)))
-
     add_section_table("LEMBAR OBSERVASI / FORMATIF KELAS", inst_rows)
-  else:
-    p_inst_text = doc.add_paragraph()
-    p_inst_text.paragraph_format.space_before = Pt(4)
-    p_inst_text.paragraph_format.space_after = Pt(4)
-    p_inst_text.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    r_it = p_inst_text.add_run(
-        str(instrumen_data)
-        .replace("LKPD", "LKM")
-        .replace("Lembar Kegiatan Murid", "Lembar Kerja Murid")
-    )
-    r_it.font.size = Pt(10)
 
-  doc.add_paragraph().paragraph_format.space_after = Pt(6)
-
-  # ====================================================
-  # HALAMAN TERPISAH 3: LEMBAR KERJA MURID (LKM)
-  # ====================================================
+  # Halaman Terpisah 3: Lembar Kerja Murid (LKM)
   doc.add_page_break()
-
   p_lkm_title = doc.add_paragraph()
   p_lkm_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-  p_lkm_title.paragraph_format.space_before = Pt(0)
   p_lkm_title.paragraph_format.space_after = Pt(12)
   r_lkm_t = p_lkm_title.add_run("LEMBAR KERJA MURID (LKM)")
   r_lkm_t.font.name = "Arial"
@@ -788,11 +536,8 @@ def generate_docx(
   table_id_lkm = doc.add_table(rows=3, cols=2)
   table_id_lkm.style = "Table Grid"
   table_id_lkm.alignment = WD_TABLE_ALIGNMENT.CENTER
-
   table_id_lkm.rows[0].cells[0].text = "Nama Kelompok / Peserta Didik:"
-  table_id_lkm.rows[0].cells[1].text = (
-      "........................................................................"
-  )
+  table_id_lkm.rows[0].cells[1].text = "........................................"
   table_id_lkm.rows[1].cells[0].text = "Kelas / Fase:"
   table_id_lkm.rows[1].cells[1].text = f"{fase_kelas}"
   table_id_lkm.rows[2].cells[0].text = "Mata Pelajaran / Topik:"
@@ -811,32 +556,13 @@ def generate_docx(
           run.font.bold = True
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
-
   lkm_data = data_ai.get("lkm_content", {})
   if isinstance(lkm_data, dict) and lkm_data:
     lkm_rows = []
     for lkm_k, lkm_v in lkm_data.items():
-      label_text = (
-          lkm_k.replace("_", " ")
-          .title()
-          .replace("Lkm", "LKM")
-          .replace("Judul", "Judul LKM")
-          .replace("Tujuan", "Tujuan Pembelajaran")
-      )
+      label_text = lkm_k.replace("_", " ").title()
       lkm_rows.append((label_text, str(lkm_v)))
-
     add_section_table("STRUKTUR LEMBAR KERJA MURID (LKM)", lkm_rows)
-  else:
-    p_lkm_text = doc.add_paragraph()
-    p_lkm_text.paragraph_format.space_before = Pt(4)
-    p_lkm_text.paragraph_format.space_after = Pt(4)
-    p_lkm_text.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    r_lt = p_lkm_text.add_run(
-        str(lkm_data)
-        .replace("LKPD", "LKM")
-        .replace("Lembar Kegiatan Murid", "Lembar Kerja Murid")
-    )
-    r_lt.font.size = Pt(10)
 
   bio = BytesIO()
   doc.save(bio)
@@ -844,20 +570,148 @@ def generate_docx(
   return bio
 
 
-# Tombol Eksekusi Generator
-if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam"):
-  if not api_key:
-    st.error("Mohon masukkan Google Gemini API Key terlebih dahulu.")
-  elif not topik:
-    st.warning("Mohon isi topik pembelajaran.")
-  else:
-    with st.spinner(
-        f"{nama_penulis} sedang menyusun Modul Ajar Pembelajaran Mendalam..."
-    ):
-      genai.configure(api_key=api_key)
-      model = genai.GenerativeModel("gemini-3.5-flash")
+# =====================================================================
+# STRUKTUR UTAMA DENGAN KOLOM (KIRI & KANAN) DI AREA UTAMA
+# =====================================================================
+col_kiri, col_kanan = st.columns([1.3, 1], gap="large")
 
-      prompt = f"""
+# --- 1. KANAN: PARAMETER PEMBELAJARAN & IDENTITAS (PINDAHAN DARI SIDEBAR) ---
+with col_kanan:
+  st.success(f"👤 **{st.session_state.get('guru_nama', 'Guru')}**")
+  st.markdown("---")
+  st.header("⚙️ Parameter Pembelajaran")
+  api_key = st.text_input(
+      "Masukkan Google Gemini API Key",
+      value=api_key_default,
+      type="password",
+  )
+
+  jenjang_pendidikan = st.selectbox(
+      "Pilih Jenjang Pendidikan",
+      ["SD / MI", "SMP / MTs", "SMA / MA", "SMK / MAK"],
+  )
+
+  if jenjang_pendidikan == "SD / MI":
+    default_mapel = "Tematik / Kelas"
+    jp_guidance = "Panduan: 1 JP = 35 Menit"
+    fase_options = [
+        "Fase A / Kelas 1 SD",
+        "Fase A / Kelas 2 SD",
+        "Fase B / Kelas 3 SD",
+        "Fase B / Kelas 4 SD",
+        "Fase C / Kelas 5 SD",
+        "Fase C / Kelas 6 SD",
+    ]
+  elif jenjang_pendidikan == "SMP / MTs":
+    default_mapel = "Matematika / IPA / IPS"
+    jp_guidance = "Panduan: 1 JP = 40 Menit"
+    fase_options = [
+        "Fase D / Kelas 7 SMP",
+        "Fase D / Kelas 8 SMP",
+        "Fase D / Kelas 9 SMP",
+    ]
+  elif jenjang_pendidikan == "SMA / MA":
+    default_mapel = "Bahasa Indonesia / Matematika"
+    jp_guidance = "Panduan: 1 JP = 45 Menit"
+    fase_options = [
+        "Fase E / Kelas X SMA",
+        "Fase F / Kelas XI SMA",
+        "Fase F / Kelas XII SMA",
+    ]
+  else:
+    default_mapel = (
+        "Dasar-dasar Teknik Otomotif / Produk Kreatif dan Kewirausahaan"
+    )
+    jp_guidance = "Panduan: 1 JP = 45 Menit"
+    fase_options = [
+        "Fase E / Kelas X SMK (Program Dasar Keahlian)",
+        "Fase F / Kelas XI SMK (Konsentrasi Keahlian)",
+        "Fase F / Kelas XII SMK (Konsentrasi Keahlian)",
+    ]
+
+  mata_pelajaran = st.text_input(
+      "Mata Pelajaran / Program Kejuruan", default_mapel
+  )
+  fase_kelas = st.selectbox("Fase / Kelas", fase_options)
+
+  topik = st.text_input(
+      "Topik / Materi Pokok / Elemen",
+      (
+          "Contoh: Pemeliharaan Sistem Rem Kendaraan Ringan"
+          if jenjang_pendidikan == "SMK / MAK"
+          else "Contoh: Menyimak Teks Laporan Observasi Secara Kritis"
+      ),
+  )
+
+  st.caption(jp_guidance)
+  alokasi_waktu = st.text_input("Alokasi Waktu", "2 JP (2 x 45 Menit)")
+  pertemuan_ke = st.text_input("Pertemuan Ke-", "1 (Pertemuan Pertama)")
+
+  st.markdown("---")
+  st.header("🏫 Identitas Satuan Pendidikan")
+  nama_sekolah = st.text_input(
+      "Nama Sekolah",
+      st.session_state.get("sekolah", "SMK Negeri 2 Bangkalan"),
+  )
+  semester = st.selectbox("Semester", ["Ganjil", "Genap"])
+  tahun_pelajaran = st.text_input("Tahun Pelajaran", "2026/2027")
+
+  st.markdown("---")
+  st.header("✍️ Identitas Pengesahan Dokumen")
+  nama_kota = st.text_input("Nama Kota", "Bangkalan")
+  tanggal_pembuatan = st.text_input(
+      "Tanggal / Bulan / Tahun", datetime.today().strftime("%d %B %Y")
+  )
+  nama_penulis = st.text_input(
+      "Nama Penulis Modul",
+      st.session_state.get("guru_nama", "Yustinus Budi Setyanta, S.Pd., M.Pd."),
+  )
+  nip_penulis = st.text_input("NIP Penulis", "196908302005011003")
+
+
+# --- 2. KIRI: HEADER, KARTU UTAMA & TOMBOL EKSEKUSI ---
+with col_kiri:
+  # Tampilan Header Modern dalam Card
+  st.markdown(
+      """
+      <div class="header-card">
+          <h2 class="header-title" style="color: white; text-align: center;">
+              Otomatisasi Penyusunan Modul Ajar PM
+          </h2>
+          <div class="header-subtitle" style="text-align: center;">
+              <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;&nbsp;
+              <em>Aplikasi Otomatisasi Perancangan Pembelajaran Deep Learning</em>
+          </div>
+      </div>
+      """,
+      unsafe_allow_html=True,
+  )
+
+  st.markdown(
+      "### 🚀 Generator Modul Ajar Berbasis Pembelajaran Mendalam"
+  )
+  st.markdown(
+      "Pastikan parameter pembelajaran di sebelah kanan sudah diisi dengan"
+      " benar, lalu klik tombol di bawah untuk mulai menyusun dokumen"
+      " secara otomatis menggunakan AI."
+  )
+
+  st.markdown("<br>", unsafe_allow_html=True)
+
+  # Tombol Eksekusi Generator
+  if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam"):
+    if not api_key:
+      st.error("Mohon masukkan Google Gemini API Key terlebih dahulu.")
+    elif not topik:
+      st.warning("Mohon isi topik pembelajaran.")
+    else:
+      with st.spinner(
+          f"{nama_penulis} sedang menyusun Modul Ajar Pembelajaran Mendalam..."
+      ):
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-3.5-flash")
+
+        prompt = f"""
             Bertindaklah sebagai pakar kurikulum profesional. Buatkan konten Modul Ajar Berbasis Pembelajaran Mendalam (Deep Learning) yang **SANGAT LENGKAP, DETAIL, DAN KOMPREHENSIF** untuk:
             - Jenjang: {jenjang_pendidikan} ({fase_kelas})
             - Mata Pelajaran: {mata_pelajaran}
@@ -927,61 +781,62 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam"):
               "instrumen_formatif": {{
                 "judul_instrumen": "Judul spesifik instrumen asesmen proses",
                 "tujuan_asesmen": "Tujuan penggunaan lembar asesmen formatif",
-                "aspek_yang_diamati": "Indikator atau aspek keaktifan/proses yang dinilai dengan format sub-bagian berlabel titik dua (misal: 1. Keaktifan Diskusi: ...\\n2. Kolaborasi Tim: ...)",
+                "aspek_yang_diamati": "Indikator atau aspek keaktifan/proses yang dinilai dengan format sub-bagian berlabel titik dua",
                 "pedoman_pengamatan": "Petunjuk penilaian atau rubrik ceklis observasi singkat"
               }},
               "lkm_content": {{
                 "judul_lkm": "Judul spesifik LKM",
                 "tujuan_lkm": "Tujuan pengerjaan LKM bagi peserta didik",
-                "petunjuk_kerja": "Langkah panduan keselamatan dan cara pengerjaan dengan format sub-bagian berlabel titik dua (misal: 1. Alat dan Bahan: ...\\n2. Langkah Kerja: ...)",
-                "tugas_analisis": "Rincian tugas investigasi, pertanyaan kerja, atau tabel isian praktik dengan format sub-bagian jelas"
+                "petunjuk_kerja": "Langkah panduan keselamatan dan cara pengerjaan dengan format sub-bagian berlabel titik dua",
+                "tugas_analisis": "Rincian tugas investigasi, pertanyaan kerja, atau tabel isian praktik"
               }}
             }}
             """
 
-      response = model.generate_content(prompt)
-      text_resp = response.text.strip()
+        response = model.generate_content(prompt)
+        text_resp = response.text.strip()
 
-      if text_resp.startswith("```json"):
-        text_resp = text_resp[7:]
-      if text_resp.startswith("```"):
-        text_resp = text_resp[3:]
-      if text_resp.endswith("```"):
-        text_resp = text_resp[:-3]
-      text_resp = text_resp.strip()
+        if text_resp.startswith("```json"):
+          text_resp = text_resp[7:]
+        if text_resp.startswith("```"):
+          text_resp = text_resp[3:]
+        if text_resp.endswith("```"):
+          text_resp = text_resp[:-3]
+        text_resp = text_resp.strip()
 
-      try:
-        data_ai = json.loads(text_resp)
-      except Exception:
-        data_ai = {}
+        try:
+          data_ai = json.loads(text_resp)
+        except Exception:
+          data_ai = {}
 
-      st.success("🎉 Modul Ajar Sesuai Sistematika Baru Berhasil Disusun!")
-      st.info(
-          "Dokumen Word (.docx) siap diunduh lengkap dengan halaman terpisah"
-          " untuk Rubrik & Pedoman Penskoran (dilengkapi tabel kategori predikat), Instrumen Asesmen Proses (Formatif), dan Lembar Kerja Murid (LKM)."
-      )
+        st.success("🎉 Modul Ajar Sesuai Sistematika Baru Berhasil Disusun!")
+        st.info(
+            "Dokumen Word (.docx) siap diunduh lengkap dengan halaman terpisah"
+            " untuk Rubrik & Pedoman Penskoran, Instrumen Asesmen Proses"
+            " (Formatif), dan Lembar Kerja Murid (LKM)."
+        )
 
-      docx_file = generate_docx(
-          data_ai,
-          nama_sekolah,
-          semester,
-          tahun_pelajaran,
-          mata_pelajaran,
-          fase_kelas,
-          topik,
-          alokasi_waktu,
-          pertemuan_ke,
-          nama_penulis,
-          nama_kota,
-          tanggal_pembuatan,
-          nip_penulis,
-      )
+        docx_file = generate_docx(
+            data_ai,
+            nama_sekolah,
+            semester,
+            tahun_pelajaran,
+            mata_pelajaran,
+            fase_kelas,
+            topik,
+            alokasi_waktu,
+            pertemuan_ke,
+            nama_penulis,
+            nama_kota,
+            tanggal_pembuatan,
+            nip_penulis,
+        )
 
-      st.download_button(
-          label="📥 Unduh Modul Ajar Pembelajaran Mendalam (.docx)",
-          data=docx_file,
-          file_name=f"Modul_Ajar_{topik.replace(' ', '_')}.docx",
-          mime=(
-              "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          ),
-      )
+        st.download_button(
+            label="📥 Unduh Modul Ajar Pembelajaran Mendalam (.docx)",
+            data=docx_file,
+            file_name=f"Modul_Ajar_{topik.replace(' ', '_')}.docx",
+            mime=(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ),
+        )
