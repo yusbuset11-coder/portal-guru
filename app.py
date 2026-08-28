@@ -10,15 +10,19 @@ st.set_page_config(
     page_icon="🚀",
     layout="wide",
 )
-# Atur jarak atas agar konten naik dan tidak terpotong di bawah
-st.markdown("""
+
+# Atur jarak bawah agar tombol login tidak terpotong
+st.markdown(
+    """
     <style>
         .block-container {
             padding-top: 1.5rem;
-            padding-bottom: 1rem;
+            padding-bottom: 6rem;
         }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
 
 # ID Master Registry Pusat
 MASTER_REGISTRY_ID = "1mgN63xzrLt__5b9-gBw8dIWYP3RRgNdagUiTurFZdgg"
