@@ -117,7 +117,7 @@ else:
     st.markdown(
         f"""
         <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 25px 30px; border-radius: 14px; border: 1px solid #334155; margin-bottom: 25px;">
-            <h2 style="color: #ffffff; margin: 0 0 10px 0; font-size: 26px;">📖 E Jurnal Mengajar Guru: Digitalisasi Jurnal</h2>
+            <h2 style="color: #ffffff; margin: 0 0 10px 0; font-size: 30px;">📖 Digitalisasi Jurnal Pembelajaran</h2>
             <p style="color: #e2e8f0; font-size: 15px; margin: 0 0 8px 0;">Selamat Datang, {guru_nama} di Modul E Jurnal Mengajar</p>
             <p style="color: #94a3b8; font-size: 14px; margin: 0;">Catat kegiatan pembelajaran harian, ketercapaian, dan laporan dengan mudah.</p>
         </div>
