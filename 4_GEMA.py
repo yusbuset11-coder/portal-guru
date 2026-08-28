@@ -12,7 +12,7 @@ import streamlit as st
 
 # Konfigurasi Halaman
 st.set_page_config(
-    page_title="GENERATOR: MODUL AJAR PEMBELAJARAN MENDALAM",
+    page_title="GEMA: GENERATOR MODUL AJAR PEMBELAJARAN MENDALAM",
     page_icon="📚",
     layout="wide",
 )
