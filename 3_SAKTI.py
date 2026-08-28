@@ -443,7 +443,7 @@ elif menu == "📊 Bank Soal & Asesmen Tersimpan":
       else:
         df_bank = pd.DataFrame(data_bank)
         with st.container(border=True):
-          st.dataframe(df_bank, width="stretch)
+          st.dataframe(df_bank, width="stretch")
     except Exception:
       st.info(
           "Tab 'Bank Soal SAKTI' belum tersedia atau belum ada data di"
