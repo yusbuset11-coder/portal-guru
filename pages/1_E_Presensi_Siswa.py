@@ -78,7 +78,7 @@ guru_nama = st.session_state.get("guru_nama", "Yusbuset")
 st.markdown(
     f"""
     <div class="main-header-card">
-        <h2 class="main-title">📋 E Presensi Siswa: Sistem Informasi Presensi Harian</h2>
+        <h2 class="main-title">📋 Digitalisasi Presensi Harian Siswa</h2>
         <p class="sub-desc">Selamat Datang, {guru_nama} di Modul E Presensi Siswa</p>
         <p class="sub-desc" style="margin-top: 4px;">Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata Pelajaran.</p>
     </div>
