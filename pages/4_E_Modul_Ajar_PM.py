@@ -82,6 +82,16 @@ st.markdown(
         animation: blink-animation 1.6s infinite ease-in-out;
         font-weight: 600;
     }
+    /* Kustomisasi Header Bagian agar selalu satu baris dan proporsional */
+    .section-header {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #f8fafc;
+        margin-top: 1.2rem;
+        margin-bottom: 0.8rem;
+        white-space: nowrap;
+        letter-spacing: 0.2px;
+    }
     .stButton > button {
         width: 100%;
         border-radius: 8px;
@@ -591,8 +601,11 @@ st.markdown(
 
 st.markdown("---")
 
-# 3. Parameter Pembelajaran (Di bawah banner)
-st.header("⚙️ Parameter Pembelajaran")
+# 3. Parameter Pembelajaran (Di bawah banner, font header diperkecil jadi satu baris)
+st.markdown(
+    '<div class="section-header">⚙️ Parameter Pembelajaran</div>',
+    unsafe_allow_html=True,
+)
 api_key = st.text_input(
     "Masukkan Google Gemini API Key", value=api_key_default, type="password"
 )
@@ -666,7 +679,10 @@ st.markdown("---")
 col_id1, col_id2 = st.columns(2)
 
 with col_id1:
-  st.header("🏫 Identitas Satuan Pendidikan")
+  st.markdown(
+      '<div class="section-header">🏫 Identitas Satuan Pendidikan</div>',
+      unsafe_allow_html=True,
+  )
   nama_sekolah = st.text_input(
       "Nama Sekolah", st.session_state.get("sekolah", "SMK Negeri 2 Bangkalan")
   )
@@ -674,7 +690,10 @@ with col_id1:
   tahun_pelajaran = st.text_input("Tahun Pelajaran", "2026/2027")
 
 with col_id2:
-  st.header("✍️ Identitas Pengesahan Dokumen")
+  st.markdown(
+      '<div class="section-header">✍️ Identitas Pengesahan Dokumen</div>',
+      unsafe_allow_html=True,
+  )
   nama_kota = st.text_input("Nama Kota", "Bangkalan")
   tanggal_pembuatan = st.text_input(
       "Tanggal / Bulan / Tahun", datetime.today().strftime("%d %B %Y")
