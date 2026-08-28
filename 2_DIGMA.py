@@ -100,13 +100,13 @@ else:
         ["🏠 Beranda DIGMA", "✍️ Input Jurnal Mengajar", "📚 Riwayat & Rekap Jurnal"],
     )
 
-    # Styling Banner ala SIPENSIS
+    # Styling Banner disamakan dengan SIPENSIS (Ukuran font lebih besar & proporsional)
     st.markdown(
         """
         <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); padding: 20px; border-radius: 12px; border: 1px solid #38bdf8; margin-bottom: 20px;">
-            <h2 style="color: #ffffff; margin: 0 0 10px 0; font-size: 24px; font-family: sans-serif;">📖 DIGMA: Digitalisasi Jurnal Mengajar</h2>
-            <p style="color: #e2e8f0; font-size: 14px; margin: 0 0 5px 0;">Selamat Datang, Yusbuset di Modul DIGMA</p>
-            <p style="color: #94a3b8; font-size: 13px; margin: 0;">Catat kegiatan pembelajaran harian, ketercapaian materi, serta catatan kelas secara digital dan terstruktur.</p>
+            <h2 style="color: #ffffff; margin: 0 0 10px 0; font-size: 26px; font-family: sans-serif;">📖 DIGMA: Digitalisasi Jurnal Mengajar</h2>
+            <p style="color: #e2e8f0; font-size: 15px; margin: 0 0 8px 0;">Selamat Datang, Yusbuset di Modul DIGMA</p>
+            <p style="color: #94a3b8; font-size: 14px; margin: 0;">Catat kegiatan pembelajaran harian, ketercapaian materi, serta catatan kelas secara digital dan terstruktur.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -126,7 +126,7 @@ else:
                 st.markdown(
                     f"""
                     <p style="color: #94a3b8; font-size: 12px; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 600;">TOTAL JURNAL TERCATAT</p>
-                    <p style="color: #ffffff; font-size: 15px; margin: 0; font-weight: 600;">{total_jurnal} Kegiatan</p>
+                    <p style="color: #ffffff; font-size: 22px; margin: 0; font-weight: 600;">{total_jurnal} Kegiatan</p>
                     """,
                     unsafe_allow_html=True,
                 )
@@ -135,7 +135,7 @@ else:
                 st.markdown(
                     """
                     <p style="color: #94a3b8; font-size: 12px; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 600;">STATUS KONEKSI DATABASE</p>
-                    <p style="color: #ffffff; font-size: 15px; margin: 0; font-weight: 600;">Terhubung Aktif ✅</p>
+                    <p style="color: #ffffff; font-size: 22px; margin: 0; font-weight: 600;">Terhubung Aktif ✅</p>
                     """,
                     unsafe_allow_html=True,
                 )
