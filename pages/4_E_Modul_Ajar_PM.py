@@ -707,7 +707,7 @@ with col_id2:
 st.markdown("---")
 
 # 5. Tombol Aksi Generator di Bawah Penuh
-st.markdown("### 🚀 Generator Modul Ajar Berbasis Pembelajaran Mendalam")
+st.markdown("### 🚀 Generator Modul Ajar Pembelajaran Mendalam")
 st.markdown(
     "Pastikan parameter dan identitas di atas sudah terisi dengan benar, lalu"
     " klik tombol di bawah untuk mulai menyusun dokumen secara otomatis"
