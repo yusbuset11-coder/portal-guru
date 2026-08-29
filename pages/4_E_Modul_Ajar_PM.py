@@ -13,11 +13,31 @@ from styles import apply_global_styles
 
 # Konfigurasi Halaman
 st.set_page_config(
-    page_title="GEMA: GENERATOR MODUL AJAR PEMBELAJARAN MENDALAM",
+    page_title="Otomatisasi Penyusunan Modul Ajar PM",
     page_icon="📚",
     layout="wide",
 )
 apply_global_styles()
+
+with st.sidebar:
+    st.markdown(
+        f"""
+        <div class="user-profile-box">
+            <span style="font-size: 24px;">👨‍💻</span><br>
+            <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
+            <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("---")
+    st.markdown(
+        """
+        <p style='color: #94a3b8; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;'>NAVIGASI MODUL</p>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # Atur jarak atas agar konten naik dan tidak terpotong di bawah
 st.markdown(
