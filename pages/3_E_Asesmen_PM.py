@@ -285,20 +285,19 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    
-  st.markdown("### 📌 Menu Navigasi SAKTI")
-  menu = st.radio(
-      "Pilih Menu:",
-      [
-          "🏠 Beranda SAKTI",
-          "✨ Generator Asesmen AI",
-          "📊 Bank Soal & Asesmen Tersimpan",
-          "📈 Rekap Nilai Siswa",
-      ],
-  )
+    st.markdown("### 📌 Menu Navigasi Asesmen")
+    menu = st.radio(
+        "Pilih Menu:",
+        [
+            "🏠 Beranda Asesmen",
+            "✨ Generator Asesmen AI",
+            "📊 Bank Soal & Asesmen Tersimpan",
+            "📈 Rekap Nilai Siswa",
+        ],
+    )
 
-# --- MENU 1: BERANDA SAKTI ---
-if menu == "🏠 Beranda SAKTI":
+# --- MENU 1: BERANDA ASESMEN ---
+if menu == "🏠 Beranda Asesmen":
   
   st.write(
       "Gunakan kecerdasan buatan untuk merancang soal asesmen formatif,"
@@ -306,7 +305,7 @@ if menu == "🏠 Beranda SAKTI":
   )
 
   with st.container(border=True):
-    st.markdown("### **✨ Fitur Unggulan SAKTI**")
+    st.markdown("### **✨ Fitur Unggulan Asesmen**")
     st.markdown(
         "* **Generator Soal Otomatis:** Buat soal Pilihan Ganda dan Essay"
         " berdasarkan Capaian Pembelajaran (CP) atau materi spesifik dengan"
@@ -514,7 +513,7 @@ elif menu == "✨ Generator Asesmen AI":
                   str(st.session_state.generated_soal),
               ])
               st.success(
-                  "🎉 Soal berhasil disimpan ke tab 'Bank Soal SAKTI' di"
+                  "🎉 Soal berhasil disimpan ke tab 'Bank Soal Asesmen' di"
                   " spreadsheet Anda!"
               )
             except Exception as e:
