@@ -3,7 +3,7 @@ import gspread
 import pandas as pd
 import streamlit as st
 from google.oauth2.service_account import Credentials
-from styles import apply_global_styles  # Impor modul styling global
+from styles import apply_global_styles
 
 # --- KONFIGURASI HALAMAN UTAMA ---
 st.set_page_config(
@@ -246,17 +246,16 @@ if not st.session_state.logged_in:
           )
 else:
   # --- SIDEBAR PROFESIONAL SETELAH LOGIN ---
-  with st.sidebar:
-    st.markdown(
-        f"""
+  st.markdown(
+            f"""
             <div class="user-profile-box">
-                <div style="font-size: 22px; margin-bottom: 2px;">👨‍🏫</div>
-                <div style="color: #38bdf8; font-weight: 700; font-size: 14px;">{st.session_state.guru_nama}</div>
-                <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">Sesi Aktif & Terverifikasi</div>
+                <span style="font-size: 24px;">👨‍💻</span><br>
+                <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
+                <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
             </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
     st.markdown("---")
     st.markdown(
         "<p style='color: #94a3b8; font-size: 11px; font-weight: 600;"
