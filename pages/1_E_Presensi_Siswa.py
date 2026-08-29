@@ -236,14 +236,91 @@ else:
         if not df_filtered_sekolah.empty
         else ["-"]
     )
+    selected_kelas = st.selectbox("Kelas", list_kelas)
 
-selected_kelas = st.selectbox("Kelas", list_kelas)
-      mapel = st.text_input(
-          "Mata Pelajaran", placeholder="Contoh: Informatika / Bahasa Indonesia"
-      )
-      jam = st.text_input(
-          "Jam Pelajaran / Keterangan Waktu", placeholder="Contoh: Jam ke 1-2"
-      )
+  mapel = st.text_input(
+      "Mata Pelajaran", placeholder="Contoh: Informatika / Bahasa Indonesia"
+  )
+  jam = st.text_input(
+      "Jam Pelajaran / Keterangan Waktu", placeholder="Contoh: Jam ke 1-2"
+  )
+
+  st.markdown("---")
+  st.subheader(
+      f"Daftar Kehadiran Siswa - {selected_sekolah} ({selected_kelas})"
+  )
+
+  df_current_students = df_filtered_sekolah[
+      df_filtered_sekolah["Kelas"] == selected_kelas
+  ]
+
+  if df_current_students.empty:
+    st.info(
+        "ℹ️ Tidak ada data siswa untuk kombinasi Sekolah dan Kelas tersebut."
+    )
+  else:
+    if "No_Absen" in df_current_students.columns:
+      df_current_students = df_current_students.sort_values(by="No_Absen")
+
+    form_key = f"form_presensi_{selected_sekolah}_{selected_kelas}"
+    with st.form(form_key):
+      attendance_results = {}
+
+      header_cols = st.columns([1, 3, 4])
+      header_cols[0].markdown("**No**")
+      header_cols[1].markdown("**Nama Siswa**")
+      header_cols[2].markdown("**Status Kehadiran**")
+      st.markdown("<hr style='margin:5px 0;'>", unsafe_allow_html=True)
+
+      for idx, row in df_current_students.reset_index(drop=True).iterrows():
+        no_absen = row.get("No_Absen", idx + 1)
+        nama = row.get("Nama_Siswa", "Tanpa Nama")
+
+        r_cols = st.columns([1, 3, 4])
+        r_cols[0].write(str(no_absen))
+        r_cols[1].write(str(nama))
+
+        status = r_cols[2].radio(
+            f"Status {nama}",
+            ["Hadir", "Izin", "Sakit", "Alpa"],
+            horizontal=True,
+            key=f"status_{selected_sekolah}_{selected_kelas}_{idx}",
+            label_visibility="collapsed",
+        )
+        attendance_results[nama] = {"no_absen": no_absen, "status": status}
+
+      st.markdown("")
+      submitted = st.form_submit_button("💾 Simpan Presensi ke Spreadsheet")
+
+      if submitted:
+        if not mapel:
+          st.error("⚠️ Mohon isi Mata Pelajaran terlebih dahulu.")
+        else:
+          _, ws_absensi = load_data_from_sheet("Absensi Siswa")
+          rows_to_add = []
+          tgl_str = tanggal.strftime("%Y-%m-%d")
+
+          for nama, info in attendance_results.items():
+            rows_to_add.append([
+                tgl_str,
+                selected_sekolah,
+                selected_kelas,
+                mapel,
+                jam,
+                info["no_absen"],
+                nama,
+                info["status"],
+            ])
+
+          if ws_absensi and rows_to_add:
+            ws_absensi.append_rows(rows_to_add)
+            st.balloons()
+            st.success(
+                "🎉 Data presensi berhasil disimpan ke Google Spreadsheet"
+                " Anda!"
+            )
+          else:
+            st.error("❌ Gagal menyimpan ke Spreadsheet.")
 
     st.markdown("---")
     st.subheader(
