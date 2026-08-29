@@ -11,6 +11,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 import pandas as pd
 import streamlit as st
+from styles import apply_global_styles
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
@@ -18,6 +19,8 @@ st.set_page_config(
     page_icon="🎯",
     layout="wide",
 )
+apply_global_styles()
+
 # Atur jarak atas agar konten naik dan tidak terpotong di bawah
 st.markdown("""
     <style>
