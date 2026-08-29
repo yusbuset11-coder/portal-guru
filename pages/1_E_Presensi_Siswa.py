@@ -3,12 +3,15 @@ from google.oauth2.service_account import Credentials
 import gspread
 import pandas as pd
 import streamlit as st
+from styles import apply_global_styles
 
 st.set_page_config(
     page_title="E Presensi Siswa - Sistem Informasi Presensi Harian",
     page_icon="📋",
     layout="wide",
 )
+apply_global_styles()
+
 st.markdown(
     """
     <style>
