@@ -615,7 +615,7 @@ st.markdown(
         </h2>
         <div class="header-subtitle">
             <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;&nbsp;
-            <em>Aplikasi Otomatisasi Perancangan Pembelajaran Deep Learning</em>
+            <em>Aplikasi Otomatisasi Perancangan Pembelajaran Mendalam</em>
         </div>
     </div>
     """,
