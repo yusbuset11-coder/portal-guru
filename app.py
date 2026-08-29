@@ -257,16 +257,7 @@ else:
             """,
           unsafe_allow_html=True,
       )
-
-      st.markdown("---")
-      st.markdown(
-          """
-            <p style='color: #94a3b8; font-size: 11px; font-weight: 600;'
-            letter-spacing: 0.5px;'>NAVIGASI MODUL</p>
-            """,
-          unsafe_allow_html=True,
-      )
-
+      
     if st.button("🚪 Keluar / Logout"):
       st.session_state.logged_in = False
       st.session_state.guru_nama = ""
