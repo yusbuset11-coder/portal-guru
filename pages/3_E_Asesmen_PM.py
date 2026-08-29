@@ -288,10 +288,7 @@ with st.sidebar:
 
 # --- MENU 1: BERANDA SAKTI ---
 if menu == "🏠 Beranda SAKTI":
-  st.subheader(
-      f"Selamat Datang, **{st.session_state.get('guru_nama', 'Guru')}** di Modul"
-      " SAKTI"
-  )
+  
   st.write(
       "Gunakan kecerdasan buatan untuk merancang soal asesmen formatif,"
       " sumatif, kisi-kisi, serta rubrik penilaian secara cepat dan akurat."
