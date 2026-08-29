@@ -286,26 +286,26 @@ else:
         unsafe_allow_html=True,
     )
 
-    st.markdown("### 📚 Modul Aplikasi Tersedia")
+    st.markdown("### 📑 Modul Aplikasi Tersedia")
 
-    col1, col2 = st.columns(2)
-  with col1:
-    st.markdown(
-        """
+    coll1, col2 = st.columns(2)
+    with coll1:
+      st.markdown(
+          """
             <div class="module-card">
-                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar PM)</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar Pembelajaran Mendalam (Deep Learning) lengkap dengan LKM, Rubrik, dan Instrumen Formatif berformat Word (.docx).</p>
+                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar dengan kecerdasan buatan.</p>
             </div>
             """,
-        unsafe_allow_html=True,
-    )
-  with col2:
-    st.markdown(
-        """
+          unsafe_allow_html=True,
+      )
+    with coll2:
+      st.markdown(
+          """
             <div class="module-card">
-                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM)</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem penilaian siswa, manajemen data pembelajaran, dan administrasi pendukung profesional lainnya.</p>
+                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi Siswa, E Jurnal, dll)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem administrasi.</p>
             </div>
             """,
-        unsafe_allow_html=True,
-    )
+          unsafe_allow_html=True,
+      )
