@@ -79,23 +79,26 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Sidebar Profil
-st.sidebar.markdown(
-    """
-    <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); 
-                padding: 15px; 
-                border-radius: 12px; 
-                border: 1px solid #334155; 
-                text-align: center; 
-                margin-bottom: 20px;">
-        <span style="font-size: 24px;">👨‍💻</span><br>
-        <b style="color: #facc15; font-size: 14px;">Yusbuset</b><br>
-        <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+# Sidebar Profil & Navigasi
+    with st.sidebar:
+      st.markdown(
+          f"""
+            <div class="user-profile-box">
+                <span style="font-size: 24px;">👨‍💻</span><br>
+                <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
+                <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
+            </div>
+            """,
+          unsafe_allow_html=True,
+      )
 
+      st.markdown("---")
+      st.markdown(
+          """
+            <p style='color: #94a3b8; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;'>NAVIGASI MODUL</p>
+            """,
+          unsafe_allow_html=True,
+      )
 
 # Koneksi Google Sheets
 @st.cache_resource
