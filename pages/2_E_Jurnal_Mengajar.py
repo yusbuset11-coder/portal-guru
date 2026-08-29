@@ -4,6 +4,7 @@ import gspread
 import pandas as pd
 import streamlit as st
 from google.oauth2.service_account import Credentials
+from styles import apply_global_styles
 
 # Konfigurasi Halaman
 st.set_page_config(
@@ -11,6 +12,8 @@ st.set_page_config(
     page_icon="📖",
     layout="wide",
 )
+apply_global_styles()
+
 st.markdown(
     "<style>.block-container { padding-top: 1.5rem; padding-bottom: 1rem;"
     " }</style>",
