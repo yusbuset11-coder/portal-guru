@@ -121,23 +121,23 @@ if "guru_nama" not in st.session_state:
 # HALAMAN 1: PORTAL UTAMA (PASTI) & LOGIN
 # =====================================================================
 st.title("PASTI - Portal Akademik Siswa Terintegrasi")
-  st.markdown(
-      """
-        <div class="header-card" style="text-align: center;">
-            <h1 class="header-title">PASTI</h1>
-            <div class="header-subtitle" style="font-size: 15px; font-weight: 600; color: #cbd5e1; margin-top: 4px;">
-                Portal Akademik Siswa Terintegrasi
-            </div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">
-                Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru
-            </div>
-            <div>
-                <span class="sub-badge">Pengembang: Yustinus Budi Setyanta - PS Cabdin Bangkalan | Sistem Otomatisasi Terintegrasi</span>
-            </div>
-        </div>
-        """,
-      unsafe_allow_html=True,
-  )
+st.markdown(
+    """
+      <div class="header-card" style="text-align: center;">
+          <h1 class="header-title">PASTI</h1>
+          <div class="header-subtitle" style="font-size: 15px; font-weight: 600; color: #cbd5e1; margin-top: 4px;">
+              Portal Akademik Siswa Terintegrasi
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">
+              Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru
+          </div>
+          <div>
+              <span class="sub-badge">Pengembang: Yustinus Budi Setyanta - PS Cabdin Bangkalan | Sistem Otomatisasi Terintegrasi</span>
+          </div>
+      </div>
+      """,
+    unsafe_allow_html=True,
+)
 
   if not st.session_state.logged_in:
     st.markdown("### 🔐 Login Akses Portal")
