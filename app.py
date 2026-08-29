@@ -274,8 +274,8 @@ else:
       st.rerun()
 
   # --- TAMPILAN BERANDA UTAMA SETELAH LOGIN ---
-  st.markdown(
-      f"""
+    st.markdown(
+        f"""
         <div class="user-welcome-card">
             ✅ Anda sudah masuk sebagai <b>{st.session_state.guru_nama}</b>.
         </div>
@@ -283,8 +283,8 @@ else:
             👉 Silakan pilih modul aplikasi di menu sebelah kiri (Sidebar) untuk mulai bekerja <b>(E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM, E-Modul Ajar PM)</b>.
         </div>
         """,
-      unsafe_allow_html=True,
-  )
+        unsafe_allow_html=True,
+    )
 
   st.markdown("### 📚 Modul Aplikasi Tersedia")
 
