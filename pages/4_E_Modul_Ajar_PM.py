@@ -630,7 +630,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 api_key = st.text_input(
-    "Masukkan Google Gemini API Key", value=api_key_default, type="password"
+    "Masukkan Google Gemini API Key", value="", type="password"
 )
 
 col_param1, col_param2 = st.columns(2)
