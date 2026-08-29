@@ -582,8 +582,9 @@ def generate_docx(
 # TAMPILAN UTAMA (TERUSUN DI BAWAH BANNER / FULL-WIDTH STACKED)
 # =====================================================================
 
-# 1. Info User Login (Posisi atas)
-st.success(f"👤 **{st.session_state.get('guru_nama', 'Guru')}**")
+# Hapus atau comment baris ini:
+# # 1. Info User Login (Posisi atas)
+# st.success(f"👤 **{st.session_state.get('guru_nama', 'Guru')}**")
 
 # 2. Header Banner Utama (Full Width)
 st.markdown(
