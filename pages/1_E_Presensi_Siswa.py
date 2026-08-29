@@ -205,14 +205,13 @@ st.sidebar.markdown(
 )
 
 # ----------------------------------------------------
-# MENU 1: PENCATATAN PRESENSI HARIAN
+# HALAMAN PENCATATAN PRESENSI HARIAN
 # ----------------------------------------------------
-if menu == "📋 Pencatatan Presensi Harian":
-  st.markdown("## 📝 Pencatatan Presensi Harian Siswa")
-  st.markdown(
-      "Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata"
-      " Pelajaran."
-  )
+st.markdown("## 📝 Pencatatan Presensi Harian Siswa")
+st.markdown(
+    "Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata"
+    " Pelajaran."
+)
 
   df_siswa, ws_siswa = load_data_from_sheet("Data Kelas-Siswa")
 
