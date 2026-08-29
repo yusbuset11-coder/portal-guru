@@ -3,7 +3,7 @@ import gspread
 import pandas as pd
 import streamlit as st
 from google.oauth2.service_account import Credentials
-from styles import apply_global_styles  # Impor modul styling global
+from styles import apply_global_styles
 
 # --- KONFIGURASI HALAMAN UTAMA ---
 st.set_page_config(
