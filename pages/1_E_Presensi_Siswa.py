@@ -19,51 +19,41 @@ st.markdown(
             padding-top: 1.5rem;
             padding-bottom: 1rem;
         }
-    </style>
-    
-""",
-    unsafe_allow_html=True,
-)
-
-# Styling CSS Universal (Background Gelap Seragam & Kartu Profesional ala DIGMA)
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-color: #0e1117;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .main-header-card {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 18px 22px;
-        border-radius: 12px;
-        border: 1px solid #334155;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.4);
-    }
-    .main-title {
-        color: #38bdf8;
-        font-size: 16px; /* Font diperkecil agar proporsional, rapi, dan tidak terlalu besar */
-        font-weight: 700;
-        margin: 0 0 6px 0;
-        line-height: 1.4;
-    }
-    .sub-desc {
-        color: #94a3b8;
-        font-size: 13px;
-        margin: 0;
-    }
-    .stat-card {
-        background: #111827;
-        padding: 18px;
-        border-radius: 10px;
-        border: 1px solid #1f2937;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    [data-testid="stSidebar"] {
-        background-color: #111827;
-        border-right: 1px solid #1f2937;
-    }
+        .stApp {
+            background-color: #0e1117;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-header-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 18px 22px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.4);
+        }
+        .main-title {
+            color: #38bdf8;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            line-height: 1.4;
+        }
+        .sub-desc {
+            color: #94a3b8;
+            font-size: 13px;
+            margin: 0;
+        }
+        .stat-card {
+            background: #111827;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid #1f2937;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        [data-testid="stSidebar"] {
+            background-color: #111827;
+            border-right: 1px solid #1f2937;
+        }
     </style>
 """,
     unsafe_allow_html=True,
@@ -89,30 +79,22 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Kartu Statistik / Status (Gaya ala DIGMA)
-col1_stat, col2_stat = st.columns(2)
-with col1_stat:
-  st.markdown(
-      """
-        <div class="stat-card">
-            <div style="color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 6px;">TOTAL SESI PRESENSI</div>
-            <div style="color: #f8fafc; font-size: 20px; font-weight: 700;">Data Tercatat Aktif</div>
-        </div>
-        """,
-      unsafe_allow_html=True,
-  )
-with col2_stat:
-  st.markdown(
-      """
-        <div class="stat-card">
-            <div style="color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 6px;">STATUS KONEKSI DATABASE</div>
-            <div style="color: #22c55e; font-size: 18px; font-weight: 700;">Terhubung Aktif ✅</div>
-        </div>
-        """,
-      unsafe_allow_html=True,
-  )
-
-st.markdown("<br>", unsafe_allow_html=True)
+# Sidebar Profil
+st.sidebar.markdown(
+    """
+    <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); 
+                padding: 15px; 
+                border-radius: 12px; 
+                border: 1px solid #334155; 
+                text-align: center; 
+                margin-bottom: 20px;">
+        <span style="font-size: 24px;">👨‍💻</span><br>
+        <b style="color: #facc15; font-size: 14px;">Yusbuset</b><br>
+        <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 # Koneksi Google Sheets
@@ -188,139 +170,59 @@ def load_data_from_sheet(sheet_name):
     return pd.DataFrame(), None
 
 
-st.sidebar.markdown(
-    """
-    <div style="background: linear-gradient(135deg, #1e293b 0%, #111827 100%); 
-                padding: 15px; 
-                border-radius: 12px; 
-                border: 1px solid #334155; 
-                text-align: center; 
-                margin-bottom: 20px;">
-        <span style="font-size: 24px;">👨‍💻</span><br>
-        <b style="color: #facc15; font-size: 14px;">Yusbuset</b><br>
-        <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
-    </div>
-    """,
-    unsafe_allow_html=True,
+# Navigasi Menu Dalam Halaman Presensi
+menu = st.radio(
+    "Navigasi Modul Presensi",
+    [
+        "📝 Pencatatan Presensi Harian",
+        "📊 Rekap Semester Ganjil & Genap",
+        "📂 Manajemen Data Sekolah & Siswa",
+    ],
+    horizontal=True,
 )
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# HALAMAN PENCATATAN PRESENSI HARIAN
+# MENU 1: PENCATATAN PRESENSI HARIAN
 # ----------------------------------------------------
-st.markdown("## 📝 Pencatatan Presensi Harian Siswa")
-st.markdown(
-    "Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata"
-    " Pelajaran."
-)
-
-df_siswa, ws_siswa = load_data_from_sheet("Data Kelas-Siswa")
-
-if df_siswa.empty or "Sekolah" not in df_siswa.columns:
-  st.warning(
-      "⚠️ Belum ada data Sekolah dan Siswa. Silakan isi atau upload data"
-      ' melalui menu **Manajemen Data Sekolah & Siswa** di sidebar.'
-  )
-else:
-  col1, col2 = st.columns(2)
-  with col1:
-    tanggal = st.date_input("Tanggal Presensi", datetime.now())
-    list_sekolah = df_siswa["Sekolah"].dropna().unique().tolist()
-    selected_sekolah = st.selectbox(
-        "Sekolah", list_sekolah if list_sekolah else ["-"]
-    )
-
-  with col2:
-    df_filtered_sekolah = df_siswa[df_siswa["Sekolah"] == selected_sekolah]
-    list_kelas = (
-        df_filtered_sekolah["Kelas"].dropna().unique().tolist()
-        if not df_filtered_sekolah.empty
-        else ["-"]
-    )
-    selected_kelas = st.selectbox("Kelas", list_kelas)
-
-  mapel = st.text_input(
-      "Mata Pelajaran", placeholder="Contoh: Informatika / Bahasa Indonesia"
-  )
-  jam = st.text_input(
-      "Jam Pelajaran / Keterangan Waktu", placeholder="Contoh: Jam ke 1-2"
+if menu == "📝 Pencatatan Presensi Harian":
+  st.markdown("## 📝 Pencatatan Presensi Harian Siswa")
+  st.markdown(
+      "Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata"
+      " Pelajaran."
   )
 
-  st.markdown("---")
-  st.subheader(
-      f"Daftar Kehadiran Siswa - {selected_sekolah} ({selected_kelas})"
-  )
+  df_siswa, ws_siswa = load_data_from_sheet("Data Kelas-Siswa")
 
-  df_current_students = df_filtered_sekolah[
-      df_filtered_sekolah["Kelas"] == selected_kelas
-  ]
-
-  if df_current_students.empty:
-    st.info(
-        "ℹ️ Tidak ada data siswa untuk kombinasi Sekolah dan Kelas tersebut."
+  if df_siswa.empty or "Sekolah" not in df_siswa.columns:
+    st.warning(
+        "⚠️ Belum ada data Sekolah dan Siswa. Silakan isi atau upload data"
+        ' melalui menu **Manajemen Data Sekolah & Siswa** di bawah.'
     )
   else:
-    if "No_Absen" in df_current_students.columns:
-      df_current_students = df_current_students.sort_values(by="No_Absen")
+    col1, col2 = st.columns(2)
+    with col1:
+      tanggal = st.date_input("Tanggal Presensi", datetime.now())
+      list_sekolah = df_siswa["Sekolah"].dropna().unique().tolist()
+      selected_sekolah = st.selectbox(
+          "Sekolah", list_sekolah if list_sekolah else ["-"]
+      )
 
-    form_key = f"form_presensi_{selected_sekolah}_{selected_kelas}"
-    with st.form(form_key):
-      attendance_results = {}
+    with col2:
+      df_filtered_sekolah = df_siswa[df_siswa["Sekolah"] == selected_sekolah]
+      list_kelas = (
+          df_filtered_sekolah["Kelas"].dropna().unique().tolist()
+          if not df_filtered_sekolah.empty
+          else ["-"]
+      )
+      selected_kelas = st.selectbox("Kelas", list_kelas)
 
-      header_cols = st.columns([1, 3, 4])
-      header_cols[0].markdown("**No**")
-      header_cols[1].markdown("**Nama Siswa**")
-      header_cols[2].markdown("**Status Kehadiran**")
-      st.markdown("<hr style='margin:5px 0;'>", unsafe_allow_html=True)
-
-      for idx, row in df_current_students.reset_index(drop=True).iterrows():
-        no_absen = row.get("No_Absen", idx + 1)
-        nama = row.get("Nama_Siswa", "Tanpa Nama")
-
-        r_cols = st.columns([1, 3, 4])
-        r_cols[0].write(str(no_absen))
-        r_cols[1].write(str(nama))
-
-        status = r_cols[2].radio(
-            f"Status {nama}",
-            ["Hadir", "Izin", "Sakit", "Alpa"],
-            horizontal=True,
-            key=f"status_{selected_sekolah}_{selected_kelas}_{idx}",
-            label_visibility="collapsed",
-        )
-        attendance_results[nama] = {"no_absen": no_absen, "status": status}
-
-      st.markdown("")
-      submitted = st.form_submit_button("💾 Simpan Presensi ke Spreadsheet")
-
-      if submitted:
-        if not mapel:
-          st.error("⚠️ Mohon isi Mata Pelajaran terlebih dahulu.")
-        else:
-          _, ws_absensi = load_data_from_sheet("Absensi Siswa")
-          rows_to_add = []
-          tgl_str = tanggal.strftime("%Y-%m-%d")
-
-          for nama, info in attendance_results.items():
-            rows_to_add.append([
-                tgl_str,
-                selected_sekolah,
-                selected_kelas,
-                mapel,
-                jam,
-                info["no_absen"],
-                nama,
-                info["status"],
-            ])
-
-          if ws_absensi and rows_to_add:
-            ws_absensi.append_rows(rows_to_add)
-            st.balloons()
-            st.success(
-                "🎉 Data presensi berhasil disimpan ke Google Spreadsheet"
-                " Anda!"
-            )
-          else:
-            st.error("❌ Gagal menyimpan ke Spreadsheet.")
+    mapel = st.text_input(
+        "Mata Pelajaran", placeholder="Contoh: Informatika / Bahasa Indonesia"
+    )
+    jam = st.text_input(
+        "Jam Pelajaran / Keterangan Waktu", placeholder="Contoh: Jam ke 1-2"
+    )
 
     st.markdown("---")
     st.subheader(
@@ -442,7 +344,7 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
         list_sek = df_sem["Sekolah"].dropna().unique().tolist()
         sel_sek = st.selectbox(
             f"Pilih Sekolah ({semester_type})",
-            list_sek,
+            list_sek if list_sek else ["-"],
             key=f"sek_{semester_type}",
         )
 
@@ -451,7 +353,7 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
         list_kls = df_s["Kelas"].dropna().unique().tolist()
         sel_kls = st.selectbox(
             f"Pilih Kelas ({semester_type})",
-            list_kls,
+            list_kls if list_kls else ["-"],
             key=f"kls_{semester_type}",
         )
 
@@ -487,8 +389,6 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
         izin = len(group[group["Status"] == "Izin"])
         sakit = len(group[group["Status"] == "Sakit"])
         alpa = len(group[group["Status"] == "Alpa"])
-
-        # Jumlah TH (Tidak Hadir) = Izin + Sakit + Alpa
         jumlah_th = izin + sakit + alpa
 
         rekap_list.append({
