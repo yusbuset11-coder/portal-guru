@@ -81,24 +81,24 @@ st.markdown(
 
 # Sidebar Profil & Navigasi
     with st.sidebar:
-      st.markdown(
-          f"""
+        st.markdown(
+            f"""
             <div class="user-profile-box">
                 <span style="font-size: 24px;">👨‍💻</span><br>
                 <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
                 <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
             </div>
             """,
-          unsafe_allow_html=True,
-      )
+            unsafe_allow_html=True,
+        )
 
-      st.markdown("---")
-      st.markdown(
-          """
+        st.markdown("---")
+        st.markdown(
+            """
             <p style='color: #94a3b8; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;'>NAVIGASI MODUL</p>
             """,
-          unsafe_allow_html=True,
-      )
+            unsafe_allow_html=True,
+        )
 
 # Koneksi Google Sheets
 @st.cache_resource
