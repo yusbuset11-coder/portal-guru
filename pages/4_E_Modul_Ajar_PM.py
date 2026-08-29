@@ -9,6 +9,7 @@ from docx.oxml.ns import nsdecls
 from docx.shared import Inches, Pt, RGBColor
 import google.generativeai as genai
 import streamlit as st
+from styles import apply_global_styles
 
 # Konfigurasi Halaman
 st.set_page_config(
@@ -16,6 +17,7 @@ st.set_page_config(
     page_icon="📚",
     layout="wide",
 )
+apply_global_styles()
 
 # Atur jarak atas agar konten naik dan tidak terpotong di bawah
 st.markdown(
