@@ -216,28 +216,28 @@ st.markdown(
 df_siswa, ws_siswa = load_data_from_sheet("Data Kelas-Siswa")
 
 if df_siswa.empty or "Sekolah" not in df_siswa.columns:
-st.warning(
-  "⚠️ Belum ada data Sekolah dan Siswa. Silakan isi atau upload data"
-  " melalui menu **Manajemen Data Sekolah & Siswa** di sidebar."
-)
+  st.warning(
+      "⚠️ Belum ada data Sekolah dan Siswa. Silakan isi atau upload data"
+      ' melalui menu **Manajemen Data Sekolah & Siswa** di sidebar.'
+  )
 else:
-col1, col2 = st.columns(2)
-with col1:
-tanggal = st.date_input("Tanggal Presensi", datetime.now())
-list_sekolah = df_siswa["Sekolah"].dropna().unique().tolist()
-selected_sekolah = st.selectbox(
-    "Sekolah", list_sekolah if list_sekolah else ["-"]
-)
+  col1, col2 = st.columns(2)
+  with col1:
+    tanggal = st.date_input("Tanggal Presensi", datetime.now())
+    list_sekolah = df_siswa["Sekolah"].dropna().unique().tolist()
+    selected_sekolah = st.selectbox(
+        "Sekolah", list_sekolah if list_sekolah else ["-"]
+    )
 
-with col2:
-df_filtered_sekolah = df_siswa[df_siswa["Sekolah"] == selected_sekolah]
-list_kelas = (
-    df_filtered_sekolah["Kelas"].dropna().unique().tolist()
-    if not df_filtered_sekolah.empty
-    else ["-"]
-)
-      selected_kelas = st.selectbox("Kelas", list_kelas)
+  with col2:
+    df_filtered_sekolah = df_siswa[df_siswa["Sekolah"] == selected_sekolah]
+    list_kelas = (
+        df_filtered_sekolah["Kelas"].dropna().unique().tolist()
+        if not df_filtered_sekolah.empty
+        else ["-"]
+    )
 
+selected_kelas = st.selectbox("Kelas", list_kelas)
       mapel = st.text_input(
           "Mata Pelajaran", placeholder="Contoh: Informatika / Bahasa Indonesia"
       )
