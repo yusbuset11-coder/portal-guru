@@ -288,7 +288,8 @@ else:
 
     st.markdown("### 📑 Modul Aplikasi Tersedia")
 
-    coll1, col2 = st.columns(2)
+    coll1, coll2 = st.columns(2)
+
     with coll1:
       st.markdown(
           """
@@ -299,6 +300,7 @@ else:
             """,
           unsafe_allow_html=True,
       )
+
     with coll2:
       st.markdown(
           """
