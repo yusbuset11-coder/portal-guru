@@ -180,23 +180,6 @@ if not st.session_state.logged_in:
       st.rerun()
 
 # =====================================================================
-# HALAMAN 2: E PRESENSI SISWA
-# =====================================================================
-elif menu == "E Presensi Siswa":
-  if not st.session_state.logged_in:
-    st.warning("⚠️ Silakan login terlebih dahulu melalui menu [Portal Utama].")
-    st.stop()
-
-  st.markdown(
-      '<div class="section-header">📋 E Presensi Siswa</div>',
-      unsafe_allow_html=True,
-  )
-  st.write(
-      "Fitur pengelolaan kehadiran siswa secara digital dan real-time terintegrasi."
-  )
-  # Tambahkan logika presensi di sini sesuai kebutuhan
-
-# =====================================================================
 # HALAMAN 3: E JURNAL MENGAJAR
 # =====================================================================
 elif menu == "E Jurnal Mengajar":
