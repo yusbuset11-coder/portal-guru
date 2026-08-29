@@ -139,7 +139,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-  if not st.session_state.logged_in:
+if not st.session_state.logged_in:
     st.markdown("### 🔐 Login Akses Portal")
     st.markdown(
         "Silakan masukkan **Email** terdaftar atau **Token Unik** Anda untuk"
