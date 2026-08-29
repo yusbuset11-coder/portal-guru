@@ -1,37 +1,67 @@
 from datetime import datetime
-from io import BytesIO
-import json
-import docx
-from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml import parse_xml
-from docx.oxml.ns import nsdecls
-from docx.shared import Inches, Pt, RGBColor
-import google.generativeai as genai
+import gspread
+import pandas as pd
 import streamlit as st
+from google.oauth2.service_account import Credentials
 
-# Konfigurasi Halaman
+# --- KONFIGURASI HALAMAN UTAMA ---
 st.set_page_config(
     page_title="PASTI - Portal Akademik Siswa Terintegrasi",
-    page_icon="📚",
+    page_icon="🚀",
     layout="wide",
 )
 
-# Atur jarak atas agar konten naik dan tidak terpotong di bawah
+# Atur jarak bawah agar tombol login tidak terpotong
 st.markdown(
     """
     <style>
         .block-container {
-            padding-top: 1.5rem;
-            padding-bottom: 1rem;
+            padding-top: 1rem;
+            padding-bottom: 10rem;
         }
     </style>
-""",
+    """,
     unsafe_allow_html=True,
 )
 
-# ===================================
-# Custom CSS untuk tampilan UI yang modern dan kontras
+# ID Master Registry Pusat
+MASTER_REGISTRY_ID = "1mgN63xzrLt__5b9-gBw8dIWYP3RRgNdagUiTurFZdgg"
+
+
+def get_gspread_client():
+  scope = [
+      "https://www.googleapis.com/auth/spreadsheets",
+      "https://www.googleapis.com/auth/drive",
+  ]
+  creds_dict = dict(st.secrets["gcp_service_account"])
+  creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+  return gspread.authorize(creds)
+
+
+@st.cache_resource
+def load_master_registry():
+  try:
+    client = get_gspread_client()
+    sh = client.open_by_key(MASTER_REGISTRY_ID)
+    worksheet = sh.worksheet("DATABASE_MASTER_REGISTRY")
+    return worksheet.get_all_records()
+  except Exception as e:
+    st.error(
+        f"❌ Gagal terhubung ke Google Spreadsheet Master Registry. Detail"
+        f" Error: {e}"
+    )
+    return None
+
+
+# --- INISIALISASI SESSION STATE GLOBAL ---
+if "logged_in" not in st.session_state:
+  st.session_state.logged_in = False
+if "guru_nama" not in st.session_state:
+  st.session_state.guru_nama = ""
+if "spreadsheet_id" not in st.session_state:
+  st.session_state.spreadsheet_id = ""
+
+# --- STYLING CSS (HEADER LEBIH RINGKAS & JARAK DIPERSEMPIT) ---
 st.markdown(
     """
     <style>
@@ -39,56 +69,78 @@ st.markdown(
         background-color: #0e1117;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    
-    /* Kustomisasi Background Sidebar agar lebih kontras */
-    [data-testid="stSidebar"] {
-        background-color: #17223b;
-        border-right: 1px solid #334155;
-    }
-    
-    .header-card {
+    .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 20px 25px;
+        padding: 16px 20px; /* Diperkecil agar kotak tidak terlalu tinggi */
         border-radius: 12px;
         border: 1px solid #334155;
-        margin-bottom: 20px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-    }
-    .header-title {
-        color: #f8fafc;
-        font-size: 26px;
-        font-weight: 700;
-        margin: 0;
-        letter-spacing: 0.5px;
+        margin-bottom: 15px; /* Jarak bawah dipersempit */
+        box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.4);
         text-align: center;
     }
-    .header-subtitle {
+    .main-title {
+        color: #38bdf8;
+        font-size: 32px; /* Ukuran font judul sedikit diringkas */
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: 1.2px;
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    .sub-title-1 {
+        color: #f8fafc;
+        font-size: 16px; /* Jarak antar baris dipersempit */
+        font-weight: 700;
+        margin-top: 4px;
+        margin-bottom: 2px;
+    }
+    .sub-title-2 {
         color: #94a3b8;
         font-size: 13px;
-        margin-top: 6px;
-        margin-bottom: 0;
-        text-align: center;
         font-weight: 500;
+        margin-top: 0;
+        margin-bottom: 8px;
     }
-    .sub-badge {
+    .dev-badge {
         display: inline-block;
-        background-color: #0f172a;
+        background: rgba(56, 189, 248, 0.1);
         color: #38bdf8;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
+        padding: 4px 14px;
+        border-radius: 15px;
+        font-size: 12px;
         font-weight: 600;
-        border: 1px solid #334155;
-        margin-top: 10px;
+        border: 1px solid rgba(56, 189, 248, 0.3);
     }
-    .section-header {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #f8fafc;
-        margin-top: 1.2rem;
-        margin-bottom: 0.8rem;
-        white-space: nowrap;
-        letter-spacing: 0.2px;
+    .user-welcome-card {
+        background: linear-gradient(135deg, #1e293b 0%, #111827 100%);
+        padding: 14px 18px;
+        border-radius: 10px;
+        border-left: 4px solid #38bdf8;
+        border: 1px solid #334155;
+        color: #e2e8f0;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    .info-notice-card {
+        background: #111827;
+        padding: 12px 18px;
+        border-radius: 10px;
+        border: 1px solid #1f2937;
+        color: #cbd5e1;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+    .module-card {
+        background: #111827;
+        padding: 18px;
+        border-radius: 10px;
+        border: 1px solid #1f2937;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    .module-card:hover {
+        border-color: #38bdf8;
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.15);
+        transform: translateY(-2px);
     }
     .stButton > button {
         width: 100%;
@@ -97,7 +149,7 @@ st.markdown(
         background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
         color: white;
         border: none;
-        padding: 0.75rem 1rem;
+        padding: 0.6rem 1rem;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
         transition: all 0.3s ease;
     }
@@ -106,236 +158,151 @@ st.markdown(
         box-shadow: 0 6px 18px rgba(59, 130, 246, 0.5);
         transform: translateY(-2px);
     }
+    [data-testid="stSidebar"] {
+        background-color: #111827;
+        border-right: 1px solid #1f2937;
+    }
     </style>
 """,
     unsafe_allow_html=True,
 )
 
-# Inisialisasi session state untuk login
-if "logged_in" not in st.session_state:
-  st.session_state.logged_in = False
-if "guru_nama" not in st.session_state:
-  st.session_state.guru_nama = ""
-
-# =====================================================================
-# HALAMAN 1: PORTAL UTAMA (PASTI) & LOGIN
-# =====================================================================
-st.title("PASTI - Portal Akademik Siswa Terintegrasi")
+# --- HEADER UTAMA PORTAL PASTI (Lebih Kompak / Kecil) ---
 st.markdown(
     """
-      <div class="header-card" style="text-align: center;">
-          <h1 class="header-title">PASTI</h1>
-          <div class="header-subtitle" style="font-size: 15px; font-weight: 600; color: #cbd5e1; margin-top: 4px;">
-              Portal Akademik Siswa Terintegrasi
-          </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">
-              Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru
-          </div>
-          <div>
-              <span class="sub-badge">Pengembang: Yustinus Budi Setyanta - PS Cabdin Bangkalan | Sistem Otomatisasi Terintegrasi</span>
-          </div>
-      </div>
-      """,
+    <div class="main-header-card">
+        <h1 class="main-title">PASTI</h1>
+        <div class="sub-title-1">Portal Akademik Siswa Terintegrasi</div>
+        <div class="sub-title-2">Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru</div>
+        <div class="dev-badge">
+            <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;|&nbsp; <em>Sistem Otomatisasi Terintegrasi</em>
+        </div>
+    </div>
+    """,
     unsafe_allow_html=True,
 )
 
+# --- HALAMAN LOGIN / VERIFIKASI (Melebar Penuh & Tidak Terpotong) ---
 if not st.session_state.logged_in:
-    st.markdown("### 🔐 Login Akses Portal")
+  with st.form("form_login"):
     st.markdown(
+        "<h3 style='color: #38bdf8; margin-top:0;'>🔐 Login Akses Portal</h3>",
+        unsafe_allow_html=True,
+    )
+    st.write(
         "Silakan masukkan **Email** terdaftar atau **Token Unik** Anda untuk"
         " masuk ke sistem."
     )
+    user_input = st.text_input(
+        "Email / Token Unik Guru",
+        placeholder=(
+            "Contoh: yustinussetyanta08@dinas.belajar.id atau TOKEN300869"
+        ),
+    )
+    btn_login = st.form_submit_button("🚀 Masuk Portal")
 
-    with st.form("login_form"):
-      email_token = st.text_input(
-          "Email / Token Unik Guru",
-          placeholder="Contoh: yustinussetyanta08@dinas.belajar.id atau"
-          " TOKEN300869",
-      )
-      submitted = st.form_submit_button("🚀 Masuk Portal")
+    if btn_login:
+      if not user_input:
+        st.warning("⚠️ Mohon masukkan Email atau Token Unik Anda.")
+      else:
+        with st.spinner("Memeriksa kredensial ke Master Registry..."):
+          data_registry = load_master_registry()
 
-      if submitted:
-        if email_token.strip():
-          st.session_state.logged_in = True
-          st.session_state.guru_nama = (
-              "Yustinus Budi Setyanta, S.Pd., M.Pd."
-              if "yustinus" in email_token.lower()
-              else "Guru Pengampu"
-          )
-          st.success("✅ Berhasil masuk ke portal! Memuat ulang sistem...")
-          st.rerun()
+        if data_registry:
+          df_registry = pd.DataFrame(data_registry)
+          df_registry.columns = df_registry.columns.str.strip()
+
+          matched = df_registry[
+              (
+                  df_registry["Email"]
+                  .astype(str)
+                  .str.strip()
+                  .str.lower()
+                  == user_input.strip().lower()
+              )
+              | (
+                  df_registry["Token_Unik"].astype(str).str.strip()
+                  == user_input.strip()
+              )
+          ]
+
+          if not matched.empty:
+            st.session_state.logged_in = True
+            st.session_state.guru_nama = matched.iloc[0]["Nama_Guru"]
+            st.session_state.spreadsheet_id = matched.iloc[0]["Spreadsheet_ID"]
+            st.success(
+                f"🎉 Selamat datang, {st.session_state.guru_nama}! Berhasil"
+                " masuk."
+            )
+            st.rerun()
+          else:
+            st.error(
+                "❌ Email atau Token Unik tidak ditemukan di Master Registry."
+            )
         else:
-          st.warning("⚠️ Mohon masukkan Email atau Token Unik Anda terlebih dahulu.")
-  else:
-    st.success(
-        f"👤 Selamat datang kembali, **{st.session_state.guru_nama}**!"
+          st.error(
+              "❌ Database Master Registry kosong atau gagal diakses. Periksa"
+              " koneksi spreadsheet Anda."
+          )
+else:
+  # --- SIDEBAR PROFESIONAL SETELAH LOGIN ---
+  with st.sidebar:
+    st.markdown(
+        f"""
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 12px; border-radius: 8px; border: 1px solid #334155; text-align: center; margin-bottom: 12px;">
+                <div style="font-size: 22px; margin-bottom: 2px;">👨‍🏫</div>
+                <div style="color: #38bdf8; font-weight: 700; font-size: 14px;">{st.session_state.guru_nama}</div>
+                <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">Sesi Aktif & Terverifikasi</div>
+            </div>
+        """,
+        unsafe_allow_html=True,
     )
-    st.info(
-        "Anda sudah masuk ke sistem. Silakan pilih menu di sidebar sebelah kiri"
-        " untuk mengelola E Presensi, E Jurnal, E Asesmen, atau E Modul Ajar."
+    st.markdown("---")
+    st.markdown(
+        "<p style='color: #94a3b8; font-size: 11px; font-weight: 600;"
+        " letter-spacing: 0.5px;'>NAVIGASI MODUL</p>",
+        unsafe_allow_html=True,
     )
-    if st.button("🚪 Keluar (Logout)"):
+
+    if st.button("🚪 Keluar / Logout"):
       st.session_state.logged_in = False
       st.session_state.guru_nama = ""
+      st.session_state.spreadsheet_id = ""
       st.rerun()
 
-# =====================================================================
-# HALAMAN 3: E JURNAL MENGAJAR
-# =====================================================================
-elif menu == "E Jurnal Mengajar":
-  if not st.session_state.logged_in:
-    st.warning("⚠️ Silakan login terlebih dahulu melalui menu [Portal Utama].")
-    st.stop()
-
+  # --- TAMPILAN BERANDA UTAMA SETELAH LOGIN ---
   st.markdown(
-      '<div class="section-header">📖 E Jurnal Mengajar Guru</div>',
-      unsafe_allow_html=True,
-  )
-  st.write("Catat agenda harian, capaian materi, dan catatan kelas di sini.")
-  # Tambahkan logika jurnal mengajar di sini sesuai kebutuhan
-
-# =====================================================================
-# HALAMAN 4: E ASESMEN PM
-# =====================================================================
-elif menu == "E Asesmen PM":
-  if not st.session_state.logged_in:
-    st.warning("⚠️ Silakan login terlebih dahulu melalui menu [Portal Utama].")
-    st.stop()
-
-  st.markdown(
-      '<div class="section-header">📝 E Asesmen Pembelajaran Mendalam</div>',
-      unsafe_allow_html=True,
-  )
-  st.write("Kelola lembar evaluasi formatif dan sumatif berbasis deep learning.")
-  # Tambahkan logika asesmen di sini sesuai kebutuhan
-
-# =====================================================================
-# HALAMAN 5: E MODUL AJAR PM
-# =====================================================================
-elif menu == "E Modul Ajar PM":
-  if not st.session_state.logged_in:
-    st.warning("⚠️ Silakan login terlebih dahulu melalui menu [Portal Utama].")
-    st.stop()
-
-  st.markdown(
-      '<div class="section-header">⚙️ Parameter Pembelajaran Modul Ajar</div>',
+      f"""
+        <div class="user-welcome-card">
+            ✅ Anda sudah masuk sebagai <b>{st.session_state.guru_nama}</b>.
+        </div>
+        <div class="info-notice-card">
+            👉 Silakan pilih modul aplikasi di menu sebelah kiri (Sidebar) untuk mulai bekerja <b>(E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM, E-Modul Ajar PM)</b>.
+        </div>
+        """,
       unsafe_allow_html=True,
   )
 
-  try:
-    api_key_default = st.secrets.get("GEMINI_API_KEY", "")
-  except Exception:
-    api_key_default = ""
+  st.markdown("### 📚 Modul Aplikasi Tersedia")
 
-  api_key = st.text_input(
-      "Masukkan Google Gemini API Key", value=api_key_default, type="password"
-  )
-
-  col_param1, col_param2 = st.columns(2)
-
-  with col_param1:
-    jenjang_pendidikan = st.selectbox(
-        "Pilih Jenjang Pendidikan",
-        ["SD / MI", "SMP / MTs", "SMA / MA", "SMK / MAK"],
-    )
-
-    if jenjang_pendidikan == "SD / MI":
-      default_mapel = "Tematik / Kelas"
-      jp_guidance = "Panduan: 1 JP = 35 Menit"
-      fase_options = [
-          "Fase A / Kelas 1 SD",
-          "Fase A / Kelas 2 SD",
-          "Fase B / Kelas 3 SD",
-          "Fase B / Kelas 4 SD",
-          "Fase C / Kelas 5 SD",
-          "Fase C / Kelas 6 SD",
-      ]
-    elif jenjang_pendidikan == "SMP / MTs":
-      default_mapel = "Matematika / IPA / IPS"
-      jp_guidance = "Panduan: 1 JP = 40 Menit"
-      fase_options = [
-          "Fase D / Kelas 7 SMP",
-          "Fase D / Kelas 8 SMP",
-          "Fase D / Kelas 9 SMP",
-      ]
-    elif jenjang_pendidikan == "SMA / MA":
-      default_mapel = "Bahasa Indonesia / Matematika"
-      jp_guidance = "Panduan: 1 JP = 45 Menit"
-      fase_options = [
-          "Fase E / Kelas X SMA",
-          "Fase F / Kelas XI SMA",
-          "Fase F / Kelas XII SMA",
-      ]
-    else:
-      default_mapel = (
-          "Dasar-dasar Teknik Otomotif / Produk Kreatif dan Kewirausahaan"
-      )
-      jp_guidance = "Panduan: 1 JP = 45 Menit"
-      fase_options = [
-          "Fase E / Kelas X SMK (Program Dasar Keahlian)",
-          "Fase F / Kelas XI SMK (Konsentrasi Keahlian)",
-          "Fase F / Kelas XII SMK (Konsentrasi Keahlian)",
-      ]
-
-    mata_pelajaran = st.text_input(
-        "Mata Pelajaran / Program Kejuruan", default_mapel
-    )
-    fase_kelas = st.selectbox("Fase / Kelas", fase_options)
-
-  with col_param2:
-    topik = st.text_input(
-        "Topik / Materi Pokok / Elemen",
-        (
-            "Contoh: Pemeliharaan Sistem Rem Kendaraan Ringan"
-            if jenjang_pendidikan == "SMK / MAK"
-            else "Contoh: Menyimak Teks Laporan Observasi Secara Kritis"
-        ),
-    )
-    st.caption(jp_guidance)
-    alokasi_waktu = st.text_input("Alokasi Waktu", "2 JP (2 x 45 Menit)")
-    pertemuan_ke = st.text_input("Pertemuan Ke-", "1 (Pertemuan Pertama)")
-
-  st.markdown("---")
-
-  col_id1, col_id2 = st.columns(2)
-
-  with col_id1:
+  col1, col2 = st.columns(2)
+  with col1:
     st.markdown(
-        '<div class="section-header">🏫 Identitas Satuan Pendidikan</div>',
+        """
+            <div class="module-card">
+                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar PM)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar Pembelajaran Mendalam (Deep Learning) lengkap dengan LKM, Rubrik, dan Instrumen Formatif berformat Word (.docx).</p>
+            </div>
+            """,
         unsafe_allow_html=True,
     )
-    nama_sekolah = st.text_input(
-        "Nama Sekolah", st.session_state.get("sekolah", "SMK Negeri 2 Bangkalan")
-    )
-    semester = st.selectbox("Semester", ["Ganjil", "Genap"])
-    tahun_pelajaran = st.text_input("Tahun Pelajaran", "2026/2027")
-
-  with col_id2:
+  with col2:
     st.markdown(
-        '<div class="section-header">✍️ Identitas Pengesahan Dokumen</div>',
+        """
+            <div class="module-card">
+                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem penilaian siswa, manajemen data pembelajaran, dan administrasi pendukung profesional lainnya.</p>
+            </div>
+            """,
         unsafe_allow_html=True,
     )
-    nama_kota = st.text_input("Nama Kota", "Bangkalan")
-    tanggal_pembuatan = st.text_input(
-        "Tanggal / Bulan / Tahun", datetime.today().strftime("%d %B %Y")
-    )
-    nama_penulis = st.text_input(
-        "Nama Penulis Modul",
-        st.session_state.get(
-            "guru_nama", "Yustinus Budi Setyanta, S.Pd., M.Pd."
-        ),
-    )
-    nip_penulis = st.text_input("NIP Penulis", "196908302005011003")
-
-  st.markdown("---")
-  st.markdown("### 🚀 Generator Modul Ajar Berbasis Pembelajaran Mendalam")
-
-  if st.button(
-      "🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=True
-  ):
-    if not api_key:
-      st.error("Mohon masukkan Google Gemini API Key terlebih dahulu.")
-    elif not topik:
-      st.warning("Mohon isi topik pembelajaran.")
-    else:
-      st.success("Modul Ajar siap diproses menggunakan AI.")
