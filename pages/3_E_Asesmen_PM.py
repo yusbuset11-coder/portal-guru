@@ -273,8 +273,19 @@ st.markdown(
 
 # --- SIDEBAR NAVIGASI ---
 with st.sidebar:
-  st.success(f"👤 **{st.session_state.get('guru_nama', 'Guru')}**")
-  st.markdown("---")
+    st.markdown(
+        f"""
+        <div class="user-profile-box">
+            <span style="font-size: 24px;">👨‍💻</span><br>
+            <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
+            <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("---")
+    
   st.markdown("### 📌 Menu Navigasi SAKTI")
   menu = st.radio(
       "Pilih Menu:",
