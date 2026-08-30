@@ -3,6 +3,7 @@ import gspread
 import pandas as pd
 import streamlit as st
 from google.oauth2.service_account import Credentials
+from styles import apply_global_styles
 
 # --- KONFIGURASI HALAMAN UTAMA ---
 st.set_page_config(
@@ -11,13 +12,16 @@ st.set_page_config(
     layout="wide",
 )
 
-# Atur jarak bawah agar tombol login tidak terpotong
+# Terapkan styling global terpusat di sini
+apply_global_styles()
+
+# Atur jarak bawah agar tampilan tidak terpotong
 st.markdown(
     """
     <style>
         .block-container {
-            padding-top: 1rem;
-            padding-bottom: 10rem;
+            padding-top: 0.8rem;
+            padding-bottom: 6rem;
         }
     </style>
     """,
@@ -61,7 +65,7 @@ if "guru_nama" not in st.session_state:
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
 
-# --- STYLING CSS (HEADER LEBIH RINGKAS & JARAK DIPERSEMPIT) ---
+# --- STYLING CSS TAMBAHAN (DIPADATKAN AGAR TIDAK TERPOTONG) ---
 st.markdown(
     """
     <style>
@@ -71,42 +75,43 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 16px 20px; /* Diperkecil agar kotak tidak terlalu tinggi */
-        border-radius: 12px;
+        padding: 14px 20px;
+        border-radius: 10px;
         border: 1px solid #334155;
-        margin-bottom: 15px; /* Jarak bawah dipersempit */
-        box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.4);
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px -3px rgba(0, 0, 0, 0.4);
         text-align: center;
     }
-    .main-title {
-        color: #38bdf8;
-        font-size: 32px; /* Ukuran font judul sedikit diringkas */
-        font-weight: 800;
-        margin: 0;
-        letter-spacing: 1.2px;
-        text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    .login-container-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        padding: 14px 20px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px -3px rgba(0, 0, 0, 0.4);
     }
-    .sub-title-1 {
-        color: #f8fafc;
-        font-size: 16px; /* Jarak antar baris dipersempit */
-        font-weight: 700;
-        margin-top: 4px;
-        margin-bottom: 2px;
+    .main-title-text {
+        color: #38bdf8;
+        font-size: 22px;
+        font-weight: 800;
+        margin: 2px 0 2px 0;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
     }
     .sub-title-2 {
         color: #94a3b8;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 500;
         margin-top: 0;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     .dev-badge {
         display: inline-block;
         background: rgba(56, 189, 248, 0.1);
         color: #38bdf8;
-        padding: 4px 14px;
-        border-radius: 15px;
-        font-size: 12px;
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 11px;
         font-weight: 600;
         border: 1px solid rgba(56, 189, 248, 0.3);
     }
@@ -149,7 +154,7 @@ st.markdown(
         background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
         color: white;
         border: none;
-        padding: 0.6rem 1rem;
+        padding: 0.5rem 1rem;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
         transition: all 0.3s ease;
     }
@@ -158,22 +163,18 @@ st.markdown(
         box-shadow: 0 6px 18px rgba(59, 130, 246, 0.5);
         transform: translateY(-2px);
     }
-    [data-testid="stSidebar"] {
-        background-color: #111827;
-        border-right: 1px solid #1f2937;
-    }
     </style>
 """,
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI (Lebih Kompak / Kecil) ---
+# --- HEADER UTAMA PORTAL PASTI (LOGO + AKRONIM RAPI) ---
 st.markdown(
     """
     <div class="main-header-card">
-        <h1 class="main-title">PASTI</h1>
-        <div class="sub-title-1">Portal Akademik Siswa Terintegrasi</div>
-        <div class="sub-title-2">Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru</div>
+        <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" alt="Logo PASTI" style="width: 75px; height: auto; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
+        <div class="main-title-text">Portal Administrasi Siswa Terintegrasi</div>
+        <div class="sub-title-2">Pusat Kendali Administrasi Guru</div>
         <div class="dev-badge">
             <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;|&nbsp; <em>Sistem Otomatisasi Terintegrasi</em>
         </div>
@@ -182,24 +183,28 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HALAMAN LOGIN / VERIFIKASI (Melebar Penuh & Tidak Terpotong) ---
+# --- KONDISI 1: JIKA BELUM LOGIN (TAMPILKAN HALAMAN LOGIN) ---
 if not st.session_state.logged_in:
+  st.markdown(
+      """
+        <div class="login-container-card">
+            <h4 style='color: #38bdf8; margin: 0 0 4px 0; font-size: 16px;'>🔐 Login Akses Portal</h4>
+            <p style='color: #94a3b8; font-size: 13px; margin: 0;'>
+                Silakan masukkan <b>Email</b> terdaftar atau <b>Token Unik</b> Anda untuk masuk ke sistem.
+            </p>
+        </div>
+        """,
+      unsafe_allow_html=True,
+  )
+
   with st.form("form_login"):
-    st.markdown(
-        "<h3 style='color: #38bdf8; margin-top:0;'>🔐 Login Akses Portal</h3>",
-        unsafe_allow_html=True,
-    )
-    st.write(
-        "Silakan masukkan **Email** terdaftar atau **Token Unik** Anda untuk"
-        " masuk ke sistem."
-    )
     user_input = st.text_input(
         "Email / Token Unik Guru",
         placeholder=(
-            "Contoh: yustinussetyanta08@dinas.belajar.id atau TOKEN300869"
+            "Contoh: yustinus_bkl@gmail.com atau TOKENPASTI12345"
         ),
     )
-    btn_login = st.form_submit_button("🚀 Masuk Portal")
+    btn_login = st.form_submit_button("🚀 Masuk Portal", use_container_width=True)
 
     if btn_login:
       if not user_input:
@@ -244,23 +249,18 @@ if not st.session_state.logged_in:
               "❌ Database Master Registry kosong atau gagal diakses. Periksa"
               " koneksi spreadsheet Anda."
           )
+
+# --- KONDISI 2: JIKA SUDAH LOGIN (TAMPILKAN SIDEBAR & DASHBOARD UTAMA) ---
 else:
-  # --- SIDEBAR PROFESIONAL SETELAH LOGIN ---
   with st.sidebar:
     st.markdown(
         f"""
-            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 12px; border-radius: 8px; border: 1px solid #334155; text-align: center; margin-bottom: 12px;">
-                <div style="font-size: 22px; margin-bottom: 2px;">👨‍🏫</div>
-                <div style="color: #38bdf8; font-weight: 700; font-size: 14px;">{st.session_state.guru_nama}</div>
-                <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">Sesi Aktif & Terverifikasi</div>
+            <div style="text-align: center; padding: 10px; background: #1e293b; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155;">
+                <span style="font-size: 24px;">👨‍💻</span><br>
+                <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
+                <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
             </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.markdown("---")
-    st.markdown(
-        "<p style='color: #94a3b8; font-size: 11px; font-weight: 600;"
-        " letter-spacing: 0.5px;'>NAVIGASI MODUL</p>",
+            """,
         unsafe_allow_html=True,
     )
 
@@ -270,7 +270,6 @@ else:
       st.session_state.spreadsheet_id = ""
       st.rerun()
 
-  # --- TAMPILAN BERANDA UTAMA SETELAH LOGIN ---
   st.markdown(
       f"""
         <div class="user-welcome-card">
@@ -283,25 +282,27 @@ else:
       unsafe_allow_html=True,
   )
 
-  st.markdown("### 📚 Modul Aplikasi Tersedia")
+  st.markdown("### 📑 Modul Aplikasi Tersedia")
 
-  col1, col2 = st.columns(2)
-  with col1:
+  coll1, coll2 = st.columns(2)
+
+  with coll1:
     st.markdown(
         """
             <div class="module-card">
-                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar PM)</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar Pembelajaran Mendalam (Deep Learning) lengkap dengan LKM, Rubrik, dan Instrumen Formatif berformat Word (.docx).</p>
+                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar dengan kecerdasan buatan.</p>
             </div>
             """,
         unsafe_allow_html=True,
     )
-  with col2:
+
+  with coll2:
     st.markdown(
         """
             <div class="module-card">
-                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM)</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem penilaian siswa, manajemen data pembelajaran, dan administrasi pendukung profesional lainnya.</p>
+                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi Siswa, E Jurnal, dll)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem administrasi.</p>
             </div>
             """,
         unsafe_allow_html=True,
