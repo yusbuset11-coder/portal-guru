@@ -201,7 +201,7 @@ if not st.session_state.logged_in:
     user_input = st.text_input(
         "Email / Token Unik Guru",
         placeholder=(
-            "Contoh: yustinussetyanta08@dinas.belajar.id atau TOKEN300869"
+            "Contoh: yustinus_bkl@gmail.com atau TOKEN112233"
         ),
     )
     btn_login = st.form_submit_button("🚀 Masuk Portal", use_container_width=True)
