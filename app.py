@@ -338,6 +338,7 @@ else:
 
     if uploaded_file is not None:
       try:
+        uploaded_file.seek(0)
         if uploaded_file.name.endswith(".csv"):
           df_preview = pd.read_csv(uploaded_file)
         else:
@@ -371,12 +372,12 @@ else:
                       title="Presensi", rows="100", cols="20"
                   )
 
-                # 3. Kosongkan dan update data
+                # 3. Kosongkan dan update data menggunakan parameter range_name dan values yang aman
                 worksheet.clear()
                 data_to_upload = [
                     df_clean.columns.values.tolist()
                 ] + df_clean.values.tolist()
-                worksheet.update(data_to_upload)
+                worksheet.update(range_name="A1", values=data_to_upload)
 
                 st.success(
                     "🎉 Data siswa berhasil diunggah ke Google Spreadsheet Anda!"
