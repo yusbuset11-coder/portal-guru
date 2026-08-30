@@ -65,7 +65,7 @@ if "guru_nama" not in st.session_state:
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
 
-# --- STYLING CSS TAMBAHAN (HEADER, LOGIN CARD & LOGO) ---
+# --- STYLING CSS TAMBAHAN ---
 st.markdown(
     """
     <style>
@@ -175,13 +175,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI (DENGAN LOGO LENCANA SEGI ENAM) ---
+# --- HEADER UTAMA PORTAL PASTI (MENGGUNAKAN LOGO BUATAN SENDIRI) ---
+st.markdown('<div class="main-header-card">', unsafe_allow_html=True)
+
+# Menampilkan Logo PASTI dari Google Drive dengan ukuran proporsional di tengah
+col_logo1, col_logo2, col_logo3 = st.columns([1, 1.2, 1])
+with col_logo2:
+  st.image(
+      "https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z",
+      use_container_width=True,
+  )
+
 st.markdown(
     """
-    <div class="main-header-card">
-        <svg width="72" height="72" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 6px; filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.6));"><polygon points="50,3 93,27 93,73 50,97 7,73 7,27" fill="url(#hex_grad)" stroke="#fbbf24" stroke-width="3" stroke-linejoin="round"/><polygon points="50,12 85,32 85,68 50,88 15,68 15,32" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 2" opacity="0.8"/><text x="50" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="44" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="1">P</text><circle cx="50" cy="3" r="3.5" fill="#38bdf8"/><circle cx="93" cy="27" r="3" fill="#f59e0b"/><circle cx="7" cy="27" r="3" fill="#f59e0b"/><circle cx="50" cy="97" r="3" fill="#38bdf8"/><defs><linearGradient id="hex_grad" x1="7" y1="3" x2="93" y2="97" gradientUnits="userSpaceOnUse"><stop stop-color="#312e81"/><stop offset="0.5" stop-color="#4f46e5"/><stop offset="1" stop-color="#581c87"/></linearGradient></defs></svg>
         <h1 class="main-title">PASTI</h1>
-        <div class="sub-title-1">Portal Akademik Siswa Terintegrasi</div>
+        <div class="sub-title-1">Portal Administrasi Siswa Terintegrasi</div>
         <div class="sub-title-2">Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru</div>
         <div class="dev-badge">
             <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;|&nbsp; <em>Sistem Otomatisasi Terintegrasi</em>
@@ -260,7 +268,6 @@ if not st.session_state.logged_in:
 
 # --- KONDISI 2: JIKA SUDAH LOGIN (TAMPILKAN SIDEBAR & DASHBOARD UTAMA) ---
 else:
-  # --- SIDEBAR PROFESIONAL SETELAH LOGIN ---
   with st.sidebar:
     st.markdown(
         f"""
@@ -279,7 +286,6 @@ else:
       st.session_state.spreadsheet_id = ""
       st.rerun()
 
-  # --- TAMPILAN BERANDA UTAMA SETELAH LOGIN ---
   st.markdown(
       f"""
         <div class="user-welcome-card">
