@@ -355,26 +355,44 @@ else:
             with st.spinner(
                 "Sedang mengunggah data ke Google Spreadsheet..."
             ):
-              client = get_gspread_client()
-              sh = client.open_by_key(st.session_state.spreadsheet_id)
-
               try:
-                worksheet = sh.worksheet("Presensi")
-              except gspread.exceptions.WorksheetNotFound:
-                worksheet = sh.add_worksheet(
-                    title="Presensi", rows="100", cols="20"
-                )
+                client = get_gspread_client()
+                sh = client.open_by_key(st.session_state.spreadsheet_id)
 
-              worksheet.clear()
-              worksheet.update(
-                  [df_preview.columns.values.tolist()]
-                  + df_preview.values.tolist()
-              )
-              st.success(
-                  "🎉 Data siswa berhasil diunggah ke Google Spreadsheet Anda!"
-              )
+                # 1. Bersihkan nilai kosong (NaN) dan konversi ke string untuk keamanan API gspread
+                df_clean = df_preview.fillna("")
+                df_clean = df_clean.astype(str)
+
+                # 2. Cek atau buat worksheet Presensi
+                try:
+                  worksheet = sh.worksheet("Presensi")
+                except gspread.exceptions.WorksheetNotFound:
+                  worksheet = sh.add_worksheet(
+                      title="Presensi", rows="100", cols="20"
+                  )
+
+                # 3. Kosongkan dan update data
+                worksheet.clear()
+                data_to_upload = [
+                    df_clean.columns.values.tolist()
+                ] + df_clean.values.tolist()
+                worksheet.update(data_to_upload)
+
+                st.success(
+                    "🎉 Data siswa berhasil diunggah ke Google Spreadsheet Anda!"
+                )
+              except Exception as upload_err:
+                st.error(
+                    "❌ Gagal mengunggah ke Google Spreadsheet. Detail Error:"
+                    f" `{upload_err}`"
+                )
+                st.info(
+                    "💡 **Pemeriksaan Penting:** Pastikan email *Service Account*"
+                    " Google Cloud Anda sudah dibagikan (*Share*) dengan akses"
+                    " **Editor** ke Spreadsheet milik guru yang bersangkutan."
+                )
       except Exception as e:
-        st.error(f"❌ Gagal membaca atau mengunggah file: {e}")
+        st.error(f"❌ Gagal membaca file yang diunggah: {e}")
 
     st.markdown("---")
     st.markdown("#### 📊 Data Siswa yang Tersimpan di Spreadsheet Anda")
@@ -392,8 +410,8 @@ else:
             st.info("Worksheet Presensi masih kosong.")
         except Exception as e:
           st.warning(
-              f"⚠️ Belum dapat memuat data (pastikan worksheet 'Presensi'"
-              f" sudah dibuat melalui tombol unggah di atas). Detail: {e}"
+              f"⚠️ Belum dapat memuat data. Pastikan worksheet 'Presensi'"
+              f" sudah dibuat melalui tombol unggah. Detail: {e}"
           )
 
   elif menu_pilihan == "📖 E-Jurnal Mengajar":
