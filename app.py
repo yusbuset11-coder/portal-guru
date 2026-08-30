@@ -3,7 +3,6 @@ import gspread
 import pandas as pd
 import streamlit as st
 from google.oauth2.service_account import Credentials
-from styles import apply_global_styles  # Impor modul styling global
 
 # --- KONFIGURASI HALAMAN UTAMA ---
 st.set_page_config(
@@ -11,9 +10,6 @@ st.set_page_config(
     page_icon="🚀",
     layout="wide",
 )
-
-# Terapkan styling global terpusat di sini
-apply_global_styles()
 
 # Atur jarak bawah agar tombol login tidak terpotong
 st.markdown(
@@ -65,7 +61,7 @@ if "guru_nama" not in st.session_state:
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
 
-# --- STYLING CSS TAMBAHAN (HEADER & KOMPONEN KHUSUS) ---
+# --- STYLING CSS (HEADER LEBIH RINGKAS & JARAK DIPERSEMPIT) ---
 st.markdown(
     """
     <style>
@@ -75,16 +71,16 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 16px 20px;
+        padding: 16px 20px; /* Diperkecil agar kotak tidak terlalu tinggi */
         border-radius: 12px;
         border: 1px solid #334155;
-        margin-bottom: 15px;
+        margin-bottom: 15px; /* Jarak bawah dipersempit */
         box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.4);
         text-align: center;
     }
     .main-title {
         color: #38bdf8;
-        font-size: 32px;
+        font-size: 32px; /* Ukuran font judul sedikit diringkas */
         font-weight: 800;
         margin: 0;
         letter-spacing: 1.2px;
@@ -92,7 +88,7 @@ st.markdown(
     }
     .sub-title-1 {
         color: #f8fafc;
-        font-size: 16px;
+        font-size: 16px; /* Jarak antar baris dipersempit */
         font-weight: 700;
         margin-top: 4px;
         margin-bottom: 2px;
@@ -162,12 +158,16 @@ st.markdown(
         box-shadow: 0 6px 18px rgba(59, 130, 246, 0.5);
         transform: translateY(-2px);
     }
+    [data-testid="stSidebar"] {
+        background-color: #111827;
+        border-right: 1px solid #1f2937;
+    }
     </style>
 """,
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI ---
+# --- HEADER UTAMA PORTAL PASTI (Lebih Kompak / Kecil) ---
 st.markdown(
     """
     <div class="main-header-card">
@@ -182,7 +182,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HALAMAN LOGIN / VERIFIKASI ---
+# --- HALAMAN LOGIN / VERIFIKASI (Melebar Penuh & Tidak Terpotong) ---
 if not st.session_state.logged_in:
   with st.form("form_login"):
     st.markdown(
@@ -249,7 +249,7 @@ else:
   with st.sidebar:
     st.markdown(
         f"""
-            <div class="user-profile-box">
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 12px; border-radius: 8px; border: 1px solid #334155; text-align: center; margin-bottom: 12px;">
                 <div style="font-size: 22px; margin-bottom: 2px;">👨‍🏫</div>
                 <div style="color: #38bdf8; font-weight: 700; font-size: 14px;">{st.session_state.guru_nama}</div>
                 <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">Sesi Aktif & Terverifikasi</div>
