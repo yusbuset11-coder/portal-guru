@@ -175,26 +175,32 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI (DENGAN LOGO KONTRAS MODERN) ---
+# --- HEADER UTAMA PORTAL PASTI (DENGAN LOGO LENCANA SEGI ENAM) ---
 st.markdown(
     """
     <div class="main-header-card">
-        <!-- Logo Modern Vektor: Kombinasi Buku, Toga Akademik & Koneksi Terintegrasi -->
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 8px; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4));">
-            <!-- Lingkaran Luar Bergradasi Emas -->
-            <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" stroke="#fbbf24" stroke-width="2"/>
-            <!-- Ikon Toga / Topi Kelulusan & Buku Terbuka -->
-            <path d="M32 16L14 24L32 32L50 24L32 16Z" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round"/>
-            <path d="M20 30V40C20 44 25 47 32 47C39 47 44 44 44 40V30" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M46 26.5V36C46 37 45 38 44 38" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
-            <!-- Titik-titik Node Integrasi Digital -->
-            <circle cx="24" cy="36" r="2" fill="#38bdf8"/>
-            <circle cx="32" cy="40" r="2" fill="#38bdf8"/>
-            <circle cx="40" cy="36" r="2" fill="#38bdf8"/>
+        <!-- Logo Konsep 3: Futuristic Monogram Badge (Segi Enam) -->
+        <svg width="72" height="72" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 6px; filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.6));">
+            <!-- Lingkup Luar Hexagon / Segi Enam Bergradasi -->
+            <polygon points="50,3 93,27 93,73 50,97 7,73 7,27" fill="url(#hex_grad)" stroke="#fbbf24" stroke-width="3" stroke-linejoin="round"/>
+            
+            <!-- Garis Inner Aksen Teknologi -->
+            <polygon points="50,12 85,32 85,68 50,88 15,68 15,32" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 2" opacity="0.8"/>
+            
+            <!-- Huruf Monogram 'P' yang Elegan -->
+            <text x="50" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="44" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="1" style="text-shadow: 0 2px 8px rgba(0,0,0,0.7);">P</text>
+            
+            <!-- Titik Node Data Integrasi di Sudut Hexagon -->
+            <circle cx="50" cy="3" r="3.5" fill="#38bdf8"/>
+            <circle cx="93" cy="27" r="3" fill="#f59e0b"/>
+            <circle cx="7" cy="27" r="3" fill="#f59e0b"/>
+            <circle cx="50" cy="97" r="3" fill="#38bdf8"/>
+            
             <defs>
-                <linearGradient id="paint0_linear" x1="2" y1="2" x2="62" y2="62" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#f59e0b"/>
-                    <stop offset="1" stop-color="#ea580c"/>
+                <linearGradient id="hex_grad" x1="7" y1="3" x2="93" y2="97" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#312e81"/>
+                    <stop offset="0.5" stop-color="#4f46e5"/>
+                    <stop offset="1" stop-color="#581c87"/>
                 </linearGradient>
             </defs>
         </svg>
