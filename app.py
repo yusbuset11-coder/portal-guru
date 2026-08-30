@@ -20,8 +20,8 @@ st.markdown(
     """
     <style>
         .block-container {
-            padding-top: 1rem;
-            padding-bottom: 10rem;
+            padding-top: 0.8rem;
+            padding-bottom: 6rem;
         }
     </style>
     """,
@@ -65,7 +65,7 @@ if "guru_nama" not in st.session_state:
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
 
-# --- STYLING CSS TAMBAHAN ---
+# --- STYLING CSS TAMBAHAN (DIPADATKAN AGAR TIDAK TERPOTONG) ---
 st.markdown(
     """
     <style>
@@ -75,43 +75,43 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 20px 20px;
-        border-radius: 12px;
+        padding: 14px 20px;
+        border-radius: 10px;
         border: 1px solid #334155;
-        margin-bottom: 15px;
-        box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.4);
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px -3px rgba(0, 0, 0, 0.4);
         text-align: center;
     }
     .login-container-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 25px 30px;
-        border-radius: 12px;
+        padding: 14px 20px;
+        border-radius: 10px;
         border: 1px solid #334155;
-        margin-bottom: 15px;
-        box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.4);
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px -3px rgba(0, 0, 0, 0.4);
     }
     .main-title-text {
         color: #38bdf8;
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 800;
-        margin: 4px 0 2px 0;
+        margin: 2px 0 2px 0;
         letter-spacing: 0.5px;
         text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
     }
     .sub-title-2 {
         color: #94a3b8;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 500;
         margin-top: 0;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
     .dev-badge {
         display: inline-block;
         background: rgba(56, 189, 248, 0.1);
         color: #38bdf8;
-        padding: 4px 14px;
-        border-radius: 15px;
-        font-size: 12px;
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 11px;
         font-weight: 600;
         border: 1px solid rgba(56, 189, 248, 0.3);
     }
@@ -154,7 +154,7 @@ st.markdown(
         background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
         color: white;
         border: none;
-        padding: 0.6rem 1rem;
+        padding: 0.5rem 1rem;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
         transition: all 0.3s ease;
     }
@@ -172,7 +172,7 @@ st.markdown(
 st.markdown(
     """
     <div class="main-header-card">
-        <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" alt="Logo PASTI" style="width: 90px; height: auto; margin: 0 auto 6px auto; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
+        <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" alt="Logo PASTI" style="width: 75px; height: auto; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
         <div class="main-title-text">Portal Administrasi Siswa Terintegrasi</div>
         <div class="sub-title-2">Pusat Kendali Administrasi Guru</div>
         <div class="dev-badge">
@@ -188,8 +188,8 @@ if not st.session_state.logged_in:
   st.markdown(
       """
         <div class="login-container-card">
-            <h3 style='color: #38bdf8; margin-top:0;'>🔐 Login Akses Portal</h3>
-            <p style='color: #94a3b8; font-size: 14px; margin-bottom: 20px;'>
+            <h4 style='color: #38bdf8; margin: 0 0 4px 0; font-size: 16px;'>🔐 Login Akses Portal</h4>
+            <p style='color: #94a3b8; font-size: 13px; margin: 0;'>
                 Silakan masukkan <b>Email</b> terdaftar atau <b>Token Unik</b> Anda untuk masuk ke sistem.
             </p>
         </div>
