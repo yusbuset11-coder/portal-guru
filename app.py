@@ -331,7 +331,7 @@ else:
         "### 🤖 Otomatisasi Penyusunan Modul Ajar PM", unsafe_allow_html=True
     )
 
-    # Menu/Expander Panduan Pembuatan Google Gemini API Key dengan Link Drive
+    # Menu/Expander Panduan Pembuatan Google Gemini API Key dengan Link Drive yang Benar
     with st.expander(
         "📖 Panduan Pembuatan Kode Google Gemini API Key", expanded=True
     ):
@@ -342,7 +342,7 @@ else:
                     Untuk menggunakan modul generator berbasis AI ini, Anda memerlukan <b>Google Gemini API Key</b> pribadi yang bersifat gratis. 
                     Silakan pelajari panduan lengkap melalui tautan Google Drive di bawah ini:
                 </p>
-                <a href="https://drive.google.com/drive/folders/YOUR_DRIVE_FOLDER_ID" target="_blank" 
+                <a href="https://drive.google.com/file/d/17FhN4P0P-_sOq0vhHe7K7063mYLbBxSs/view" target="_blank" 
                    style='display: inline-block; background: #38bdf8; color: #0f172a; padding: 8px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 13px;'>
                    📂 Buka Dokumen Panduan Google Drive (PDF)
                 </a>
