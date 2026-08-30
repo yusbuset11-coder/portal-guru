@@ -15,7 +15,7 @@ st.set_page_config(
 # Terapkan styling global terpusat di sini
 apply_global_styles()
 
-# Atur jarak bawah agar tombol login tidak terpotong
+# Atur jarak bawah agar tampilan tidak terpotong
 st.markdown(
     """
     <style>
@@ -182,82 +182,88 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HALAMAN LOGIN / VERIFIKASI ---
+# --- KONDISI 1: JIKA BELUM LOGIN (TAMPILKAN HALAMAN LOGIN) ---
 if not st.session_state.logged_in:
-  with st.form("form_login"):
-    st.markdown(
-        "<h3 style='color: #38bdf8; margin-top:0;'>🔐 Login Akses Portal</h3>",
-        unsafe_allow_html=True,
-    )
-    st.write(
-        "Silakan masukkan **Email** terdaftar atau **Token Unik** Anda untuk"
-        " masuk ke sistem."
-    )
-    user_input = st.text_input(
-        "Email / Token Unik Guru",
-        placeholder=(
-            "Contoh: yustinussetyanta08@dinas.belajar.id atau TOKEN300869"
-        ),
-    )
-    btn_login = st.form_submit_button("🚀 Masuk Portal")
+  col1, col2, col3 = st.columns([1, 1.2, 1])
+  with col2:
+    with st.form("form_login"):
+      st.markdown(
+          "<h3 style='color: #38bdf8; margin-top:0;'>🔐 Login Akses Portal</h3>",
+          unsafe_allow_html=True,
+      )
+      st.write(
+          "Silakan masukkan **Email** terdaftar atau **Token Unik** Anda untuk"
+          " masuk ke sistem."
+      )
+      user_input = st.text_input(
+          "Email / Token Unik Guru",
+          placeholder=(
+              "Contoh: yustinussetyanta08@dinas.belajar.id atau TOKEN300869"
+          ),
+      )
+      btn_login = st.form_submit_button("🚀 Masuk Portal")
 
-    if btn_login:
-      if not user_input:
-        st.warning("⚠️ Mohon masukkan Email atau Token Unik Anda.")
-      else:
-        with st.spinner("Memeriksa kredensial ke Master Registry..."):
-          data_registry = load_master_registry()
+      if btn_login:
+        if not user_input:
+          st.warning("⚠️ Mohon masukkan Email atau Token Unik Anda.")
+        else:
+          with st.spinner("Memeriksa kredensial ke Master Registry..."):
+            data_registry = load_master_registry()
 
-        if data_registry:
-          df_registry = pd.DataFrame(data_registry)
-          df_registry.columns = df_registry.columns.str.strip()
+          if data_registry:
+            df_registry = pd.DataFrame(data_registry)
+            df_registry.columns = df_registry.columns.str.strip()
 
-          matched = df_registry[
-              (
-                  df_registry["Email"]
-                  .astype(str)
-                  .str.strip()
-                  .str.lower()
-                  == user_input.strip().lower()
+            matched = df_registry[
+                (
+                    df_registry["Email"]
+                    .astype(str)
+                    .str.strip()
+                    .str.lower()
+                    == user_input.strip().lower()
+                )
+                | (
+                    df_registry["Token_Unik"].astype(str).str.strip()
+                    == user_input.strip()
+                )
+            ]
+
+            if not matched.empty:
+              st.session_state.logged_in = True
+              st.session_state.guru_nama = matched.iloc[0]["Nama_Guru"]
+              st.session_state.spreadsheet_id = matched.iloc[0][
+                  "Spreadsheet_ID"
+              ]
+              st.success(
+                  f"🎉 Selamat datang, {st.session_state.guru_nama}! Berhasil"
+                  " masuk."
               )
-              | (
-                  df_registry["Token_Unik"].astype(str).str.strip()
-                  == user_input.strip()
+              st.rerun()
+            else:
+              st.error(
+                  "❌ Email atau Token Unik tidak ditemukan di Master Registry."
               )
-          ]
-
-          if not matched.empty:
-            st.session_state.logged_in = True
-            st.session_state.guru_nama = matched.iloc[0]["Nama_Guru"]
-            st.session_state.spreadsheet_id = matched.iloc[0]["Spreadsheet_ID"]
-            st.success(
-                f"🎉 Selamat datang, {st.session_state.guru_nama}! Berhasil"
-                " masuk."
-            )
-            st.rerun()
           else:
             st.error(
-                "❌ Email atau Token Unik tidak ditemukan di Master Registry."
+                "❌ Database Master Registry kosong atau gagal diakses."
+                " Periksa koneksi spreadsheet Anda."
             )
-        else:
-          st.error(
-              "❌ Database Master Registry kosong atau gagal diakses. Periksa"
-              " koneksi spreadsheet Anda."
-          )
+
+# --- KONDISI 2: JIKA SUDAH LOGIN (TAMPILKAN SIDEBAR & DASHBOARD UTAMA) ---
 else:
   # --- SIDEBAR PROFESIONAL SETELAH LOGIN ---
-    with st.sidebar:
-      st.markdown(
-          f"""
-            <div class="user-profile-box">
+  with st.sidebar:
+    st.markdown(
+        f"""
+            <div style="text-align: center; padding: 10px; background: #1e293b; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155;">
                 <span style="font-size: 24px;">👨‍💻</span><br>
                 <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
                 <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
             </div>
             """,
-          unsafe_allow_html=True,
-      )
-      
+        unsafe_allow_html=True,
+    )
+
     if st.button("🚪 Keluar / Logout"):
       st.session_state.logged_in = False
       st.session_state.guru_nama = ""
@@ -265,8 +271,8 @@ else:
       st.rerun()
 
   # --- TAMPILAN BERANDA UTAMA SETELAH LOGIN ---
-    st.markdown(
-        f"""
+  st.markdown(
+      f"""
         <div class="user-welcome-card">
             ✅ Anda sudah masuk sebagai <b>{st.session_state.guru_nama}</b>.
         </div>
@@ -274,31 +280,31 @@ else:
             👉 Silakan pilih modul aplikasi di menu sebelah kiri (Sidebar) untuk mulai bekerja <b>(E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM, E-Modul Ajar PM)</b>.
         </div>
         """,
-        unsafe_allow_html=True,
-    )
+      unsafe_allow_html=True,
+  )
 
-    st.markdown("### 📑 Modul Aplikasi Tersedia")
+  st.markdown("### 📑 Modul Aplikasi Tersedia")
 
-    coll1, coll2 = st.columns(2)
+  coll1, coll2 = st.columns(2)
 
-    with coll1:
-      st.markdown(
-          """
+  with coll1:
+    st.markdown(
+        """
             <div class="module-card">
                 <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar)</h4>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar dengan kecerdasan buatan.</p>
             </div>
             """,
-          unsafe_allow_html=True,
-      )
+        unsafe_allow_html=True,
+    )
 
-    with coll2:
-      st.markdown(
-          """
+  with coll2:
+    st.markdown(
+        """
             <div class="module-card">
                 <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi Siswa, E Jurnal, dll)</h4>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem administrasi.</p>
             </div>
             """,
-          unsafe_allow_html=True,
-      )
+        unsafe_allow_html=True,
+    )
