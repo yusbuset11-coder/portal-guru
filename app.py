@@ -65,7 +65,7 @@ if "guru_nama" not in st.session_state:
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
 
-# --- STYLING CSS TAMBAHAN (HEADER, LOGIN CARD & KOMPONEN KHUSUS) ---
+# --- STYLING CSS TAMBAHAN (HEADER, LOGIN CARD & LOGO) ---
 st.markdown(
     """
     <style>
@@ -75,7 +75,7 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 16px 20px;
+        padding: 24px 20px;
         border-radius: 12px;
         border: 1px solid #334155;
         margin-bottom: 15px;
@@ -94,7 +94,7 @@ st.markdown(
         color: #38bdf8;
         font-size: 32px;
         font-weight: 800;
-        margin: 0;
+        margin: 5px 0 0 0;
         letter-spacing: 1.2px;
         text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
     }
@@ -110,7 +110,7 @@ st.markdown(
         font-size: 13px;
         font-weight: 500;
         margin-top: 0;
-        margin-bottom: 8px;
+        margin-bottom: 12px;
     }
     .dev-badge {
         display: inline-block;
@@ -175,10 +175,29 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI ---
+# --- HEADER UTAMA PORTAL PASTI (DENGAN LOGO KONTRAS MODERN) ---
 st.markdown(
     """
     <div class="main-header-card">
+        <!-- Logo Modern Vektor: Kombinasi Buku, Toga Akademik & Koneksi Terintegrasi -->
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 8px; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4));">
+            <!-- Lingkaran Luar Bergradasi Emas -->
+            <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" stroke="#fbbf24" stroke-width="2"/>
+            <!-- Ikon Toga / Topi Kelulusan & Buku Terbuka -->
+            <path d="M32 16L14 24L32 32L50 24L32 16Z" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M20 30V40C20 44 25 47 32 47C39 47 44 44 44 40V30" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M46 26.5V36C46 37 45 38 44 38" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+            <!-- Titik-titik Node Integrasi Digital -->
+            <circle cx="24" cy="36" r="2" fill="#38bdf8"/>
+            <circle cx="32" cy="40" r="2" fill="#38bdf8"/>
+            <circle cx="40" cy="36" r="2" fill="#38bdf8"/>
+            <defs>
+                <linearGradient id="paint0_linear" x1="2" y1="2" x2="62" y2="62" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#f59e0b"/>
+                    <stop offset="1" stop-color="#ea580c"/>
+                </linearGradient>
+            </defs>
+        </svg>
         <h1 class="main-title">PASTI</h1>
         <div class="sub-title-1">Portal Akademik Siswa Terintegrasi</div>
         <div class="sub-title-2">Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru</div>
@@ -190,7 +209,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- KONDISI 1: JIKA BELUM LOGIN (TAMPILKAN HALAMAN LOGIN MELEBAR SEJAJAR) ---
+# --- KONDISI 1: JIKA BELUM LOGIN (TAMPILKAN HALAMAN LOGIN) ---
 if not st.session_state.logged_in:
   st.markdown(
       """
@@ -204,7 +223,6 @@ if not st.session_state.logged_in:
       unsafe_allow_html=True,
   )
 
-  # Form input diletakkan langsung agar melebar menyesuaikan layout utama
   with st.form("form_login"):
     user_input = st.text_input(
         "Email / Token Unik Guru",
