@@ -75,7 +75,7 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 24px 20px;
+        padding: 20px 20px;
         border-radius: 12px;
         border: 1px solid #334155;
         margin-bottom: 15px;
@@ -90,27 +90,20 @@ st.markdown(
         margin-bottom: 15px;
         box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.4);
     }
-    .main-title {
+    .main-title-text {
         color: #38bdf8;
-        font-size: 32px;
+        font-size: 24px;
         font-weight: 800;
-        margin: 5px 0 0 0;
-        letter-spacing: 1.2px;
+        margin: 4px 0 2px 0;
+        letter-spacing: 0.5px;
         text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-    }
-    .sub-title-1 {
-        color: #f8fafc;
-        font-size: 16px;
-        font-weight: 700;
-        margin-top: 4px;
-        margin-bottom: 2px;
     }
     .sub-title-2 {
         color: #94a3b8;
         font-size: 13px;
         font-weight: 500;
         margin-top: 0;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
     .dev-badge {
         display: inline-block;
@@ -175,13 +168,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI (LOGO RAPI & PROPOSIONAL DI DALAM CARD) ---
+# --- HEADER UTAMA PORTAL PASTI (LOGO + AKRONIM RAPI) ---
 st.markdown(
     """
     <div class="main-header-card">
-        <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" alt="Logo PASTI" style="width: 110px; height: auto; margin: 0 auto 10px auto; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
-        <h1 class="main-title">PASTI</h1>
-        <div class="sub-title-1">Portal Administrasi Siswa Terintegrasi</div>
+        <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" alt="Logo PASTI" style="width: 90px; height: auto; margin: 0 auto 6px auto; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
+        <div class="main-title-text">Portal Administrasi Siswa Terintegrasi</div>
         <div class="sub-title-2">Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru</div>
         <div class="dev-badge">
             <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;|&nbsp; <em>Sistem Otomatisasi Terintegrasi</em>
