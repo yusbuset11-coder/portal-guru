@@ -175,19 +175,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI (MENGGUNAKAN LOGO BUATAN SENDIRI) ---
-st.markdown('<div class="main-header-card">', unsafe_allow_html=True)
-
-# Menampilkan Logo PASTI dari Google Drive dengan ukuran proporsional di tengah
-col_logo1, col_logo2, col_logo3 = st.columns([1, 1.2, 1])
-with col_logo2:
-  st.image(
-      "https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z",
-      use_container_width=True,
-  )
-
+# --- HEADER UTAMA PORTAL PASTI (LOGO RAPI & PROPOSIONAL DI DALAM CARD) ---
 st.markdown(
     """
+    <div class="main-header-card">
+        <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" alt="Logo PASTI" style="width: 110px; height: auto; margin: 0 auto 10px auto; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
         <h1 class="main-title">PASTI</h1>
         <div class="sub-title-1">Portal Administrasi Siswa Terintegrasi</div>
         <div class="sub-title-2">Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru</div>
