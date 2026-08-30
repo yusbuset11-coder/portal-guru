@@ -64,6 +64,8 @@ if "guru_nama" not in st.session_state:
   st.session_state.guru_nama = ""
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
+if "gemini_api_key" not in st.session_state:
+  st.session_state.gemini_api_key = ""
 
 # --- STYLING CSS TAMBAHAN (DIPADATKAN AGAR TIDAK TERPOTONG) ---
 st.markdown(
@@ -250,7 +252,7 @@ if not st.session_state.logged_in:
               " koneksi spreadsheet Anda."
           )
 
-# --- KONDISI 2: JIKA SUDAH LOGIN (TAMPILKAN SIDEBAR & DASHBOARD UTAMA) ---
+# --- KONDISI 2: JIKA SUDAH LOGIN (TAMPILKAN SIDEBAR & NAVIGASI MODUL) ---
 else:
   with st.sidebar:
     st.markdown(
@@ -264,14 +266,30 @@ else:
         unsafe_allow_html=True,
     )
 
+    # Menu Navigasi Samping (Sidebar)
+    menu_pilihan = st.radio(
+        "📌 Navigasi Menu",
+        [
+            "🏠 Dashboard Utama",
+            "📋 E-Presensi Siswa",
+            "📖 E-Jurnal Mengajar",
+            "📝 E-Asesmen PM",
+            "🤖 E-Modul Ajar PM",
+        ],
+    )
+
+    st.markdown("---")
     if st.button("🚪 Keluar / Logout"):
       st.session_state.logged_in = False
       st.session_state.guru_nama = ""
       st.session_state.spreadsheet_id = ""
+      st.session_state.gemini_api_key = ""
       st.rerun()
 
-  st.markdown(
-      f"""
+  # --- KONTROL HALAMAN BERDASARKAN MENU SIDEBAR ---
+  if menu_pilihan == "🏠 Dashboard Utama":
+    st.markdown(
+        f"""
         <div class="user-welcome-card">
             ✅ Anda sudah masuk sebagai <b>{st.session_state.guru_nama}</b>.
         </div>
@@ -279,31 +297,142 @@ else:
             👉 Silakan pilih modul aplikasi di menu sebelah kiri (Sidebar) untuk mulai bekerja <b>(E Presensi Siswa, E Jurnal Mengajar, E-Asesmen PM, E-Modul Ajar PM)</b>.
         </div>
         """,
-      unsafe_allow_html=True,
-  )
+        unsafe_allow_html=True,
+    )
 
-  st.markdown("### 📑 Modul Aplikasi Tersedia")
+    st.markdown("### 📑 Modul Aplikasi Tersedia")
 
-  coll1, coll2 = st.columns(2)
+    coll1, coll2 = st.columns(2)
 
-  with coll1:
-    st.markdown(
-        """
+    with coll1:
+      st.markdown(
+          """
             <div class="module-card">
                 <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar)</h4>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar dengan kecerdasan buatan.</p>
             </div>
             """,
-        unsafe_allow_html=True,
-    )
+          unsafe_allow_html=True,
+      )
 
-  with coll2:
-    st.markdown(
-        """
+    with coll2:
+      st.markdown(
+          """
             <div class="module-card">
                 <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi Siswa, E Jurnal, dll)</h4>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem administrasi.</p>
             </div>
             """,
-        unsafe_allow_html=True,
+          unsafe_allow_html=True,
+      )
+
+  elif menu_pilihan == "🤖 E-Modul Ajar PM":
+    st.markdown(
+        "### 🤖 Otomatisasi Penyusunan Modul Ajar PM", unsafe_allow_html=True
+    )
+
+    # Menu/Expander Panduan Pembuatan Google Gemini API Key dengan Link Drive
+    with st.expander(
+        "📖 Panduan Pembuatan Kode Google Gemini API Key", expanded=True
+    ):
+      st.markdown(
+          """
+            <div style='background-color: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155;'>
+                <p style='color: #cbd5e1; font-size: 13px; margin-bottom: 10px;'>
+                    Untuk menggunakan modul generator berbasis AI ini, Anda memerlukan <b>Google Gemini API Key</b> pribadi yang bersifat gratis. 
+                    Silakan pelajari panduan lengkap melalui tautan Google Drive di bawah ini:
+                </p>
+                <a href="https://drive.google.com/drive/folders/YOUR_DRIVE_FOLDER_ID" target="_blank" 
+                   style='display: inline-block; background: #38bdf8; color: #0f172a; padding: 8px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 13px;'>
+                   📂 Buka Dokumen Panduan Google Drive (PDF)
+                </a>
+                <hr style='border-color: #334155; margin: 12px 0;'>
+                <p style='color: #94a3b8; font-size: 12px; margin-bottom: 4px;'><b>Ringkasan Singkat Langkah-langkah:</b></p>
+                <ol style='color: #cbd5e1; font-size: 12px; margin: 0; padding-left: 20px;'>
+                    <li>Akses situs <a href="https://aistudio.google.com/app/apikey" target="_blank" style='color: #38bdf8;'>Google AI Studio API Keys</a>.</li>
+                    <li>Klik tombol <b>Create API key</b> di pojok kanan atas.</li>
+                    <li>Pilih project yang tersedia, lalu klik <b>Create key</b>.</li>
+                    <li>Salin kode kunci (<code>Copy key</code>) yang muncul dan tempelkan ke kolom di bawah ini.</li>
+                </ol>
+            </div>
+            """,
+          unsafe_allow_html=True,
+      )
+
+    # Input Kolom Google Gemini API Key Mandiri
+    st.session_state.gemini_api_key = st.text_input(
+        "🔑 Masukkan Google Gemini API Key Anda",
+        value=st.session_state.gemini_api_key,
+        type="password",
+        placeholder="Contoh: AIzaSy...",
+        help=(
+            "Masukkan kunci API Gemini Anda. Kunci ini bersifat aman dan hanya"
+            " digunakan selama sesi aktif Anda."
+        ),
+    )
+
+    if not st.session_state.gemini_api_key:
+      st.warning(
+          "⚠️ Mohon masukkan Google Gemini API Key Anda terlebih dahulu untuk"
+          " mengaktifkan fitur pembuatan Modul Ajar."
+      )
+    else:
+      st.success(
+          "✅ Google Gemini API Key berhasil disematkan! Silakan isi parameter"
+          " pembelajaran di bawah."
+      )
+
+      # Form Parameter Pembelajaran Modul Ajar
+      with st.form("form_parameter_modul"):
+        st.markdown("#### ⚙️ Parameter Pembelajaran")
+        col_a, col_b = st.columns(2)
+
+        with col_a:
+          jenjang = st.selectbox(
+              "Pilih Jenjang Pendidikan", ["SMK / MAK", "SMA / MA", "SMP"]
+          )
+          mapel = st.text_input(
+              "Mata Pelajaran / Program Kejuruan",
+              value=(
+                  "Dasar-dasar Teknik Otomotif / Produk Kreatif dan Kewirausahaan"
+              ),
+          )
+          fase_kelas = st.selectbox(
+              "Fase / Kelas",
+              [
+                  "Fase E / Kelas X SMK (Program Dasar Keahlian)",
+                  "Fase F / Kelas XI SMK",
+                  "Fase F / Kelas XII SMK",
+              ],
+          )
+
+        with col_b:
+          topik = st.text_input(
+              "Topik / Materi Pokok / Elemen",
+              value="Menyimak Teks Laporan Hasil Observasi (KIKL)",
+          )
+          alokasi = st.text_input("Alokasi Waktu", value="2 JP (2 x 45 Menit)")
+          pertemuan = st.selectbox(
+              "Pertemuan Ke-", ["1 (Pertemuan Pertama)", "2 (Pertemuan Kedua)"]
+          )
+
+        btn_generate = st.form_submit_button(
+            "🚀 Buat Modul Ajar dengan AI", use_container_width=True
+        )
+
+        if btn_generate:
+          if not st.session_state.gemini_api_key:
+            st.error("❌ Google Gemini API Key belum dimasukkan!")
+          else:
+            st.info(
+                "⏳ Menghubungkan ke Gemini AI menggunakan API Key mandiri..."
+            )
+            # Logika pemanggilan API atau proses generator selanjutnya dapat diletakkan di sini
+
+  else:
+    # Modul Lainnya (Placeholder)
+    st.markdown(f"### 📋 {menu_pilihan}")
+    st.info(
+        "Modul ini sedang dalam tahap persiapan dan akan segera terintegrasi"
+        " dengan sistem pusat."
     )
