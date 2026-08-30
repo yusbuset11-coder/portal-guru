@@ -67,7 +67,7 @@ if "spreadsheet_id" not in st.session_state:
 if "gemini_api_key" not in st.session_state:
   st.session_state.gemini_api_key = ""
 
-# --- STYLING CSS TAMBAHAN (DIPADATKAN AGAR TIDAK TERPOTONG) ---
+# --- STYLING CSS TAMBAHAN ---
 st.markdown(
     """
     <style>
@@ -170,7 +170,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- HEADER UTAMA PORTAL PASTI (LOGO + AKRONIM RAPI) ---
+# --- HEADER UTAMA PORTAL PASTI ---
 st.markdown(
     """
     <div class="main-header-card">
@@ -185,7 +185,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- KONDISI 1: JIKA BELUM LOGIN (TAMPILKAN HALAMAN LOGIN) ---
+# --- KONDISI 1: JIKA BELUM LOGIN ---
 if not st.session_state.logged_in:
   st.markdown(
       """
@@ -252,7 +252,7 @@ if not st.session_state.logged_in:
               " koneksi spreadsheet Anda."
           )
 
-# --- KONDISI 2: JIKA SUDAH LOGIN (TAMPILKAN SIDEBAR & NAVIGASI MODUL) ---
+# --- KONDISI 2: JIKA SUDAH LOGIN ---
 else:
   with st.sidebar:
     st.markdown(
@@ -266,7 +266,6 @@ else:
         unsafe_allow_html=True,
     )
 
-    # Menu Navigasi Samping (Sidebar)
     menu_pilihan = st.radio(
         "📌 Navigasi Menu",
         [
@@ -326,12 +325,117 @@ else:
           unsafe_allow_html=True,
       )
 
-  elif menu_pilihan == "🤖 E-Modul Ajar PM":
+  elif menu_pilihan == "📋 E-Presensi Siswa":
+    st.markdown("### 📋 E-Presensi Siswa", unsafe_allow_html=True)
     st.markdown(
-        "### 🤖 Otomatisasi Penyusunan Modul Ajar PM", unsafe_allow_html=True
+        "Unggah file Excel atau CSV daftar siswa Anda untuk disinkronkan"
+        " langsung ke Google Spreadsheet pribadi Anda."
     )
 
-    # Menu/Expander Panduan Pembuatan Google Gemini API Key dengan Link Drive yang Benar
+    uploaded_file = st.file_uploader(
+        "Pilih file data siswa", type=["xlsx", "xls", "csv"]
+    )
+
+    if uploaded_file is not None:
+      try:
+        if uploaded_file.name.endswith(".csv"):
+          df_preview = pd.read_csv(uploaded_file)
+        else:
+          df_preview = pd.read_excel(uploaded_file)
+
+        st.markdown("#### Preview Data yang akan diunggah:")
+        st.dataframe(df_preview, use_container_width=True)
+
+        if st.button("🚀 Unggah ke Google Spreadsheet", use_container_width=True):
+          if not st.session_state.spreadsheet_id:
+            st.error(
+                "❌ Spreadsheet ID Anda tidak ditemukan di Master Registry."
+            )
+          else:
+            with st.spinner(
+                "Sedang mengunggah data ke Google Spreadsheet..."
+            ):
+              client = get_gspread_client()
+              sh = client.open_by_key(st.session_state.spreadsheet_id)
+
+              try:
+                worksheet = sh.worksheet("Presensi")
+              except gspread.exceptions.WorksheetNotFound:
+                worksheet = sh.add_worksheet(
+                    title="Presensi", rows="100", cols="20"
+                )
+
+              worksheet.clear()
+              worksheet.update(
+                  [df_preview.columns.values.tolist()]
+                  + df_preview.values.tolist()
+              )
+              st.success(
+                  "🎉 Data siswa berhasil diunggah ke Google Spreadsheet Anda!"
+              )
+      except Exception as e:
+        st.error(f"❌ Gagal membaca atau mengunggah file: {e}")
+
+    st.markdown("---")
+    st.markdown("#### 📊 Data Siswa yang Tersimpan di Spreadsheet Anda")
+    if st.button("🔄 Muat Data dari Spreadsheet"):
+      with st.spinner("Memuat data dari spreadsheet..."):
+        try:
+          client = get_gspread_client()
+          sh = client.open_by_key(st.session_state.spreadsheet_id)
+          worksheet = sh.worksheet("Presensi")
+          records = worksheet.get_all_records()
+          if records:
+            df_stored = pd.DataFrame(records)
+            st.dataframe(df_stored, use_container_width=True)
+          else:
+            st.info("Worksheet Presensi masih kosong.")
+        except Exception as e:
+          st.warning(
+              f"⚠️ Belum dapat memuat data (pastikan worksheet 'Presensi'"
+              f" sudah dibuat melalui tombol unggah di atas). Detail: {e}"
+          )
+
+  elif menu_pilihan == "📖 E-Jurnal Mengajar":
+    st.markdown("### 📖 E-Jurnal Mengajar", unsafe_allow_html=True)
+    st.info("Catat agenda dan kegiatan pembelajaran harian Anda di sini.")
+    with st.form("form_jurnal"):
+      tanggal = st.date_input("Tanggal Mengajar", datetime.now())
+      kelas = st.text_input("Kelas / Rombel", "X TSM-1")
+      materi = st.text_input(
+          "Materi Pembelajaran", "Pemeliharaan Mesin Kendaraan Ringan"
+      )
+      catatan = st.text_area("Catatan Kejadian / Refleksi Mengajar")
+      btn_simpan_jurnal = st.form_submit_button(
+          "💾 Simpan Jurnal ke Spreadsheet", use_container_width=True
+      )
+
+      if btn_simpan_jurnal:
+        with st.spinner("Menyimpan jurnal..."):
+          try:
+            client = get_gspread_client()
+            sh = client.open_by_key(st.session_state.spreadsheet_id)
+            try:
+              ws_jurnal = sh.worksheet("Jurnal_Mengajar")
+            except gspread.exceptions.WorksheetNotFound:
+              ws_jurnal = sh.add_worksheet(
+                  title="Jurnal_Mengajar", rows="100", cols="10"
+              )
+              ws_jurnal.append_row(["Tanggal", "Kelas", "Materi", "Catatan"])
+            ws_jurnal.append_row([str(tanggal), kelas, materi, catatan])
+            st.success("🎉 Jurnal mengajar berhasil disimpan ke Spreadsheet!")
+          except Exception as e:
+            st.error(f"❌ Gagal menyimpan jurnal: {e}")
+
+  elif menu_pilihan == "📝 E-Asesmen PM":
+    st.markdown("### 📝 E-Asesmen Projek Mandiri", unsafe_allow_html=True)
+    st.info(
+        "Modul pengelolaan dan rekapitulasi penilaian formatif/sumatif siswa."
+    )
+
+  elif menu_pilihan == "🤖 E-Modul Ajar PM":
+    st.markdown("### 🤖 Otomatisasi Penyusunan Modul Ajar PM", unsafe_allow_html=True)
+
     with st.expander(
         "📖 Panduan Pembuatan Kode Google Gemini API Key", expanded=True
     ):
@@ -359,7 +463,6 @@ else:
           unsafe_allow_html=True,
       )
 
-    # Input Kolom Google Gemini API Key Mandiri
     st.session_state.gemini_api_key = st.text_input(
         "🔑 Masukkan Google Gemini API Key Anda",
         value=st.session_state.gemini_api_key,
@@ -382,7 +485,6 @@ else:
           " pembelajaran di bawah."
       )
 
-      # Form Parameter Pembelajaran Modul Ajar
       with st.form("form_parameter_modul"):
         st.markdown("#### ⚙️ Parameter Pembelajaran")
         col_a, col_b = st.columns(2)
@@ -427,12 +529,3 @@ else:
             st.info(
                 "⏳ Menghubungkan ke Gemini AI menggunakan API Key mandiri..."
             )
-            # Logika pemanggilan API atau proses generator selanjutnya dapat diletakkan di sini
-
-  else:
-    # Modul Lainnya (Placeholder)
-    st.markdown(f"### 📋 {menu_pilihan}")
-    st.info(
-        "Modul ini sedang dalam tahap persiapan dan akan segera terintegrasi"
-        " dengan sistem pusat."
-    )
