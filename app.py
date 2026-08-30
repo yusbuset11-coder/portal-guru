@@ -15,13 +15,13 @@ st.set_page_config(
 # Terapkan styling global terpusat di sini
 apply_global_styles()
 
-# Atur jarak bawah agar tampilan tidak terpotong
+# Atur jarak bawah agar tombol login tidak terpotong
 st.markdown(
     """
     <style>
         .block-container {
-            padding-top: 0.8rem;
-            padding-bottom: 6rem;
+            padding-top: 1rem;
+            padding-bottom: 10rem;
         }
     </style>
     """,
@@ -64,10 +64,8 @@ if "guru_nama" not in st.session_state:
   st.session_state.guru_nama = ""
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
-if "gemini_api_key" not in st.session_state:
-  st.session_state.gemini_api_key = ""
 
-# --- STYLING CSS TAMBAHAN ---
+# --- STYLING CSS TAMBAHAN (HEADER & KOMPONEN KHUSUS) ---
 st.markdown(
     """
     <style>
@@ -77,43 +75,42 @@ st.markdown(
     }
     .main-header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 14px 20px;
-        border-radius: 10px;
+        padding: 16px 20px;
+        border-radius: 12px;
         border: 1px solid #334155;
-        margin-bottom: 10px;
-        box-shadow: 0 4px 12px -3px rgba(0, 0, 0, 0.4);
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.4);
         text-align: center;
     }
-    .login-container-card {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 14px 20px;
-        border-radius: 10px;
-        border: 1px solid #334155;
-        margin-bottom: 10px;
-        box-shadow: 0 4px 12px -3px rgba(0, 0, 0, 0.4);
-    }
-    .main-title-text {
+    .main-title {
         color: #38bdf8;
-        font-size: 22px;
+        font-size: 32px;
         font-weight: 800;
-        margin: 2px 0 2px 0;
-        letter-spacing: 0.5px;
+        margin: 0;
+        letter-spacing: 1.2px;
         text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    .sub-title-1 {
+        color: #f8fafc;
+        font-size: 16px;
+        font-weight: 700;
+        margin-top: 4px;
+        margin-bottom: 2px;
     }
     .sub-title-2 {
         color: #94a3b8;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 500;
         margin-top: 0;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
     .dev-badge {
         display: inline-block;
         background: rgba(56, 189, 248, 0.1);
         color: #38bdf8;
-        padding: 3px 12px;
-        border-radius: 12px;
-        font-size: 11px;
+        padding: 4px 14px;
+        border-radius: 15px;
+        font-size: 12px;
         font-weight: 600;
         border: 1px solid rgba(56, 189, 248, 0.3);
     }
@@ -156,7 +153,7 @@ st.markdown(
         background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
         color: white;
         border: none;
-        padding: 0.5rem 1rem;
+        padding: 0.6rem 1rem;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
         transition: all 0.3s ease;
     }
@@ -174,9 +171,9 @@ st.markdown(
 st.markdown(
     """
     <div class="main-header-card">
-        <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" alt="Logo PASTI" style="width: 75px; height: auto; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
-        <div class="main-title-text">Portal Administrasi Siswa Terintegrasi</div>
-        <div class="sub-title-2">Pusat Kendali Administrasi Guru</div>
+        <h1 class="main-title">PASTI</h1>
+        <div class="sub-title-1">Portal Akademik Siswa Terintegrasi</div>
+        <div class="sub-title-2">Pusat Kendali Aplikasi Pembelajaran dan Administrasi Guru</div>
         <div class="dev-badge">
             <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;|&nbsp; <em>Sistem Otomatisasi Terintegrasi</em>
         </div>
@@ -185,28 +182,24 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- KONDISI 1: JIKA BELUM LOGIN ---
+# --- HALAMAN LOGIN / VERIFIKASI ---
 if not st.session_state.logged_in:
-  st.markdown(
-      """
-        <div class="login-container-card">
-            <h4 style='color: #38bdf8; margin: 0 0 4px 0; font-size: 16px;'>🔐 Login Akses Portal</h4>
-            <p style='color: #94a3b8; font-size: 13px; margin: 0;'>
-                Silakan masukkan <b>Email</b> terdaftar atau <b>Token Unik</b> Anda untuk masuk ke sistem.
-            </p>
-        </div>
-        """,
-      unsafe_allow_html=True,
-  )
-
   with st.form("form_login"):
+    st.markdown(
+        "<h3 style='color: #38bdf8; margin-top:0;'>🔐 Login Akses Portal</h3>",
+        unsafe_allow_html=True,
+    )
+    st.write(
+        "Silakan masukkan **Email** terdaftar atau **Token Unik** Anda untuk"
+        " masuk ke sistem."
+    )
     user_input = st.text_input(
         "Email / Token Unik Guru",
         placeholder=(
-            "Contoh: yustinus_bkl@gmail.com atau TOKENPASTI12345"
+            "Contoh: yustinussetyanta08@dinas.belajar.id atau TOKEN300869"
         ),
     )
-    btn_login = st.form_submit_button("🚀 Masuk Portal", use_container_width=True)
+    btn_login = st.form_submit_button("🚀 Masuk Portal")
 
     if btn_login:
       if not user_input:
@@ -251,42 +244,27 @@ if not st.session_state.logged_in:
               "❌ Database Master Registry kosong atau gagal diakses. Periksa"
               " koneksi spreadsheet Anda."
           )
-
-# --- KONDISI 2: JIKA SUDAH LOGIN ---
 else:
-  with st.sidebar:
-    st.markdown(
-        f"""
-            <div style="text-align: center; padding: 10px; background: #1e293b; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155;">
+  # --- SIDEBAR PROFESIONAL SETELAH LOGIN ---
+    with st.sidebar:
+      st.markdown(
+          f"""
+            <div class="user-profile-box">
                 <span style="font-size: 24px;">👨‍💻</span><br>
                 <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
                 <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
             </div>
             """,
-        unsafe_allow_html=True,
-    )
-
-    menu_pilihan = st.radio(
-        "📌 Navigasi Menu",
-        [
-            "🏠 Dashboard Utama",
-            "📋 E-Presensi Siswa",
-            "📖 E-Jurnal Mengajar",
-            "📝 E-Asesmen PM",
-            "🤖 E-Modul Ajar PM",
-        ],
-    )
-
-    st.markdown("---")
+          unsafe_allow_html=True,
+      )
+      
     if st.button("🚪 Keluar / Logout"):
       st.session_state.logged_in = False
       st.session_state.guru_nama = ""
       st.session_state.spreadsheet_id = ""
-      st.session_state.gemini_api_key = ""
       st.rerun()
 
-  # --- KONTROL HALAMAN BERDASARKAN MENU SIDEBAR ---
-  if menu_pilihan == "🏠 Dashboard Utama":
+  # --- TAMPILAN BERANDA UTAMA SETELAH LOGIN ---
     st.markdown(
         f"""
         <div class="user-welcome-card">
@@ -324,227 +302,3 @@ else:
             """,
           unsafe_allow_html=True,
       )
-
-  elif menu_pilihan == "📋 E-Presensi Siswa":
-    st.markdown("### 📋 E-Presensi Siswa", unsafe_allow_html=True)
-    st.markdown(
-        "Unggah file Excel atau CSV daftar siswa Anda untuk disinkronkan"
-        " langsung ke Google Spreadsheet pribadi Anda."
-    )
-
-    uploaded_file = st.file_uploader(
-        "Pilih file data siswa", type=["xlsx", "xls", "csv"]
-    )
-
-    if uploaded_file is not None:
-      try:
-        uploaded_file.seek(0)
-        if uploaded_file.name.endswith(".csv"):
-          df_preview = pd.read_csv(uploaded_file)
-        else:
-          df_preview = pd.read_excel(uploaded_file)
-
-        st.markdown("#### Preview Data yang akan diunggah:")
-        st.dataframe(df_preview, use_container_width=True)
-
-        if st.button("🚀 Unggah ke Google Spreadsheet", use_container_width=True):
-          if not st.session_state.spreadsheet_id:
-            st.error(
-                "❌ Spreadsheet ID Anda tidak ditemukan di Master Registry."
-            )
-          else:
-            with st.spinner(
-                "Sedang mengunggah data ke Google Spreadsheet..."
-            ):
-              try:
-                client = get_gspread_client()
-                sh = client.open_by_key(st.session_state.spreadsheet_id)
-
-                # 1. Bersihkan nilai kosong (NaN) dan konversi ke string untuk keamanan API gspread
-                df_clean = df_preview.fillna("")
-                df_clean = df_clean.astype(str)
-
-                # 2. Cek atau buat worksheet Presensi
-                try:
-                  worksheet = sh.worksheet("Presensi")
-                except gspread.exceptions.WorksheetNotFound:
-                  worksheet = sh.add_worksheet(
-                      title="Presensi", rows="100", cols="20"
-                  )
-
-                # 3. Kosongkan dan update data menggunakan parameter range_name dan values yang aman
-                worksheet.clear()
-                data_to_upload = [
-                    df_clean.columns.values.tolist()
-                ] + df_clean.values.tolist()
-                worksheet.update(range_name="A1", values=data_to_upload)
-
-                st.success(
-                    "🎉 Data siswa berhasil diunggah ke Google Spreadsheet Anda!"
-                )
-              except Exception as upload_err:
-                st.error(
-                    "❌ Gagal mengunggah ke Google Spreadsheet. Detail Error:"
-                    f" `{upload_err}`"
-                )
-                st.info(
-                    "💡 **Pemeriksaan Penting:** Pastikan email *Service Account*"
-                    " Google Cloud Anda sudah dibagikan (*Share*) dengan akses"
-                    " **Editor** ke Spreadsheet milik guru yang bersangkutan."
-                )
-      except Exception as e:
-        st.error(f"❌ Gagal membaca file yang diunggah: {e}")
-
-    st.markdown("---")
-    st.markdown("#### 📊 Data Siswa yang Tersimpan di Spreadsheet Anda")
-    if st.button("🔄 Muat Data dari Spreadsheet"):
-      with st.spinner("Memuat data dari spreadsheet..."):
-        try:
-          client = get_gspread_client()
-          sh = client.open_by_key(st.session_state.spreadsheet_id)
-          worksheet = sh.worksheet("Presensi")
-          records = worksheet.get_all_records()
-          if records:
-            df_stored = pd.DataFrame(records)
-            st.dataframe(df_stored, use_container_width=True)
-          else:
-            st.info("Worksheet Presensi masih kosong.")
-        except Exception as e:
-          st.warning(
-              f"⚠️ Belum dapat memuat data. Pastikan worksheet 'Presensi'"
-              f" sudah dibuat melalui tombol unggah. Detail: {e}"
-          )
-
-  elif menu_pilihan == "📖 E-Jurnal Mengajar":
-    st.markdown("### 📖 E-Jurnal Mengajar", unsafe_allow_html=True)
-    st.info("Catat agenda dan kegiatan pembelajaran harian Anda di sini.")
-    with st.form("form_jurnal"):
-      tanggal = st.date_input("Tanggal Mengajar", datetime.now())
-      kelas = st.text_input("Kelas / Rombel", "X TSM-1")
-      materi = st.text_input(
-          "Materi Pembelajaran", "Pemeliharaan Mesin Kendaraan Ringan"
-      )
-      catatan = st.text_area("Catatan Kejadian / Refleksi Mengajar")
-      btn_simpan_jurnal = st.form_submit_button(
-          "💾 Simpan Jurnal ke Spreadsheet", use_container_width=True
-      )
-
-      if btn_simpan_jurnal:
-        with st.spinner("Menyimpan jurnal..."):
-          try:
-            client = get_gspread_client()
-            sh = client.open_by_key(st.session_state.spreadsheet_id)
-            try:
-              ws_jurnal = sh.worksheet("Jurnal_Mengajar")
-            except gspread.exceptions.WorksheetNotFound:
-              ws_jurnal = sh.add_worksheet(
-                  title="Jurnal_Mengajar", rows="100", cols="10"
-              )
-              ws_jurnal.append_row(["Tanggal", "Kelas", "Materi", "Catatan"])
-            ws_jurnal.append_row([str(tanggal), kelas, materi, catatan])
-            st.success("🎉 Jurnal mengajar berhasil disimpan ke Spreadsheet!")
-          except Exception as e:
-            st.error(f"❌ Gagal menyimpan jurnal: {e}")
-
-  elif menu_pilihan == "📝 E-Asesmen PM":
-    st.markdown("### 📝 E-Asesmen Projek Mandiri", unsafe_allow_html=True)
-    st.info(
-        "Modul pengelolaan dan rekapitulasi penilaian formatif/sumatif siswa."
-    )
-
-  elif menu_pilihan == "🤖 E-Modul Ajar PM":
-    st.markdown("### 🤖 Otomatisasi Penyusunan Modul Ajar PM", unsafe_allow_html=True)
-
-    with st.expander(
-        "📖 Panduan Pembuatan Kode Google Gemini API Key", expanded=True
-    ):
-      st.markdown(
-          """
-            <div style='background-color: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155;'>
-                <p style='color: #cbd5e1; font-size: 13px; margin-bottom: 10px;'>
-                    Untuk menggunakan modul generator berbasis AI ini, Anda memerlukan <b>Google Gemini API Key</b> pribadi yang bersifat gratis. 
-                    Silakan pelajari panduan lengkap melalui tautan Google Drive di bawah ini:
-                </p>
-                <a href="https://drive.google.com/file/d/17FhN4P0P-_sOq0vhHe7K7063mYLbBxSs/view" target="_blank" 
-                   style='display: inline-block; background: #38bdf8; color: #0f172a; padding: 8px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 13px;'>
-                   📂 Buka Dokumen Panduan Google Drive (PDF)
-                </a>
-                <hr style='border-color: #334155; margin: 12px 0;'>
-                <p style='color: #94a3b8; font-size: 12px; margin-bottom: 4px;'><b>Ringkasan Singkat Langkah-langkah:</b></p>
-                <ol style='color: #cbd5e1; font-size: 12px; margin: 0; padding-left: 20px;'>
-                    <li>Akses situs <a href="https://aistudio.google.com/app/apikey" target="_blank" style='color: #38bdf8;'>Google AI Studio API Keys</a>.</li>
-                    <li>Klik tombol <b>Create API key</b> di pojok kanan atas.</li>
-                    <li>Pilih project yang tersedia, lalu klik <b>Create key</b>.</li>
-                    <li>Salin kode kunci (<code>Copy key</code>) yang muncul dan tempelkan ke kolom di bawah ini.</li>
-                </ol>
-            </div>
-            """,
-          unsafe_allow_html=True,
-      )
-
-    st.session_state.gemini_api_key = st.text_input(
-        "🔑 Masukkan Google Gemini API Key Anda",
-        value=st.session_state.gemini_api_key,
-        type="password",
-        placeholder="Contoh: AIzaSy...",
-        help=(
-            "Masukkan kunci API Gemini Anda. Kunci ini bersifat aman dan hanya"
-            " digunakan selama sesi aktif Anda."
-        ),
-    )
-
-    if not st.session_state.gemini_api_key:
-      st.warning(
-          "⚠️ Mohon masukkan Google Gemini API Key Anda terlebih dahulu untuk"
-          " mengaktifkan fitur pembuatan Modul Ajar."
-      )
-    else:
-      st.success(
-          "✅ Google Gemini API Key berhasil disematkan! Silakan isi parameter"
-          " pembelajaran di bawah."
-      )
-
-      with st.form("form_parameter_modul"):
-        st.markdown("#### ⚙️ Parameter Pembelajaran")
-        col_a, col_b = st.columns(2)
-
-        with col_a:
-          jenjang = st.selectbox(
-              "Pilih Jenjang Pendidikan", ["SMK / MAK", "SMA / MA", "SMP"]
-          )
-          mapel = st.text_input(
-              "Mata Pelajaran / Program Kejuruan",
-              value=(
-                  "Dasar-dasar Teknik Otomotif / Produk Kreatif dan Kewirausahaan"
-              ),
-          )
-          fase_kelas = st.selectbox(
-              "Fase / Kelas",
-              [
-                  "Fase E / Kelas X SMK (Program Dasar Keahlian)",
-                  "Fase F / Kelas XI SMK",
-                  "Fase F / Kelas XII SMK",
-              ],
-          )
-
-        with col_b:
-          topik = st.text_input(
-              "Topik / Materi Pokok / Elemen",
-              value="Menyimak Teks Laporan Hasil Observasi (KIKL)",
-          )
-          alokasi = st.text_input("Alokasi Waktu", value="2 JP (2 x 45 Menit)")
-          pertemuan = st.selectbox(
-              "Pertemuan Ke-", ["1 (Pertemuan Pertama)", "2 (Pertemuan Kedua)"]
-          )
-
-        btn_generate = st.form_submit_button(
-            "🚀 Buat Modul Ajar dengan AI", use_container_width=True
-        )
-
-        if btn_generate:
-          if not st.session_state.gemini_api_key:
-            st.error("❌ Google Gemini API Key belum dimasukkan!")
-          else:
-            st.info(
-                "⏳ Menghubungkan ke Gemini AI menggunakan API Key mandiri..."
-            )
