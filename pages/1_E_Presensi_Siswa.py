@@ -384,7 +384,7 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
         izin = len(group[group["Status"] == "Izin"])
         sakit = len(group[group["Status"] == "Sakit"])
         alpa = len(group[group["Status"] == "Alpa"])
-        jumlah_th = izin + sakit + alpa
+        jumlah = izin + sakit + alpa
 
         rekap_list.append({
             "Sekolah": sekolah,
@@ -396,7 +396,7 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
             "Izin": izin,
             "Sakit": sakit,
             "Alpa": alpa,
-            "Jumlah_TH": jumlah_th,
+            "Jumlah": jumlah,
         })
 
       df_rekap = pd.DataFrame(rekap_list)
@@ -421,7 +421,7 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
                 "Izin",
                 "Sakit",
                 "Alpa",
-                "Jumlah_TH",
+                "Jumlah",
             ]
             ws_rekap.append_row(headers)
             ws_rekap.append_rows(df_rekap.values.tolist())
