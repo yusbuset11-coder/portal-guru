@@ -668,10 +668,38 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
         r_kelas = st.selectbox(
             "Pilih Kelas", sorted(daftar_kelas), key="input_kelas"
         )
+        
+        r_jenjang = st.selectbox(
+            "Jenjang",
+            ["SD", "SMP", "SMA", "SMK"],
+            key="input_jenjang",
+        )
+
         r_jenis = st.selectbox(
             "Jenis Asesmen",
             ["Asesmen Formatif", "Asesmen Sumatif"],
             key="input_jenis",
+        )
+
+        if r_jenis == "Asesmen Formatif":
+            sub_asesmen_input_options = [
+                "Formatif Tertulis",
+                "Formatif Tidak Tertulis",
+            ]
+        else:
+            sub_asesmen_input_options = [
+                "Tulis",
+                "Lisan",
+                "Tugas",
+                "Praktik",
+                "Proyek",
+                "Produk",
+            ]
+
+        r_sub_jenis = st.selectbox(
+            "Bentuk / Sub Jenis Asesmen",
+            sub_asesmen_input_options,
+            key="input_sub_jenis",
         )
 
     with col_r2:
@@ -756,10 +784,10 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
                     st.session_state.get("guru_nama", ""),
                     r_sekolah,
                     r_mapel,
-                    "",
+                    r_jenjang,
                     r_kelas,
                     r_jenis,
-                    "",
+                    r_sub_jenis,
                     r_materi,
                     r_no_absen,
                     r_nama_siswa,
