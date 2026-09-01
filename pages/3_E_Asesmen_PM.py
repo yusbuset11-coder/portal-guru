@@ -535,11 +535,11 @@ elif menu == "✨ Generator Asesmen AI":
                         except Exception as e:
                             st.error(f"Gagal menyimpan ke spreadsheet: {e}")
 
-# --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN (DIPERBAIKI DENGAN TOMBOL DOWNLOAD) ---
+# --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN (KOLOM KANAN UNTUK DOWNLOAD & NO MULAI DARI 1) ---
 elif menu == "📁 Bank Soal & Asesmen Tersimpan":
     st.subheader("📁 **Bank Soal & Asesmen Tersimpan**")
     st.write(
-        "Daftar arsip ringkasan asesmen yang pernah Anda buat dan simpan. Anda dapat mengunduh kembali dokumen Word (.docx) untuk setiap soal."
+        "Daftar arsip ringkasan asesmen yang pernah Anda buat dan simpan. Tombol untuk mengunduh dokumen Word (.docx) tersedia langsung di kolom paling kanan."
     )
 
     if user_spreadsheet_id:
@@ -549,16 +549,20 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
             if df_bank.empty or len(df_bank) == 0:
                 st.info("Belum ada data bank soal yang tersimpan di database.")
             else:
-                # Tampilkan tabel preview ringkas di atas
-                display_cols = [c for c in ["Tanggal", "Mata_Pelajaran", "Materi", "Jenjang", "Kelas", "Jenis_Asesmen"] if c in df_bank.columns]
-                st.markdown("### Daftar Ringkasan Arsip")
-                st.dataframe(df_bank[display_cols] if display_cols else df_bank, use_container_width=True)
-
                 st.markdown("---")
-                st.markdown("### 📥 Unduh Ulang Dokumen Soal (.docx)")
+                # Header Tabel Kustom
+                h_cols = st.columns([0.5, 1.2, 1.8, 1.8, 1.4, 1.5])
+                h_cols[0].markdown("**No.**")
+                h_cols[1].markdown("**Tanggal**")
+                h_cols[2].markdown("**Mata Pelajaran**")
+                h_cols[3].markdown("**Materi**")
+                h_cols[4].markdown("**Jenis Asesmen**")
+                h_cols[5].markdown("**Unduh Soal**")
+                st.markdown("---")
 
-                # Loop setiap baris untuk menyediakan tombol unduh dokumen Word
+                # Baris Data Tabel dengan Tombol di Kolom Paling Kanan
                 for idx, row in df_bank.iterrows():
+                    nomor = idx + 1  # Memulai penomoran dari 1, bukan 0
                     tgl = row.get("Tanggal", "")
                     mapel = row.get("Mata_Pelajaran", "Mapel")
                     materi = row.get("Materi", "Materi")
@@ -571,34 +575,38 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                     jns_soal_val = row.get("Jenis_Soal", "Pilihan Ganda")
                     konten_val = row.get("Konten_Soal", "")
 
-                    with st.container(border=True):
-                        c1, c2 = st.columns([3, 1])
-                        with c1:
-                            st.markdown(f"**📚 {mapel} — {materi}**")
-                            st.caption(f"📅 Tanggal: {tgl} | 🏷️ Jenis: {jenis} | 🏫 Kelas: {jenjang_val} {kelas_val}")
-                        with c2:
-                            if konten_val:
-                                docx_file_bank = generate_professional_word_document(
-                                    mapel=mapel,
-                                    materi=materi,
-                                    kelas=kelas_val,
-                                    jenjang=jenjang_val,
-                                    fase=fase_val,
-                                    jenis_asesmen=jenis,
-                                    sub_asesmen=sub_jenis_val,
-                                    jumlah_soal=jml_soal_val,
-                                    jenis_soal=jns_soal_val,
-                                    content_text=konten_val
-                                )
-                                st.download_button(
-                                    label="📥 Unduh Word",
-                                    data=docx_file_bank,
-                                    file_name=f"Asesmen_{mapel}_{materi}.docx".replace(" ", "_"),
-                                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                    key=f"dl_bank_doc_{idx}"
-                                )
-                            else:
-                                st.warning("Konten soal belum tersedia di spreadsheet (format lama).")
+                    row_cols = st.columns([0.5, 1.2, 1.8, 1.8, 1.4, 1.5])
+                    row_cols[0].write(str(nomor))
+                    row_cols[1].write(tgl)
+                    row_cols[2].write(mapel)
+                    row_cols[3].write(materi)
+                    row_cols[4].write(jenis)
+                    
+                    with row_cols[5]:
+                        if konten_val:
+                            docx_file_bank = generate_professional_word_document(
+                                mapel=mapel,
+                                materi=materi,
+                                kelas=kelas_val,
+                                jenjang=jenjang_val,
+                                fase=fase_val,
+                                jenis_asesmen=jenis,
+                                sub_asesmen=sub_jenis_val,
+                                jumlah_soal=jml_soal_val,
+                                jenis_soal=jns_soal_val,
+                                content_text=konten_val
+                            )
+                            st.download_button(
+                                label="📥 Unduh Word",
+                                data=docx_file_bank,
+                                file_name=f"Asesmen_{mapel}_{materi}.docx".replace(" ", "_"),
+                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                key=f"dl_bank_doc_{idx}",
+                                use_container_width=True
+                            )
+                        else:
+                            st.caption("Kosong")
+                    st.markdown("---")
 
 # --- MENU 4: INPUT DAN REKAP NILAI SISWA ---
 elif menu == "📊 Input dan Rekap Nilai Siswa":
