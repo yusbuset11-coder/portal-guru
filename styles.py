@@ -44,7 +44,7 @@ def apply_global_styles():
 
             /* --- WARNA TEKS UTAMA --- */
             h1, h2, h3, h4 {
-                color: #f0f6fc !important;
+                color: #ffffff !important;
             }
         </style>
         """,
