@@ -81,16 +81,17 @@ st.markdown(
 
 # Sidebar Profil & Navigasi
 with st.sidebar:
-    st.markdown(
-        f"""
+  st.markdown(
+      f"""
         <div class="user-profile-box">
             <span style="font-size: 24px;">👨‍💻</span><br>
             <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
             <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
         </div>
         """,
-        unsafe_allow_html=True,
-    )
+      unsafe_allow_html=True,
+  )
+
 
 # Koneksi Google Sheets
 @st.cache_resource
@@ -195,29 +196,36 @@ if menu == "📝 Pencatatan Presensi Harian":
         ' melalui menu **Manajemen Data Sekolah & Siswa** di bawah.'
     )
   else:
-    col1, col2 = st.columns(2)
+    list_sekolah = df_siswa["Sekolah"].dropna().unique().tolist()
+
+    # BARIS PERTAMA: Tanggal Presensi - Kelas - Sekolah (3 Kolom)
+    col1, col2, col3 = st.columns(3)
     with col1:
       tanggal = st.date_input("Tanggal Presensi", datetime.now())
-      list_sekolah = df_siswa["Sekolah"].dropna().unique().tolist()
+    with col3:
       selected_sekolah = st.selectbox(
           "Sekolah", list_sekolah if list_sekolah else ["-"]
       )
 
+    df_filtered_sekolah = df_siswa[df_siswa["Sekolah"] == selected_sekolah]
+    list_kelas = (
+        df_filtered_sekolah["Kelas"].dropna().unique().tolist()
+        if not df_filtered_sekolah.empty
+        else ["-"]
+    )
     with col2:
-      df_filtered_sekolah = df_siswa[df_siswa["Sekolah"] == selected_sekolah]
-      list_kelas = (
-          df_filtered_sekolah["Kelas"].dropna().unique().tolist()
-          if not df_filtered_sekolah.empty
-          else ["-"]
-      )
       selected_kelas = st.selectbox("Kelas", list_kelas)
 
-    mapel = st.text_input(
-        "Mata Pelajaran", placeholder="Contoh: Informatika / Bahasa Indonesia"
-    )
-    jam = st.text_input(
-        "Jam Pelajaran / Keterangan Waktu", placeholder="Contoh: Jam ke 1-2"
-    )
+    # BARIS KEDUA: Mata Pelajaran - Jam Pelajaran / Keterangan Waktu (2 Kolom)
+    col_m1, col_m2 = st.columns(2)
+    with col_m1:
+      mapel = st.text_input(
+          "Mata Pelajaran", placeholder="Contoh: Informatika / Bahasa Indonesia"
+      )
+    with col_m2:
+      jam = st.text_input(
+          "Jam Pelajaran / Keterangan Waktu", placeholder="Contoh: Jam ke 1-2"
+      )
 
     st.markdown("---")
     st.subheader(
@@ -433,7 +441,6 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
 
     except Exception as e:
       st.error(f"Terjadi kesalahan memproses rekap: {e}")
-
 
   with tab_ganjil:
     st.subheader("Rekapitulasi Kehadiran Semester Ganjil")
