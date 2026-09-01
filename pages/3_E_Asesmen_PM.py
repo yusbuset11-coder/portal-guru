@@ -273,21 +273,9 @@ def get_clean_bank_soal_dataframe(sheet_id):
         except Exception:
             ws = ss_user.worksheet("Bank Soal")
         rows = ws.get_all_values()
-        if not rows:
-            return pd.DataFrame(
-                columns=[
-                    "Tanggal",
-                    "Mata_Pelajaran",
-                    "Materi",
-                    "Jenis_Asesmen",
-                ]
-            )
+        if not rows or len(rows) <= 1:
+            return pd.DataFrame()
         df = pd.DataFrame(rows[1:], columns=rows[0])
-        expected_cols = ["Tanggal", "Mata_Pelajaran", "Materi", "Jenis_Asesmen"]
-        for col in expected_cols:
-            if col not in df.columns:
-                df[col] = ""
-        df = df[expected_cols]
         return df
     except Exception as e:
         return pd.DataFrame()
@@ -506,17 +494,24 @@ elif menu == "✨ Generator Asesmen AI":
                                 ws_bank = ss_user.worksheet("Bank Soal SAKTI")
                             except Exception:
                                 ws_bank = ss_user.add_worksheet(
-                                    title="Bank Soal SAKTI", rows="1000", cols="4"
+                                    title="Bank Soal SAKTI", rows="1000", cols="11"
                                 )
 
                             correct_bank_header = [
                                 "Tanggal",
                                 "Mata_Pelajaran",
                                 "Materi",
+                                "Jenjang",
+                                "Fase",
+                                "Kelas",
                                 "Jenis_Asesmen",
+                                "Sub_Jenis_Asesmen",
+                                "Jumlah_Soal",
+                                "Jenis_Soal",
+                                "Konten_Soal"
                             ]
                             try:
-                                ws_bank.update("A1:D1", [correct_bank_header])
+                                ws_bank.update("A1:K1", [correct_bank_header])
                             except:
                                 pass
 
@@ -524,20 +519,27 @@ elif menu == "✨ Generator Asesmen AI":
                                 str(datetime.today().strftime("%Y-%m-%d")),
                                 str(st.session_state.get("meta_mapel", "")),
                                 str(st.session_state.get("meta_materi", "")),
+                                str(st.session_state.get("meta_jenjang", "")),
+                                str(st.session_state.get("meta_fase", "")),
+                                str(st.session_state.get("meta_kelas", "")),
                                 str(st.session_state.get("meta_jenis", "")),
+                                str(st.session_state.get("meta_sub_asesmen", "")),
+                                str(st.session_state.get("meta_jumlah_soal", 5)),
+                                str(st.session_state.get("meta_jenis_soal", "")),
+                                str(st.session_state.get("generated_soal", ""))
                             ])
                             st.success(
-                                "🎉 Metadata soal berhasil disimpan ke tab 'Bank"
+                                "🎉 Soal beserta metadata berhasil disimpan ke tab 'Bank"
                                 " Soal SAKTI' di spreadsheet Anda!"
                             )
                         except Exception as e:
                             st.error(f"Gagal menyimpan ke spreadsheet: {e}")
 
-# --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN ---
+# --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN (DIPERBAIKI DENGAN TOMBOL DOWNLOAD) ---
 elif menu == "📁 Bank Soal & Asesmen Tersimpan":
     st.subheader("📁 **Bank Soal & Asesmen Tersimpan**")
     st.write(
-        "Daftar arsip ringkasan asesmen yang pernah Anda buat dan simpan."
+        "Daftar arsip ringkasan asesmen yang pernah Anda buat dan simpan. Anda dapat mengunduh kembali dokumen Word (.docx) untuk setiap soal."
     )
 
     if user_spreadsheet_id:
@@ -547,9 +549,56 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
             if df_bank.empty or len(df_bank) == 0:
                 st.info("Belum ada data bank soal yang tersimpan di database.")
             else:
-                df_bank.index = range(1, len(df_bank) + 1)
-                with st.container(border=True):
-                    st.dataframe(df_bank, use_container_width=True)
+                # Tampilkan tabel preview ringkas di atas
+                display_cols = [c for c in ["Tanggal", "Mata_Pelajaran", "Materi", "Jenjang", "Kelas", "Jenis_Asesmen"] if c in df_bank.columns]
+                st.markdown("### Daftar Ringkasan Arsip")
+                st.dataframe(df_bank[display_cols] if display_cols else df_bank, use_container_width=True)
+
+                st.markdown("---")
+                st.markdown("### 📥 Unduh Ulang Dokumen Soal (.docx)")
+
+                # Loop setiap baris untuk menyediakan tombol unduh dokumen Word
+                for idx, row in df_bank.iterrows():
+                    tgl = row.get("Tanggal", "")
+                    mapel = row.get("Mata_Pelajaran", "Mapel")
+                    materi = row.get("Materi", "Materi")
+                    jenis = row.get("Jenis_Asesmen", "Asesmen")
+                    kelas_val = row.get("Kelas", "Kelas 10")
+                    jenjang_val = row.get("Jenjang", "SMA")
+                    fase_val = row.get("Fase", "Fase E")
+                    sub_jenis_val = row.get("Sub_Jenis_Asesmen", "Tugas")
+                    jml_soal_val = int(row.get("Jumlah_Soal", 5)) if str(row.get("Jumlah_Soal", 5)).isdigit() else 5
+                    jns_soal_val = row.get("Jenis_Soal", "Pilihan Ganda")
+                    konten_val = row.get("Konten_Soal", "")
+
+                    with st.container(border=True):
+                        c1, c2 = st.columns([3, 1])
+                        with c1:
+                            st.markdown(f"**📚 {mapel} — {materi}**")
+                            st.caption(f"📅 Tanggal: {tgl} | 🏷️ Jenis: {jenis} | 🏫 Kelas: {jenjang_val} {kelas_val}")
+                        with c2:
+                            if konten_val:
+                                docx_file_bank = generate_professional_word_document(
+                                    mapel=mapel,
+                                    materi=materi,
+                                    kelas=kelas_val,
+                                    jenjang=jenjang_val,
+                                    fase=fase_val,
+                                    jenis_asesmen=jenis,
+                                    sub_asesmen=sub_jenis_val,
+                                    jumlah_soal=jml_soal_val,
+                                    jenis_soal=jns_soal_val,
+                                    content_text=konten_val
+                                )
+                                st.download_button(
+                                    label="📥 Unduh Word",
+                                    data=docx_file_bank,
+                                    file_name=f"Asesmen_{mapel}_{materi}.docx".replace(" ", "_"),
+                                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                    key=f"dl_bank_doc_{idx}"
+                                )
+                            else:
+                                st.warning("Konten soal belum tersedia di spreadsheet (format lama).")
 
 # --- MENU 4: INPUT DAN REKAP NILAI SISWA ---
 elif menu == "📊 Input dan Rekap Nilai Siswa":
@@ -625,8 +674,6 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
         r_kelas = st.selectbox(
             "Pilih Kelas", sorted(daftar_kelas), key="input_kelas"
         )
-
-        # Label & input Jenjang Dihapus sepenuhnya dari UI sesuai permintaan
 
         r_jenis = st.selectbox(
             "Jenis Asesmen",
@@ -759,7 +806,7 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
             except Exception as e:
                 st.error(f"Gagal menyimpan ke database: {e}")
 
-    # --- BAGIAN MENU UNDUH / EXPORT REKAP NILAI (DIPERBAIKI) ---
+    # --- BAGIAN MENU UNDUH / EXPORT REKAP NILAI ---
     st.markdown("---")
     st.subheader("📥 Unduh Rekap Nilai Siswa")
     st.markdown(
