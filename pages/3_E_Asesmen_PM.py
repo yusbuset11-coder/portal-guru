@@ -21,7 +21,6 @@ st.set_page_config(
 )
 apply_global_styles()
 
-# Atur jarak atas agar konten naik dan tidak terpotong di bawah
 st.markdown("""
     <style>
         .block-container {
@@ -60,8 +59,6 @@ def init_connections():
 
 
 gc = init_connections()
-
-# Ambil ID Spreadsheet khusus guru dari session state portal utama
 user_spreadsheet_id = st.session_state.get("spreadsheet_id", "")
 
 
@@ -103,7 +100,6 @@ def generate_professional_word_document(
         section.left_margin = Inches(1)
         section.right_margin = Inches(1)
 
-    # Judul Dokumen Utama
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.LEFT
     run_title = p_title.add_run(f"INSTRUMEN {jenis_asesmen.upper()}")
@@ -113,7 +109,6 @@ def generate_professional_word_document(
     run_title.font.color.rgb = RGBColor(27, 54, 93)
     p_title.paragraph_format.space_after = Pt(8)
 
-    # TABEL 1: Informasi / Metadata Instrumen
     table_meta = doc.add_table(rows=5, cols=2)
     table_meta.alignment = WD_TABLE_ALIGNMENT.CENTER
 
@@ -136,9 +131,6 @@ def generate_professional_word_document(
 
         p_k = cell_key.paragraphs[0]
         p_k.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        p_k.paragraph_format.space_before = Pt(2)
-        p_k.paragraph_format.space_after = Pt(2)
-        p_k.paragraph_format.line_spacing = 1.15
         r_k = p_k.add_run(key)
         r_k.bold = True
         r_k.font.name = "Cambria"
@@ -146,9 +138,6 @@ def generate_professional_word_document(
 
         p_v = cell_val.paragraphs[0]
         p_v.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        p_v.paragraph_format.space_before = Pt(2)
-        p_v.paragraph_format.space_after = Pt(2)
-        p_v.paragraph_format.line_spacing = 1.15
         r_v = p_v.add_run(str(val))
         r_v.font.name = "Cambria"
         r_v.font.size = Pt(10.5)
@@ -159,7 +148,6 @@ def generate_professional_word_document(
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-    # TABEL 2: Spesifikasi Asesmen
     p_sub = doc.add_paragraph()
     run_sub = p_sub.add_run("SPESIFIKASI ASESMEN")
     run_sub.bold = True
@@ -189,9 +177,6 @@ def generate_professional_word_document(
         for cell in (c0, c1):
             for p in cell.paragraphs:
                 p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                p.paragraph_format.space_before = Pt(2)
-                p.paragraph_format.space_after = Pt(2)
-                p.paragraph_format.line_spacing = 1.15
                 for run in p.runs:
                     run.font.name = "Cambria"
                     run.font.size = Pt(10.5)
@@ -201,7 +186,6 @@ def generate_professional_word_document(
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-    # BUTIR SOAL TITLE
     p_bs_title = doc.add_paragraph()
     r_bst = p_bs_title.add_run("BUTIR SOAL & PEMBAHASAN")
     r_bst.bold = True
@@ -210,7 +194,6 @@ def generate_professional_word_document(
     r_bst.font.color.rgb = RGBColor(27, 54, 93)
     p_bs_title.paragraph_format.space_after = Pt(6)
 
-    # PARSING KONTEN SOAL
     for line in content_text.split("\n"):
         line_str = line.strip()
         if not line_str:
@@ -221,30 +204,13 @@ def generate_professional_word_document(
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.line_spacing = 1.15
 
-        if (
-            line_str.startswith("###")
-            or line_str.startswith("##")
-            or line_str.startswith("#")
-        ):
+        if line_str.startswith("#"):
             run = p.add_run(line_str.replace("#", "").strip())
             run.font.name = "Cambria"
             run.font.size = Pt(11.5)
             run.font.bold = True
             run.font.color.rgb = RGBColor(27, 54, 93)
             p.paragraph_format.space_before = Pt(8)
-        elif (
-            line_str.startswith("SOAL")
-            or line_str.startswith("KUNCI")
-            or line_str.startswith("Pertanyaan")
-            or line_str.startswith("Pembahasan")
-            or line_str.startswith("Soal")
-        ):
-            run = p.add_run(line_str)
-            run.font.name = "Cambria"
-            run.font.size = Pt(10.5)
-            run.font.bold = True
-            run.font.color.rgb = RGBColor(15, 23, 42)
-            p.paragraph_format.space_before = Pt(4)
         else:
             run = p.add_run(line_str)
             run.font.name = "Cambria"
@@ -296,39 +262,36 @@ with st.sidebar:
         ],
     )
 
-# --- HEADER BANK SOAL STANDAR ---
-EXPECTED_BANK_SOAL_HEADER = [
-    "Tanggal",
-    "Mata_Pelajaran",
-    "Materi",
-    "Jenis_Asesmen",
-    "Bentuk_Soal",
-]
 
-
-def get_clean_bank_soal_dataframe(ws):
+# --- FUNGSI AMAN BANK SOAL SAKTI (Tanpa Kolom E) ---
+@st.cache_data(ttl=10)
+def get_clean_bank_soal_dataframe(sheet_id):
     try:
+        ss_user = gc.open_by_key(sheet_id)
+        try:
+            ws = ss_user.worksheet("Bank Soal SAKTI")
+        except Exception:
+            ws = ss_user.worksheet("Bank Soal")
         rows = ws.get_all_values()
-    except Exception:
-        rows = []
-
-    if not rows:
-        ws.append_row(EXPECTED_BANK_SOAL_HEADER)
-        return pd.DataFrame(columns=EXPECTED_BANK_SOAL_HEADER)
-
-    if rows[0] != EXPECTED_BANK_SOAL_HEADER:
-        ws.insert_row(EXPECTED_BANK_SOAL_HEADER, index=1)
-        rows = ws.get_all_values()
-
-    if len(rows) > 1:
+        if not rows:
+            return pd.DataFrame(
+                columns=[
+                    "Tanggal",
+                    "Mata_Pelajaran",
+                    "Materi",
+                    "Jenis_Asesmen",
+                ]
+            )
         df = pd.DataFrame(rows[1:], columns=rows[0])
-        for col in EXPECTED_BANK_SOAL_HEADER:
+        # Pastikan hanya mengambil 4 kolom pertama jika ada kolom berlebih
+        expected_cols = ["Tanggal", "Mata_Pelajaran", "Materi", "Jenis_Asesmen"]
+        for col in expected_cols:
             if col not in df.columns:
                 df[col] = ""
-        df = df[EXPECTED_BANK_SOAL_HEADER]
+        df = df[expected_cols]
         return df
-    else:
-        return pd.DataFrame(columns=EXPECTED_BANK_SOAL_HEADER)
+    except Exception as e:
+        return pd.DataFrame()
 
 
 # --- MENU 1: BERANDA ASESMEN ---
@@ -350,8 +313,8 @@ if menu == "🏠 Beranda Asesmen":
             " mendalam untuk setiap butir soal."
         )
         st.markdown(
-            "* **Penyimpanan Cloud & Word Profesional:** Simpan hasil asesmen ke"
-            " Google Spreadsheet dan unduh dokumen Word siap cetak."
+            "* **Penyimpanan Cloud & Word Profesional:** Simpan ringkasan asesmen"
+            " ke Google Spreadsheet dan unduh dokumen Word siap cetak."
         )
         st.markdown(
             "* **Rekap Nilai Siswa:** Kelola dan sinkronkan rekap nilai siswa"
@@ -541,32 +504,33 @@ elif menu == "✨ Generator Asesmen AI":
                         try:
                             ss_user = gc.open_by_key(user_spreadsheet_id)
                             try:
-                                ws_bank = ss_user.worksheet("Bank Soal")
+                                ws_bank = ss_user.worksheet("Bank Soal SAKTI")
                             except Exception:
                                 ws_bank = ss_user.add_worksheet(
-                                    title="Bank Soal", rows="1000", cols="5"
+                                    title="Bank Soal SAKTI", rows="1000", cols="4"
                                 )
 
-                            # Pastikan header bersih
-                            rows_check = ws_bank.get_all_values()
-                            if (
-                                not rows_check
-                                or rows_check[0] != EXPECTED_BANK_SOAL_HEADER
-                            ):
-                                ws_bank.insert_row(
-                                    EXPECTED_BANK_SOAL_HEADER, index=1
-                                )
+                            correct_bank_header = [
+                                "Tanggal",
+                                "Mata_Pelajaran",
+                                "Materi",
+                                "Jenis_Asesmen",
+                            ]
+                            try:
+                                ws_bank.update("A1:D1", [correct_bank_header])
+                            except:
+                                pass
 
+                            # Menyimpan hanya metadata ringkas (Tanpa Kolom E / Konten Soal)
                             ws_bank.append_row([
                                 str(datetime.today().strftime("%Y-%m-%d")),
                                 str(st.session_state.get("meta_mapel", "")),
                                 str(st.session_state.get("meta_materi", "")),
                                 str(st.session_state.get("meta_jenis", "")),
-                                str(st.session_state.get("meta_sub_asesmen", "")),
                             ])
                             st.success(
-                                "🎉 Soal berhasil disimpan ke tab 'Bank Soal' di"
-                                " spreadsheet Anda!"
+                                "🎉 Metadata soal berhasil disimpan ke tab 'Bank"
+                                " Soal SAKTI' di spreadsheet Anda!"
                             )
                         except Exception as e:
                             st.error(f"Gagal menyimpan ke spreadsheet: {e}")
@@ -574,13 +538,13 @@ elif menu == "✨ Generator Asesmen AI":
 # --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN ---
 elif menu == "📁 Bank Soal & Asesmen Tersimpan":
     st.subheader("📁 **Bank Soal & Asesmen Tersimpan**")
-    st.write("Daftar arsip naskah asesmen yang pernah Anda buat dan simpan.")
+    st.write(
+        "Daftar arsip ringkasan asesmen yang pernah Anda buat dan simpan."
+    )
 
     if user_spreadsheet_id:
-        try:
-            ss_user = gc.open_by_key(user_spreadsheet_id)
-            ws_bank = ss_user.worksheet("Bank Soal")
-            df_bank = get_clean_bank_soal_dataframe(ws_bank)
+        with st.spinner("Memuat data bank soal..."):
+            df_bank = get_clean_bank_soal_dataframe(user_spreadsheet_id)
 
             if df_bank.empty or len(df_bank) == 0:
                 st.info("Belum ada data bank soal yang tersimpan di database.")
@@ -588,11 +552,6 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                 df_bank.index = range(1, len(df_bank) + 1)
                 with st.container(border=True):
                     st.dataframe(df_bank, use_container_width=True)
-        except Exception as e:
-            st.info(
-                "Tab 'Bank Soal' belum tersedia atau belum ada data di"
-                f" spreadsheet Anda. (Detail: {e})"
-            )
 
 # --- MENU 4: INPUT DAN REKAP NILAI SISWA ---
 elif menu == "📊 Input dan Rekap Nilai Siswa":
@@ -606,14 +565,14 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
         st.stop()
 
 
-    @st.cache_data(ttl=5)
+    @st.cache_data(ttl=10)
     def fetch_master_data(sheet_id):
         try:
             ss = gc.open_by_key(sheet_id)
             ws = ss.worksheet("Data Kelas-Siswa")
             records = ws.get_all_records()
             return records
-        except Exception as e:
+        except Exception:
             return []
 
 
@@ -668,7 +627,7 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
         r_kelas = st.selectbox(
             "Pilih Kelas", sorted(daftar_kelas), key="input_kelas"
         )
-        
+
         r_jenjang = st.selectbox(
             "Jenjang",
             ["SD", "SMP", "SMA", "SMK"],
@@ -720,7 +679,9 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
         for r in siswa_filtered:
             try:
                 absen_raw = r.get("No_Absen", r.get("No Absen", 1))
-                nama_raw = r.get("Nama_Siswa", r.get("Nama Siswa", r.get("Nama", "")))
+                nama_raw = r.get(
+                    "Nama_Siswa", r.get("Nama Siswa", r.get("Nama", ""))
+                )
 
                 absen = int(absen_raw)
                 nama = str(nama_raw).strip()
