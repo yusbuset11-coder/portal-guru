@@ -283,7 +283,6 @@ def get_clean_bank_soal_dataframe(sheet_id):
                 ]
             )
         df = pd.DataFrame(rows[1:], columns=rows[0])
-        # Pastikan hanya mengambil 4 kolom pertama jika ada kolom berlebih
         expected_cols = ["Tanggal", "Mata_Pelajaran", "Materi", "Jenis_Asesmen"]
         for col in expected_cols:
             if col not in df.columns:
@@ -521,7 +520,6 @@ elif menu == "✨ Generator Asesmen AI":
                             except:
                                 pass
 
-                            # Menyimpan hanya metadata ringkas (Tanpa Kolom E / Konten Soal)
                             ws_bank.append_row([
                                 str(datetime.today().strftime("%Y-%m-%d")),
                                 str(st.session_state.get("meta_mapel", "")),
@@ -716,12 +714,11 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
             try:
                 ss = gc.open_by_key(user_spreadsheet_id)
 
+                # Header Rekap_Nilai tanpa kolom 'Nama Guru' dan 'Jenjang'
                 correct_header = [
                     "Tanggal",
-                    "Nama Guru",
                     "Sekolah",
                     "Mata Pelajaran",
-                    "Jenjang",
                     "Kelas",
                     "Jenis Asesmen",
                     "Sub Jenis Asesmen",
@@ -733,19 +730,18 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
 
                 try:
                     sheet = ss.worksheet("Rekap_Nilai")
-                    sheet.update("A1:L1", [correct_header])
+                    sheet.update("A1:J1", [correct_header])
                 except:
-                    sheet = ss.add_worksheet(title="Rekap_Nilai", rows=100, cols=12)
+                    sheet = ss.add_worksheet(title="Rekap_Nilai", rows=100, cols=10)
                     sheet.append_row(correct_header)
 
                 tanggal_str = tanggal_input.strftime("%Y-%m-%d")
 
+                # Menyimpan data tanpa kolom Nama Guru dan Jenjang
                 sheet.append_row([
                     tanggal_str,
-                    st.session_state.get("guru_nama", ""),
                     r_sekolah,
                     r_mapel,
-                    r_jenjang,
                     r_kelas,
                     r_jenis,
                     r_sub_jenis,
