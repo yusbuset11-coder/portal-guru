@@ -535,7 +535,7 @@ elif menu == "✨ Generator Asesmen AI":
                         except Exception as e:
                             st.error(f"Gagal menyimpan ke spreadsheet: {e}")
 
-# --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN (KOLOM KANAN UNTUK DOWNLOAD & NO MULAI DARI 1) ---
+# --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN ---
 elif menu == "📁 Bank Soal & Asesmen Tersimpan":
     st.subheader("📁 **Bank Soal & Asesmen Tersimpan**")
     st.write(
@@ -550,7 +550,6 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                 st.info("Belum ada data bank soal yang tersimpan di database.")
             else:
                 st.markdown("---")
-                # Header Tabel Kustom
                 h_cols = st.columns([0.5, 1.2, 1.8, 1.8, 1.4, 1.5])
                 h_cols[0].markdown("**No.**")
                 h_cols[1].markdown("**Tanggal**")
@@ -560,9 +559,8 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                 h_cols[5].markdown("**Unduh Soal**")
                 st.markdown("---")
 
-                # Baris Data Tabel dengan Tombol di Kolom Paling Kanan
                 for idx, row in df_bank.iterrows():
-                    nomor = idx + 1  # Memulai penomoran dari 1, bukan 0
+                    nomor = idx + 1
                     tgl = row.get("Tanggal", "")
                     mapel = row.get("Mata_Pelajaran", "Mapel")
                     materi = row.get("Materi", "Materi")
@@ -608,7 +606,7 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                             st.caption("Kosong")
                     st.markdown("---")
 
-# --- MENU 4: INPUT DAN REKAP NILAI SISWA ---
+# --- MENU 4: INPUT DAN REKAP NILAI SISWA (TATA LETAK DISEJAJARKAN) ---
 elif menu == "📊 Input dan Rekap Nilai Siswa":
     st.subheader("Simpan & Rekap Nilai Hasil Asesmen")
 
@@ -654,6 +652,7 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
         st.session_state.val_materi = ""
 
     col_r1, col_r2 = st.columns(2)
+
     with col_r1:
         tanggal_input = st.date_input("Pilih Tanggal", value=datetime.now())
         r_mapel = st.text_input(
@@ -687,27 +686,6 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
             "Jenis Asesmen",
             ["Asesmen Formatif", "Asesmen Sumatif"],
             key="input_jenis",
-        )
-
-        if r_jenis == "Asesmen Formatif":
-            sub_asesmen_input_options = [
-                "Formatif Tertulis",
-                "Formatif Tidak Tertulis",
-            ]
-        else:
-            sub_asesmen_input_options = [
-                "Tulis",
-                "Lisan",
-                "Tugas",
-                "Praktik",
-                "Proyek",
-                "Produk",
-            ]
-
-        r_sub_jenis = st.selectbox(
-            "Bentuk / Sub Jenis Asesmen",
-            sub_asesmen_input_options,
-            key="input_sub_jenis",
         )
 
     with col_r2:
@@ -754,6 +732,27 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
 
         r_nilai = st.number_input(
             "Nilai Siswa", min_value=0, max_value=100, value=80
+        )
+
+        if r_jenis == "Asesmen Formatif":
+            sub_asesmen_input_options = [
+                "Formatif Tertulis",
+                "Formatif Tidak Tertulis",
+            ]
+        else:
+            sub_asesmen_input_options = [
+                "Tulis",
+                "Lisan",
+                "Tugas",
+                "Praktik",
+                "Proyek",
+                "Produk",
+            ]
+
+        r_sub_jenis = st.selectbox(
+            "Bentuk / Sub Jenis Asesmen",
+            sub_asesmen_input_options,
+            key="input_sub_jenis",
         )
 
     if st.button("💾 Simpan Nilai ke Google Sheets", use_container_width=True):
