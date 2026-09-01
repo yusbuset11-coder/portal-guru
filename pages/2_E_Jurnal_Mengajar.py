@@ -2,6 +2,7 @@ from datetime import datetime
 import io
 import gspread
 import pandas as pd
+import streamlit as str_lit  # menggunakan alias atau langsung st
 import streamlit as st
 from google.oauth2.service_account import Credentials
 from styles import apply_global_styles
@@ -39,8 +40,8 @@ def get_gspread_client():
     return gspread.authorize(creds)
 
 
-# Fungsi Border & Format Header Spreadsheet
-def apply_sheet_formatting(ws, num_rows, num_cols):
+# Fungsi Border & Format Header Spreadsheet (7 Kolom)
+def apply_sheet_formatting(ws, num_rows, num_cols=7):
     if num_rows < 1 or num_cols < 1:
         return
     try:
@@ -84,28 +85,43 @@ def apply_sheet_formatting(ws, num_rows, num_cols):
         print(f"Gagal menerapkan format sheet: {e}")
 
 
-# Fungsi untuk memastikan Header Jurnal Mengajar selalu ada di baris 1
-def ensure_jurnal_header(ws):
-    expected_header = [
-        "Tanggal",
-        "Sekolah",
-        "Kelas",
-        "Jam_Pelajaran",
-        "Mata_Pelajaran",
-        "Materi_Pembelajaran",
-        "Catatan_Kejadian",
-        "Guru_Pengajar",
-    ]
-    try:
-        first_row = ws.row_values(1)
-    except Exception:
-        first_row = []
+# Header standar (Tanpa Guru_Pengajar - total 7 kolom)
+EXPECTED_JURNAL_HEADER = [
+    "Tanggal",
+    "Sekolah",
+    "Kelas",
+    "Jam_Pelajaran",
+    "Mata_Pelajaran",
+    "Materi_Pembelajaran",
+    "Catatan_Kejadian",
+]
 
-    if not first_row:
-        ws.append_row(expected_header)
-    elif first_row != expected_header:
-        # Jika baris pertama bukan header (misal terisi data lama), sisipkan header di atasnya
-        ws.insert_row(expected_header, index=1)
+
+def get_clean_jurnal_dataframe(ws):
+    try:
+        rows = ws.get_all_values()
+    except Exception:
+        rows = []
+
+    if not rows:
+        ws.append_row(EXPECTED_JURNAL_HEADER)
+        return pd.DataFrame(columns=EXPECTED_JURNAL_HEADER)
+
+    # Jika baris pertama bukan header yang benar, sisipkan header di baris 1
+    if rows[0] != EXPECTED_JURNAL_HEADER:
+        ws.insert_row(EXPECTED_JURNAL_HEADER, index=1)
+        rows = ws.get_all_values()
+
+    if len(rows) > 1:
+        df = pd.DataFrame(rows[1:], columns=rows[0])
+        # Bersihkan kolom jika ada kelebihan/kekurangan kolom di sheet lama
+        for col in EXPECTED_JURNAL_HEADER:
+            if col not in df.columns:
+                df[col] = ""
+        df = df[EXPECTED_JURNAL_HEADER]  # Batasi hanya 7 kolom utama
+        return df
+    else:
+        return pd.DataFrame(columns=EXPECTED_JURNAL_HEADER)
 
 
 # Sidebar Profil & Navigasi
@@ -131,7 +147,6 @@ def load_guru_database(sheet_id):
         return None
 
 
-# Ambil spreadsheet_id dengan aman agar tidak error jika belum ada
 spreadsheet_id = st.session_state.get("spreadsheet_id", "")
 
 if not spreadsheet_id:
@@ -158,7 +173,6 @@ else:
         ],
     )
 
-    # Header Utama E Jurnal Mengajar Guru
     guru_nama = st.session_state.get("guru_nama", "")
 
     st.markdown(
@@ -175,9 +189,8 @@ else:
     if menu_digma == "🏠 Beranda DIGMA":
         try:
             ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
-            ensure_jurnal_header(ws_jurnal)
-            data_jurnal = ws_jurnal.get_all_records()
-            total_jurnal = len(data_jurnal)
+            df_jurnal = get_clean_jurnal_dataframe(ws_jurnal)
+            total_jurnal = len(df_jurnal)
         except Exception:
             total_jurnal = 0
 
@@ -212,7 +225,6 @@ else:
             unsafe_allow_html=True,
         )
 
-        # Ambil daftar sekolah & kelas dari tab Data Kelas-Siswa jika ada
         try:
             sheet_siswa = sh_guru.worksheet("Data Kelas-Siswa")
             data_siswa = sheet_siswa.get_all_records()
@@ -285,12 +297,20 @@ else:
                                 ws_jurnal = sh_guru.add_worksheet(
                                     title="Jurnal Mengajar",
                                     rows="1000",
-                                    cols="8",
+                                    cols="7",
                                 )
 
-                            # Pastikan header selalu ada di baris pertama
-                            ensure_jurnal_header(ws_jurnal)
+                            # Pastikan header bersih ada di baris 1
+                            rows_check = ws_jurnal.get_all_values()
+                            if (
+                                not rows_check
+                                or rows_check[0] != EXPECTED_JURNAL_HEADER
+                            ):
+                                ws_jurnal.insert_row(
+                                    EXPECTED_JURNAL_HEADER, index=1
+                                )
 
+                            # Append baris data (7 kolom tanpa Guru_Pengajar)
                             ws_jurnal.append_row([
                                 str(tanggal_jurnal),
                                 str(pilih_sekolah),
@@ -299,12 +319,11 @@ else:
                                 str(mata_pelajaran),
                                 str(kompetensi_dasar),
                                 str(catatan_kejadian),
-                                str(st.session_state.guru_nama),
                             ])
 
                             all_jurnal_data = ws_jurnal.get_all_values()
                             apply_sheet_formatting(
-                                ws_jurnal, len(all_jurnal_data), 8
+                                ws_jurnal, len(all_jurnal_data), 7
                             )
 
                             st.balloons()
@@ -326,14 +345,11 @@ else:
 
         try:
             ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
-            ensure_jurnal_header(ws_jurnal)
-            data_jurnal = ws_jurnal.get_all_records()
+            df_jurnal = get_clean_jurnal_dataframe(ws_jurnal)
 
-            if not data_jurnal:
+            if df_jurnal.empty or len(df_jurnal) == 0:
                 st.info("Belum ada data jurnal mengajar yang tersimpan.")
             else:
-                df_jurnal = pd.DataFrame(data_jurnal)
-
                 with st.container(border=True):
                     st.markdown("#### **🔍 Filter Riwayat Jurnal**")
                     col_f1, col_f2 = st.columns(2)
@@ -375,6 +391,10 @@ else:
                         df_filtered_j["Kelas"] == sel_cls_j
                     ]
 
+                # Mengatur agar nomor urut/indeks tabel dimulai dari angka 1
+                if not df_filtered_j.empty:
+                    df_filtered_j.index = range(1, len(df_filtered_j) + 1)
+
                 with st.container(border=True):
                     st.dataframe(df_filtered_j, use_container_width=True)
 
@@ -382,7 +402,7 @@ else:
                 output_jurnal = io.BytesIO()
                 with pd.ExcelWriter(output_jurnal, engine="openpyxl") as writer:
                     df_filtered_j.to_excel(
-                        writer, index=False, sheet_name="Jurnal_Mengajar"
+                        writer, index=True, sheet_name="Jurnal_Mengajar"
                     )
                 excel_jurnal_data = output_jurnal.getvalue()
 
@@ -395,8 +415,8 @@ else:
                     ),
                     use_container_width=True,
                 )
-        except Exception:
+        except Exception as e:
             st.info(
                 "Tab 'Jurnal Mengajar' belum tersedia atau belum ada data di"
-                " Spreadsheet Anda."
+                f" Spreadsheet Anda. (Detail: {e})"
             )
