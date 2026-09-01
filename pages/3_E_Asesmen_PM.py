@@ -414,7 +414,7 @@ elif menu == "✨ Generator Asesmen AI":
                     2. Jika jenis soal adalah Pilihan Ganda, gunakan {aturan_opsi}.
                     3. Berikan kunci jawaban yang jelas serta pembahasan mendalam untuk setiap soal."""
 
-                    model = genai.GenerativeModel("gemini-2.5-flash")
+                    model = genai.GenerativeModel("gemini-3.5-flash")
                     response = model.generate_content(prompt)
 
                     st.session_state.generated_soal = response.text
