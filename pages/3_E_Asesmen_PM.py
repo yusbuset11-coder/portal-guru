@@ -263,7 +263,7 @@ with st.sidebar:
     )
 
 
-# --- FUNGSI AMAN BANK SOAL SAKTI (Tanpa Kolom E) ---
+# --- FUNGSI AMAN BANK SOAL SAKTI ---
 @st.cache_data(ttl=10)
 def get_clean_bank_soal_dataframe(sheet_id):
     try:
@@ -626,11 +626,7 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
             "Pilih Kelas", sorted(daftar_kelas), key="input_kelas"
         )
 
-        r_jenjang = st.selectbox(
-            "Jenjang",
-            ["SD", "SMP", "SMA", "SMK"],
-            key="input_jenjang",
-        )
+        # Label & input Jenjang Dihapus sepenuhnya dari UI sesuai permintaan
 
         r_jenis = st.selectbox(
             "Jenis Asesmen",
@@ -714,7 +710,6 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
             try:
                 ss = gc.open_by_key(user_spreadsheet_id)
 
-                # Header Rekap_Nilai tanpa kolom 'Nama Guru' dan 'Jenjang'
                 correct_header = [
                     "Tanggal",
                     "Sekolah",
@@ -737,7 +732,6 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
 
                 tanggal_str = tanggal_input.strftime("%Y-%m-%d")
 
-                # Menyimpan data tanpa kolom Nama Guru dan Jenjang
                 sheet.append_row([
                     tanggal_str,
                     r_sekolah,
@@ -765,7 +759,7 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
             except Exception as e:
                 st.error(f"Gagal menyimpan ke database: {e}")
 
-    # --- BAGIAN MENU UNDUH / EXPORT REKAP NILAI ---
+    # --- BAGIAN MENU UNDUH / EXPORT REKAP NILAI (DIPERBAIKI) ---
     st.markdown("---")
     st.subheader("📥 Unduh Rekap Nilai Siswa")
     st.markdown(
@@ -776,13 +770,15 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
     try:
         ss_rekap = gc.open_by_key(user_spreadsheet_id)
         ws_rekap = ss_rekap.worksheet("Rekap_Nilai")
-        all_rekap_records = ws_rekap.get_all_records()
+        all_rekap_rows = ws_rekap.get_all_values()
+        if len(all_rekap_rows) > 1:
+            df_rekap = pd.DataFrame(all_rekap_rows[1:], columns=all_rekap_rows[0])
+        else:
+            df_rekap = pd.DataFrame()
     except:
-        all_rekap_records = []
+        df_rekap = pd.DataFrame()
 
-    if all_rekap_records:
-        df_rekap = pd.DataFrame(all_rekap_records)
-
+    if not df_rekap.empty:
         list_dl_sekolah = (
             df_rekap["Sekolah"].unique().tolist()
             if "Sekolah" in df_rekap.columns
