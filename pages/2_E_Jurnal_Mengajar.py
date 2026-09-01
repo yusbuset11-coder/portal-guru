@@ -84,6 +84,30 @@ def apply_sheet_formatting(ws, num_rows, num_cols):
         print(f"Gagal menerapkan format sheet: {e}")
 
 
+# Fungsi untuk memastikan Header Jurnal Mengajar selalu ada di baris 1
+def ensure_jurnal_header(ws):
+    expected_header = [
+        "Tanggal",
+        "Sekolah",
+        "Kelas",
+        "Jam_Pelajaran",
+        "Mata_Pelajaran",
+        "Materi_Pembelajaran",
+        "Catatan_Kejadian",
+        "Guru_Pengajar",
+    ]
+    try:
+        first_row = ws.row_values(1)
+    except Exception:
+        first_row = []
+
+    if not first_row:
+        ws.append_row(expected_header)
+    elif first_row != expected_header:
+        # Jika baris pertama bukan header (misal terisi data lama), sisipkan header di atasnya
+        ws.insert_row(expected_header, index=1)
+
+
 # Sidebar Profil & Navigasi
 with st.sidebar:
     st.markdown(
@@ -96,6 +120,7 @@ with st.sidebar:
         """,
         unsafe_allow_html=True,
     )
+
 
 @st.cache_resource
 def load_guru_database(sheet_id):
@@ -110,11 +135,11 @@ def load_guru_database(sheet_id):
 spreadsheet_id = st.session_state.get("spreadsheet_id", "")
 
 if not spreadsheet_id:
-  st.warning(
-      "⚠️ Spreadsheet ID belum dikonfigurasi. Silakan kembali ke Halaman"
-      " Utama untuk mengatur konfigurasi terlebih dahulu."
-  )
-  st.stop()
+    st.warning(
+        "⚠️ Spreadsheet ID belum dikonfigurasi. Silakan kembali ke Halaman"
+        " Utama untuk mengatur konfigurasi terlebih dahulu."
+    )
+    st.stop()
 
 sh_guru = load_guru_database(spreadsheet_id)
 
@@ -150,6 +175,7 @@ else:
     if menu_digma == "🏠 Beranda DIGMA":
         try:
             ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
+            ensure_jurnal_header(ws_jurnal)
             data_jurnal = ws_jurnal.get_all_records()
             total_jurnal = len(data_jurnal)
         except Exception:
@@ -248,9 +274,13 @@ else:
                             " diisi!"
                         )
                     else:
-                        with st.spinner("Menyimpan jurnal ke Google Sheets..."):
+                        with st.spinner(
+                            "Menyimpan jurnal ke Google Sheets..."
+                        ):
                             try:
-                                ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
+                                ws_jurnal = sh_guru.worksheet(
+                                    "Jurnal Mengajar"
+                                )
                             except Exception:
                                 ws_jurnal = sh_guru.add_worksheet(
                                     title="Jurnal Mengajar",
@@ -258,18 +288,8 @@ else:
                                     cols="8",
                                 )
 
-                            existing_data = ws_jurnal.get_all_values()
-                            if not existing_data:
-                                ws_jurnal.append_row([
-                                    "Tanggal",
-                                    "Sekolah",
-                                    "Kelas",
-                                    "Jam_Pelajaran",
-                                    "Mata_Pelajaran",
-                                    "Materi_Pembelajaran",
-                                    "Catatan_Kejadian",
-                                    "Guru_Pengajar",
-                                ])
+                            # Pastikan header selalu ada di baris pertama
+                            ensure_jurnal_header(ws_jurnal)
 
                             ws_jurnal.append_row([
                                 str(tanggal_jurnal),
@@ -306,6 +326,7 @@ else:
 
         try:
             ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
+            ensure_jurnal_header(ws_jurnal)
             data_jurnal = ws_jurnal.get_all_records()
 
             if not data_jurnal:
