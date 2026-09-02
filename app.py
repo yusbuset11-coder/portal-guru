@@ -16,6 +16,7 @@ st.set_page_config(
 apply_global_styles()
 
 # Atur jarak bawah agar tampilan tidak terpotong
+# Atur jarak bawah agar tampilan tidak terpotong
 st.markdown(
     """
     <style>
@@ -26,6 +27,7 @@ st.markdown(
     </style>
     """,
     unsafe_allow_html=True,
+)
     with st.sidebar:
     st.markdown(
         """
