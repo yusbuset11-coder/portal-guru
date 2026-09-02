@@ -20,16 +20,16 @@ st.set_page_config(
 apply_global_styles()
 
 with st.sidebar:
-    st.markdown(
-        f"""
+  st.markdown(
+      f"""
         <div class="user-profile-box">
             <span style="font-size: 24px;">👨‍💻</span><br>
             <b style="color: #facc15; font-size: 14px;">{st.session_state.get('guru_nama', 'Guru')}</b><br>
             <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
         </div>
         """,
-        unsafe_allow_html=True,
-    )
+      unsafe_allow_html=True,
+  )
 
 # Atur jarak atas agar konten naik dan tidak terpotong di bawah
 st.markdown(
@@ -96,7 +96,6 @@ st.markdown(
         animation: blink-animation 1.6s infinite ease-in-out;
         font-weight: 600;
     }
-    /* Kustomisasi Header Bagian agar selalu satu baris dan proporsional */
     .section-header {
         font-size: 1.2rem;
         font-weight: 700;
@@ -430,7 +429,7 @@ def generate_docx(
   run_name.font.bold = True
   p_sign.add_run(f"\nNIP. {nip_penulis}")
 
-  # Halaman Terpisah 1: Rubrik Penilaian
+  # Halaman Terpisah 1: Rubrik Penilaian (Diubah Menjadi Tabel Matriks Rapi)
   doc.add_page_break()
   p_rubrik_title = doc.add_paragraph()
   p_rubrik_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -464,41 +463,79 @@ def generate_docx(
           run.font.bold = True
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
-  rubrik_data = data_ai.get("rubrik_penilaian", "")
+
   p_sub = doc.add_paragraph()
   run_sub = p_sub.add_run("A. Rubrik Penilaian Kinerja / Kompetensi")
   run_sub.font.bold = True
-  run_sub.font.size = Pt(10)
+  run_sub.font.size = Pt(10.5)
+  run_sub.font.color.rgb = RGBColor(74, 46, 33)
 
-  if isinstance(rubrik_data, dict):
-    for k, v in rubrik_data.items():
+  rubrik_data = data_ai.get("rubrik_penilaian", {})
+  if isinstance(rubrik_data, dict) and rubrik_data:
+    rubrik_table = doc.add_table(rows=len(rubrik_data) + 1, cols=5)
+    rubrik_table.style = "Table Grid"
+    rubrik_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+    hdr_cells = rubrik_table.rows[0].cells
+    headers = [
+        "Kriteria Penilaian",
+        "Perlu Bimbingan",
+        "Cukup",
+        "Baik",
+        "Sangat Baik",
+    ]
+    col_widths = [
+        Inches(1.5),
+        Inches(1.25),
+        Inches(1.25),
+        Inches(1.25),
+        Inches(1.25),
+    ]
+
+    for idx, text_hdr in enumerate(headers):
+      hdr_cells[idx].text = text_hdr
+      hdr_cells[idx].width = col_widths[idx]
+      set_cell_background(hdr_cells[idx], "5A3825")
+      for p in hdr_cells[idx].paragraphs:
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(4)
+        p.paragraph_format.space_after = Pt(4)
+        for run in p.runs:
+          run.font.bold = True
+          run.font.size = Pt(9.5)
+          run.font.color.rgb = RGBColor(255, 255, 255)
+
+    for row_idx, (k, v) in enumerate(rubrik_data.items()):
+      row_cells = rubrik_table.rows[row_idx + 1].cells
       if isinstance(v, dict):
         nama = v.get("nama_kriteria", k)
-        pb = v.get("perlu_bimbingan", "")
-        c = v.get("cukup", "")
-        b = v.get("baik", "")
-        sb = v.get("sangat_baik", "")
+        pb = v.get("perlu_bimbingan", "-")
+        c = v.get("cukup", "-")
+        b = v.get("baik", "-")
+        sb = v.get("sangat_baik", "-")
+      else:
+        nama = str(k)
+        pb, c, b, sb = str(v), "", "", ""
 
-        p_crit = doc.add_paragraph()
-        p_crit.paragraph_format.left_indent = Inches(0.2)
-        r_nama = p_crit.add_run(f"• {nama}")
-        r_nama.font.bold = True
-        r_nama.font.size = Pt(10)
+      row_values = [nama, pb, c, b, sb]
+      for col_idx, val_text in enumerate(row_values):
+        row_cells[col_idx].text = str(val_text)
+        row_cells[col_idx].width = col_widths[col_idx]
 
-        for level_name, level_desc in [
-            ("Perlu Bimbingan", pb),
-            ("Cukup", c),
-            ("Baik", b),
-            ("Sangat Baik", sb),
-        ]:
-          if level_desc:
-            p_lvl = doc.add_paragraph()
-            p_lvl.paragraph_format.left_indent = Inches(0.4)
-            r_l_name = p_lvl.add_run(f"- {level_name}: ")
-            r_l_name.font.bold = True
-            r_l_name.font.size = Pt(9.5)
-            r_l_desc = p_lvl.add_run(str(level_desc))
-            r_l_desc.font.size = Pt(9.5)
+        if col_idx == 0:
+          set_cell_background(row_cells[col_idx], "F5EBE0")
+
+        for p in row_cells[col_idx].paragraphs:
+          p.paragraph_format.space_before = Pt(4)
+          p.paragraph_format.space_after = Pt(4)
+          p.paragraph_format.line_spacing = 1.15
+          p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+          for run in p.runs:
+            run.font.size = Pt(9.0)
+            run.font.bold = (col_idx == 0)
+            run.font.color.rgb = RGBColor(51, 51, 51)
+
+  doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
   # Halaman Terpisah 2: Instrumen Asesmen Proses (Formatif)
   doc.add_page_break()
@@ -594,11 +631,6 @@ def generate_docx(
 # TAMPILAN UTAMA (TERUSUN DI BAWAH BANNER / FULL-WIDTH STACKED)
 # =====================================================================
 
-# Hapus atau comment baris ini:
-# # 1. Info User Login (Posisi atas)
-# st.success(f"👤 **{st.session_state.get('guru_nama', 'Guru')}**")
-
-# 2. Header Banner Utama (Full Width)
 st.markdown(
     """
     <div class="header-card">
@@ -616,7 +648,6 @@ st.markdown(
 
 st.markdown("---")
 
-# 3. Parameter Pembelajaran (Di bawah banner, font header diperkecil jadi satu baris)
 st.markdown(
     '<div class="section-header">⚙️ Parameter Pembelajaran</div>',
     unsafe_allow_html=True,
@@ -690,7 +721,6 @@ with col_param2:
 
 st.markdown("---")
 
-# 4. Identitas Satuan Pendidikan & Pengesahan Dokumen
 col_id1, col_id2 = st.columns(2)
 
 with col_id1:
@@ -721,7 +751,6 @@ with col_id2:
 
 st.markdown("---")
 
-# 5. Tombol Aksi Generator di Bawah Penuh
 st.markdown("### 🚀 Generator Modul Ajar Pembelajaran Mendalam")
 st.markdown(
     "Pastikan parameter dan identitas di atas sudah terisi dengan benar, lalu"
