@@ -290,7 +290,7 @@ else:
     st.markdown(
         """
             <div class="module-card">
-                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">E-Modul Ajar)</h4>
+                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">E-Modul Ajar</h4>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi Perancangan Modul Ajar Pembelajaran Mendalam.</p>
             </div>
             """,
@@ -301,7 +301,7 @@ else:
     st.markdown(
         """
             <div class="module-card">
-                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">E Presensi, E Jurnal, E Asesmen)</h4>
+                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">E Presensi, E Jurnal, E Asesmen</h4>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem administrasi.</p>
             </div>
             """,
