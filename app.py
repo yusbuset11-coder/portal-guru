@@ -293,11 +293,11 @@ else:
       unsafe_allow_html=True,
   )
 
-  st.markdown("### 📑 Modul Aplikasi Tersedia")
+    st.markdown("### 📑 Modul Aplikasi Tersedia")
 
-  coll1, coll2, coll3 = st.columns(3)
+    coll1, coll2, coll3 = st.columns(3)
 
-  with coll1:
+    with coll1:
     st.markdown(
         """
             <div class="module-card">
@@ -308,7 +308,7 @@ else:
         unsafe_allow_html=True,
     )
 
-  with coll2:
+    with coll2:
     st.markdown(
         """
             <div class="module-card">
@@ -319,7 +319,7 @@ else:
         unsafe_allow_html=True,
     )
 
-  with coll3:
+    with coll3:
     st.markdown(
         """
             <div class="module-card">
