@@ -28,7 +28,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-    with st.sidebar:
+with st.sidebar:
     st.markdown(
         """
         <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #1f2937; margin-bottom: 15px;">
