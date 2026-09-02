@@ -182,7 +182,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # MENU 1: PENCATATAN PRESENSI HARIAN
 # ----------------------------------------------------
 if menu == "📝 Pencatatan Presensi Harian":
-  st.markdown("## 📝 Pencatatan Presensi Harian Siswa")
+  st.markdown("### 📝 Pencatatan Presensi Harian Siswa")
   st.markdown(
       "Kelola dan pantau kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata"
       " Pelajaran."
@@ -308,7 +308,7 @@ if menu == "📝 Pencatatan Presensi Harian":
 # MENU 2: REKAP SEMESTER GANJIL & GENAP
 # ----------------------------------------------------
 elif menu == "📊 Rekap Semester Ganjil & Genap":
-  st.markdown("## 📊 Rekapitulasi Kehadiran Semester")
+  st.markdown("### 📊 Rekapitulasi Kehadiran Semester")
   st.markdown(
       "Pantau rekap kehadiran siswa berdasarkan Sekolah, Kelas, dan Mata"
       " Pelajaran."
@@ -454,7 +454,7 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
 # MENU 3: MANAJEMEN DATA SEKOLAH & SISWA
 # ----------------------------------------------------
 elif menu == "📂 Manajemen Data Sekolah & Siswa":
-    st.markdown("## 📂 Manajemen Data Sekolah, Kelas, & Siswa")
+    st.markdown("### 📂 Manajemen Data Sekolah, Kelas, & Siswa")
     st.markdown(
         "Download template atau upload daftar siswa Anda agar tersinkronisasi"
         " dengan Google Spreadsheet."
