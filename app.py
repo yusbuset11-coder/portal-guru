@@ -290,8 +290,8 @@ else:
     st.markdown(
         """
             <div class="module-card">
-                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">Generator Modul Ajar (E-Modul Ajar)</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi perancangan Modul Ajar dengan kecerdasan buatan.</p>
+                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">E-Modul Ajar)</h4>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi Perancangan Modul Ajar Pembelajaran Mendalam.</p>
             </div>
             """,
         unsafe_allow_html=True,
@@ -301,7 +301,7 @@ else:
     st.markdown(
         """
             <div class="module-card">
-                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">Modul Lainnya (E Presensi, Jurnal, dll)</h4>
+                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">E Presensi, E Jurnal, E Asesmen)</h4>
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem administrasi.</p>
             </div>
             """,
