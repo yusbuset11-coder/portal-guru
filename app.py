@@ -254,6 +254,15 @@ if not st.session_state.logged_in:
 else:
   with st.sidebar:
     st.markdown(
+        """
+        <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #1f2937; margin-bottom: 15px;">
+            <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" style="width: 32px; height: auto;">
+            <span style="color: #38bdf8; font-size: 20px; font-weight: bold; letter-spacing: 1px;">PASTI</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
         f"""
             <div style="text-align: center; padding: 10px; background: #1e293b; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155;">
                 <span style="font-size: 24px;">👨‍💻</span><br>
