@@ -26,7 +26,16 @@ st.markdown(
     </style>
     """,
     unsafe_allow_html=True,
-)
+    with st.sidebar:
+    st.markdown(
+        """
+        <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #1f2937; margin-bottom: 15px;">
+            <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" style="width: 32px; height: auto;">
+            <span style="color: #38bdf8; font-size: 20px; font-weight: bold; letter-spacing: 1px;">PASTI</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # ID Master Registry Pusat
 MASTER_REGISTRY_ID = "1mgN63xzrLt__5b9-gBw8dIWYP3RRgNdagUiTurFZdgg"
