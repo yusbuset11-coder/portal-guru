@@ -79,7 +79,6 @@ def set_callout_borders(cell, border_color="1B365D"):
     tcPr = cell._tc.get_or_add_tcPr()
     tcBorders = OxmlElement('w:tcBorders')
     
-    # Left thick border
     left = OxmlElement('w:left')
     left.set(qn('w:val'), 'single')
     left.set(qn('w:sz'), '24') # 3pt width
@@ -87,7 +86,6 @@ def set_callout_borders(cell, border_color="1B365D"):
     left.set(qn('w:color'), border_color)
     tcBorders.append(left)
     
-    # Clear other borders
     for b_name in ['top', 'bottom', 'right']:
         b = OxmlElement(f'w:{b_name}')
         b.set(qn('w:val'), 'none')
@@ -107,14 +105,13 @@ def generate_professional_word_document(
         section.left_margin = Inches(1)
         section.right_margin = Inches(1)
 
-    # Header / Judul Dokumen
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run_title = p_title.add_run(f"INSTRUMEN {jenis_asesmen.upper()}")
     run_title.bold = True
     run_title.font.name = "Cambria"
     run_title.font.size = Pt(16)
-    run_title.font.color.rgb = RGBColor(27, 54, 93) # Deep Navy
+    run_title.font.color.rgb = RGBColor(27, 54, 93)
     p_title.paragraph_format.space_after = Pt(2)
 
     p_sub_title = doc.add_paragraph()
@@ -126,7 +123,6 @@ def generate_professional_word_document(
     run_sub_title.font.color.rgb = RGBColor(74, 85, 104)
     p_sub_title.paragraph_format.space_after = Pt(14)
 
-    # Tabel Metadata Ringkas
     table_meta = doc.add_table(rows=5, cols=2)
     table_meta.alignment = WD_TABLE_ALIGNMENT.CENTER
 
@@ -164,7 +160,6 @@ def generate_professional_word_document(
 
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
-    # Divider Heading Butir Soal
     p_sec = doc.add_paragraph()
     r_sec = p_sec.add_run("DOKUMEN BUTIR SOAL & PEMBAHASAN")
     r_sec.bold = True
@@ -173,7 +168,6 @@ def generate_professional_word_document(
     r_sec.font.color.rgb = RGBColor(27, 54, 93)
     p_sec.paragraph_format.space_after = Pt(8)
 
-    # Parsing teks dari AI agar masuk ke dalam format Word yang rapi & eye-catching
     lines = content_text.split("\n")
     in_callout = False
     callout_buffer = []
@@ -242,13 +236,13 @@ def generate_professional_word_document(
             run.font.name = "Cambria"
             run.font.size = Pt(10.5)
             run.font.bold = True
-            run.font.color.rgb = RGBColor(16, 128, 67) # Green accent for answer
+            run.font.color.rgb = RGBColor(10, 128, 67)
         elif line_str.startswith("Pembahasan"):
             run = p.add_run(line_str)
             run.font.name = "Cambria"
             run.font.size = Pt(10.5)
             run.font.bold = True
-            run.font.color.rgb = RGBColor(180, 83, 9) # Amber accent for discussion
+            run.font.color.rgb = RGBColor(180, 83, 9)
         elif line_str.startswith("A.") or line_str.startswith("B.") or line_str.startswith("C.") or line_str.startswith("D.") or line_str.startswith("E."):
             p.paragraph_format.left_indent = Inches(0.25)
             run = p.add_run(line_str)
@@ -503,7 +497,7 @@ elif menu == "✨ Generator Asesmen AI":
 # --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN ---
 elif menu == "📁 Bank Soal & Asesmen Tersimpan":
     st.subheader("📁 **Bank Soal & Asesmen Tersimpan**")
-    st.write("Daftar arsip ringkasan asesmen yang pernah Anda buat dan simpan di spreadsheet.")
+    st.write("Daftar arsip ringkasan asesmen yang pernah Anda buat dan simpan. Klik tombol **Unduh Soal** pada kolom aksi untuk men-generate dan mengunduh dokumen Word siap cetak.")
 
     if user_spreadsheet_id:
         with st.spinner("Memuat data bank soal..."):
@@ -527,17 +521,77 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                     tgl = row.get("Tanggal", "")
                     mapel = row.get("Mata_Pelajaran", "Mapel")
                     materi = row.get("Materi", "Materi")
-                    jenis = row.get("Jenis_Asesmen", "Asesmen")
+                    jenjang = row.get("Jenjang", "SD")
+                    fase = row.get("Fase", "Fase A")
+                    kelas = row.get("Kelas", "Kelas 1")
+                    jenis_asesmen = row.get("Jenis_Asesmen", "Asesmen Formatif")
+                    sub_asesmen = row.get("Sub_Jenis_Asesmen", "Tertulis")
+                    try:
+                        jumlah_soal = int(row.get("Jumlah_Soal", 5))
+                    except:
+                        jumlah_soal = 5
+                    jenis_soal = row.get("Jenis_Soal", "Pilihan Ganda")
 
                     row_cols = st.columns([0.5, 1.2, 1.8, 1.8, 1.4, 1.5])
                     row_cols[0].write(str(nomor))
                     row_cols[1].write(tgl)
                     row_cols[2].write(mapel)
                     row_cols[3].write(materi)
-                    row_cols[4].write(jenis)
+                    row_cols[4].write(jenis_asesmen)
                     
                     with row_cols[5]:
-                        st.caption("Tersimpan di Sheet")
+                        # Tombol Unduh Soal interaktif untuk setiap baris
+                        btn_key = f"dl_bank_{idx}"
+                        if st.button("📥 Unduh Soal", key=btn_key, use_container_width=True):
+                            with st.spinner("⏳ Menyiapkan dokumen Word dari arsip..."):
+                                try:
+                                    if jenjang == "SD":
+                                        aturan_opsi = "3 opsi (A sampai C)"
+                                    elif jenjang == "SMP":
+                                        aturan_opsi = "4 opsi (A sampai D)"
+                                    else:
+                                        aturan_opsi = "5 opsi (A sampai E)"
+
+                                    prompt = f"""Bertindaklah sebagai pakar kurikulum dan penyusun instrumen asesmen profesional. Buatkan {jumlah_soal} butir soal dengan bentuk **{jenis_soal}**, dalam bentuk asesmen {sub_asesmen} ({jenis_asesmen}) untuk Mata Pelajaran: {mapel}, Materi/Topik: {materi}, Jenjang: {jenjang} ({fase}, {kelas}). 
+                                    
+                                    Ketentuan Khusus:
+                                    1. Gunakan pendekatan Pembelajaran Mendalam (Deep Learning) yang merangsang berpikir kritis dan kontekstual.
+                                    2. Jika jenis soal adalah Pilihan Ganda, gunakan {aturan_opsi}.
+                                    3. Berikan kunci jawaban yang jelas serta pembahasan mendalam untuk setiap soal."""
+
+                                    model = genai.GenerativeModel("gemini-3.5-flash")
+                                    response = model.generate_content(prompt)
+                                    content_text = response.text
+
+                                    docx_file = generate_professional_word_document(
+                                        mapel=mapel,
+                                        materi=materi,
+                                        kelas=kelas,
+                                        jenjang=jenjang,
+                                        fase=fase,
+                                        jenis_asesmen=jenis_asesmen,
+                                        sub_asesmen=sub_asesmen,
+                                        jumlah_soal=jumlah_soal,
+                                        jenis_soal=jenis_soal,
+                                        content_text=content_text,
+                                    )
+
+                                    st.session_state[f"file_bytes_{idx}"] = docx_file.getvalue()
+                                    st.session_state[f"file_name_{idx}"] = f"Asesmen_{mapel}_{materi}.docx"
+                                    st.success("✅ Dokumen siap diunduh!")
+                                except Exception as e:
+                                    st.error(f"Gagal membuat dokumen: {e}")
+
+                        # Jika file sudah di-generate, tampilkan tombol unduh file yang sesungguhnya
+                        if f"file_bytes_{idx}" in st.session_state:
+                            st.download_button(
+                                label="💾 Simpan File Word",
+                                data=st.session_state[f"file_bytes_{idx}"],
+                                file_name=st.session_state[f"file_name_{idx}"],
+                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                key=f"dl_btn_ready_{idx}",
+                                use_container_width=True
+                            )
                     st.markdown("---")
 
 # --- MENU 4: INPUT DAN REKAP NILAI SISWA ---
