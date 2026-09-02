@@ -174,7 +174,7 @@ st.markdown(
     <div class="main-header-card">
         <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" alt="Logo PASTI" style="width: 75px; height: auto; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
         <div class="main-title-text" style="color: #ffffff !important;">Portal Administrasi Siswa Terintegrasi</div>
-        <div class="sub-title-2">Pusat Kendali Administrasi Guru</div>
+        <div class="sub-title-2">Platform Multi-Aplikasi Pendukung Pengelolaan Pembelajaran</div>
         <div class="dev-badge" style="color: #ffffff !important;">
             <b>Pengembang:</b> Yustinus Budi Setyanta - PS Cabdin Bangkalan &nbsp;|&nbsp; <em>Sistem Otomatisasi Terintegrasi</em>
         </div>
