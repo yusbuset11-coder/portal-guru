@@ -293,40 +293,40 @@ else:
       unsafe_allow_html=True,
   )
 
-    st.markdown("### 📑 Modul Aplikasi Tersedia")
+        st.markdown("### 📑 Modul Aplikasi Tersedia")
 
-    coll1, coll2, coll3 = st.columns(3)
+        coll1, coll2, coll3 = st.columns(3)
 
-    with coll1:
-    st.markdown(
-        """
-            <div class="module-card">
-                <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">E-Modul Ajar</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi Perancangan Modul Ajar Pembelajaran Mendalam.</p>
-            </div>
-            """,
-        unsafe_allow_html=True,
-    )
+        with coll1:
+        st.markdown(
+            """
+                <div class="module-card">
+                    <h4 style="color: #facc15; margin-top: 0; font-size: 16px;">E-Modul Ajar</h4>
+                    <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Otomatisasi Perancangan Modul Ajar Pembelajaran Mendalam.</p>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-    with coll2:
-    st.markdown(
-        """
-            <div class="module-card">
-                <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">E Presensi, E Jurnal, E Asesmen</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem administrasi.</p>
-            </div>
-            """,
-        unsafe_allow_html=True,
-    )
+        with coll2:
+        st.markdown(
+            """
+                <div class="module-card">
+                    <h4 style="color: #38bdf8; margin-top: 0; font-size: 16px;">E Presensi, E Jurnal, E Asesmen</h4>
+                    <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">Persiapan modul tambahan untuk sistem administrasi.</p>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
-    with coll3:
-    st.markdown(
-        """
-            <div class="module-card">
-                <h4 style="color: #10b981; margin-top: 0; font-size: 16px;">🔑 Panduan API Key Gemini</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 12px;">Panduan lengkap cara membuat & mendapatkan Google Gemini API Key.</p>
-                <a href="https://drive.google.com/file/d/17FhN4P0P-_sOq0vhHe7K7063mYLbBxSs/view?usp=sharing" target="_blank" style="display: inline-block; background: #059669; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; text-decoration: none; font-weight: 600;">📖 Buka Panduan PDF</a>
-            </div>
-            """,
-        unsafe_allow_html=True,
-    )
+        with coll3:
+        st.markdown(
+            """
+                <div class="module-card">
+                    <h4 style="color: #10b981; margin-top: 0; font-size: 16px;">🔑 Panduan API Key Gemini</h4>
+                    <p style="color: #94a3b8; font-size: 12px; margin-bottom: 12px;">Panduan lengkap cara membuat & mendapatkan Google Gemini API Key.</p>
+                    <a href="https://drive.google.com/file/d/17FhN4P0P-_sOq0vhHe7K7063mYLbBxSs/view?usp=sharing" target="_blank" style="display: inline-block; background: #059669; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; text-decoration: none; font-weight: 600;">📖 Buka Panduan PDF</a>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
