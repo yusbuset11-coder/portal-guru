@@ -139,6 +139,7 @@ def load_data_from_sheet(sheet_name):
             "Izin",
             "Sakit",
             "Alpa",
+            "Dispensasi",
             "Jumlah_TH",
         ])
 
@@ -248,7 +249,7 @@ if menu == "📝 Pencatatan Presensi Harian":
       with st.form(form_key):
         attendance_results = {}
 
-        header_cols = st.columns([1, 3, 4])
+        header_cols = st.columns([1, 3, 5])
         header_cols[0].markdown("**No**")
         header_cols[1].markdown("**Nama Siswa**")
         header_cols[2].markdown("**Status Kehadiran**")
@@ -258,13 +259,14 @@ if menu == "📝 Pencatatan Presensi Harian":
           no_absen = row.get("No_Absen", idx + 1)
           nama = row.get("Nama_Siswa", "Tanpa Nama")
 
-          r_cols = st.columns([1, 3, 4])
+          r_cols = st.columns([1, 3, 5])
           r_cols[0].write(str(no_absen))
           r_cols[1].write(str(nama))
 
+          # Opsi status kini mencakup Dispensasi
           status = r_cols[2].radio(
               f"Status {nama}",
-              ["Hadir", "Izin", "Sakit", "Alpa"],
+              ["Hadir", "Izin", "Sakit", "Alpa", "Dispensasi"],
               horizontal=True,
               key=f"status_{selected_sekolah}_{selected_kelas}_{idx}",
               label_visibility="collapsed",
@@ -392,7 +394,8 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
         izin = len(group[group["Status"] == "Izin"])
         sakit = len(group[group["Status"] == "Sakit"])
         alpa = len(group[group["Status"] == "Alpa"])
-        jumlah = izin + sakit + alpa
+        dispensasi = len(group[group["Status"] == "Dispensasi"])
+        jumlah = izin + sakit + alpa + dispensasi
 
         rekap_list.append({
             "Sekolah": sekolah,
@@ -404,6 +407,7 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
             "Izin": izin,
             "Sakit": sakit,
             "Alpa": alpa,
+            "Dispensasi": dispensasi,
             "Jumlah": jumlah,
         })
 
@@ -429,6 +433,7 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
                 "Izin",
                 "Sakit",
                 "Alpa",
+                "Dispensasi",
                 "Jumlah",
             ]
             ws_rekap.append_row(headers)
