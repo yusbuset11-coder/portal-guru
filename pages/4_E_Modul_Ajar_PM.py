@@ -879,8 +879,8 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
               "contoh_kontekstual": "Studi kasus atau contoh nyata pengaplikasian materi dalam kehidupan sehari-hari"
             }},
             "lkm_content": {{
-              "judul_LKM": "Judul spesifik LKM",
-              "tujuan_LKM": "Tujuan pengerjaan LKM bagi peserta didik",
+              "judul_lkm": "Judul spesifik LKM",
+              "tujuan_lkm": "Tujuan pengerjaan LKM bagi peserta didik",
               "petunjuk_kerja": "Langkah panduan keselamatan dan cara pengerjaan dengan format sub-bagian berlabel titik dua",
               "tugas_analisis": "Rincian tugas investigasi, pertanyaan kerja, atau tabel isian praktik"
             }}
