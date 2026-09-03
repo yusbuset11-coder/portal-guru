@@ -11,7 +11,7 @@ import google.generativeai as genai
 import streamlit as st
 from styles import apply_global_styles
 
-# Konfigurasi Halaman
+# Konfigurasi Halaman[cite: 5]
 st.set_page_config(
     page_title="Otomatisasi Penyusunan Modul Ajar PM",
     page_icon="📚",
@@ -411,6 +411,7 @@ def generate_docx(
   run_name.font.bold = True
   p_sign.add_run(f"\nNIP. {nip_penulis}")
 
+  # HALAMAN 2: RUBRIK PENILAIAN
   doc.add_page_break()
   p_rubrik_title = doc.add_paragraph()
   p_rubrik_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -518,6 +519,7 @@ def generate_docx(
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
+  # HALAMAN 3: INSTRUMEN ASESMEN PROSES (FORMATIF)
   doc.add_page_break()
   p_inst_title = doc.add_paragraph()
   p_inst_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -559,6 +561,49 @@ def generate_docx(
       inst_rows.append((label_text, str(inst_v)))
     add_section_table("LEMBAR OBSERVASI / FORMATIF KELAS", inst_rows)
 
+  # HALAMAN 4: BAHAN AJAR (BARU DITAMBAHKAN)
+  doc.add_page_break()
+  p_bahan_title = doc.add_paragraph()
+  p_bahan_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+  p_bahan_title.paragraph_format.space_after = Pt(12)
+  r_bahan_t = p_bahan_title.add_run("BAHAN AJAR / MATERI PEMBELAJARAN")
+  r_bahan_t.font.name = "Arial"
+  r_bahan_t.font.size = Pt(15)
+  r_bahan_t.font.bold = True
+  r_bahan_t.font.color.rgb = RGBColor(74, 46, 33)
+
+  table_id_bahan = doc.add_table(rows=3, cols=2)
+  table_id_bahan.style = "Table Grid"
+  table_id_bahan.alignment = WD_TABLE_ALIGNMENT.CENTER
+  table_id_bahan.rows[0].cells[0].text = "Mata Pelajaran:"
+  table_id_bahan.rows[0].cells[1].text = f"{mata_pelajaran}"
+  table_id_bahan.rows[1].cells[0].text = "Fase / Kelas / Topik:"
+  table_id_bahan.rows[1].cells[1].text = f"{fase_kelas} - {topik}"
+  table_id_bahan.rows[2].cells[0].text = "Alokasi Waktu / Pertemuan:"
+  table_id_bahan.rows[2].cells[1].text = f"{alokasi_waktu} ({pertemuan_ke})"
+
+  for row in table_id_bahan.rows:
+    row.cells[0].width = Inches(2.3)
+    row.cells[1].width = Inches(4.2)
+    set_cell_background(row.cells[0], "F5EBE0")
+    for cell in row.cells:
+      for p in cell.paragraphs:
+        p.paragraph_format.space_before = Pt(4)
+        p.paragraph_format.space_after = Pt(4)
+        for run in p.runs:
+          run.font.size = Pt(10)
+          run.font.bold = True
+
+  doc.add_paragraph().paragraph_format.space_after = Pt(6)
+  bahan_data = data_ai.get("bahan_ajar", {})
+  if isinstance(bahan_data, dict) and bahan_data:
+    bahan_rows = []
+    for b_k, b_v in bahan_data.items():
+      label_text = b_k.replace("_", " ").title()
+      bahan_rows.append((label_text, str(b_v)))
+    add_section_table("URAIAN MATERI & KONSEP PEMBELAJARAN", bahan_rows)
+
+  # HALAMAN 5: LEMBAR KERJA MURID (LKM)
   doc.add_page_break()
   p_lkm_title = doc.add_paragraph()
   p_lkm_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -773,8 +818,9 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
              - Tahap Asesmen: [...]
           6. Pengalaman Belajar harus terstruktur mencakup Kegiatan Pendahuluan, Kegiatan Inti (Memahami, Mengaplikasi, Merefleksi), dan Kegiatan Penutup (refleksi joyful dan bermakna). Gunakan istilah **LKM (Lembar Kerja Murid)** (BUKAN LKPD atau Lembar Kegiatan Murid) di seluruh uraian.
           7. Asesmen Pembelajaran mencakup Asesmen Awal, Asesmen Proses (Formatif), dan Asesmen Akhir (Sumatif) beserta Rubrik Penilaian dan Pedoman Penskorannya.
-          8. **Instrumen Asesmen Proses (Formatif)**: Sediakan instrumen asesmen proses/formatif yang mendalam (seperti lembar observasi keaktifan, catatan anekdotal, atau rubrik formatif aktivitas siswa) pada kunci `instrumen_formatif` yang terstruktur dengan sub-bagian penting bertanda titik dua agar mudah disajikan dalam bentuk tabel rapi pada halaman khusus sebelum LKM.
-          9. **LKM (Lembar Kerja Murid)**: Sediakan konten LKM yang mendalam pada kunci `lkm_content` yang mencakup judul, tujuan, petunjuk kerja, serta langkah-langkah tugas/investigasi peserta didik yang terstruktur rapi dengan sub-bagian penting bertanda titik dua agar mudah ditebalkan di halaman terpisah paling akhir.
+          8. **Instrumen Asesmen Proses (Formatif)**: Sediakan instrumen asesmen proses/formatif yang mendalam pada kunci `instrumen_formatif` yang terstruktur dengan sub-bagian penting bertanda titik dua agar mudah disajikan dalam bentuk tabel rapi pada halaman khusus.
+          9. **Bahan Ajar**: Sediakan materi pembelajaran/bahan bacaan yang mendalam dan komprehensif sesuai topik pada kunci `bahan_ajar` yang mencakup pengantar konsep, uraian materi inti, serta contoh kontekstual dengan format sub-bagian berlabel titik dua agar tersaji rapi sebagai halaman khusus Bahan Ajar sebelum LKM.
+          10. **LKM (Lembar Kerja Murid)**: Sediakan konten LKM yang mendalam pada kunci `lkm_content` yang mencakup judul, tujuan, petunjuk kerja, serta langkah-langkah tugas/investigasi peserta didik pada halaman terpisah paling akhir.
 
           Berikan output HANYA dalam format JSON valid yang memuat kunci-kunci berikut:
           {{
@@ -820,6 +866,11 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
               "aspek_yang_diamati": "Indikator atau aspek keaktifan/proses yang dinilai dengan format sub-bagian berlabel titik dua",
               "pedoman_pengamatan": "Petunjuk penilaian atau rubrik ceklis observasi singkat"
             }},
+            "bahan_ajar": {{
+              "pengantar_konsep": "Definisi atau pengantar esensial mengenai topik pembelajaran",
+              "uraian_materi_inti": "Penjelasan detail dan komprehensif substansi materi yang dipelajari",
+              "contoh_kontekstual": "Studi kasus atau contoh nyata pengaplikasian materi dalam kehidupan sehari-hari"
+            }},
             "lkm_content": {{
               "judul_lkm": "Judul spesifik LKM",
               "tujuan_lkm": "Tujuan pengerjaan LKM bagi peserta didik",
@@ -848,8 +899,8 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
       st.success("🎉 Modul Ajar Sesuai Sistematika Baru Berhasil Disusun!")
       st.info(
           "Dokumen Word (.docx) siap diunduh lengkap dengan halaman terpisah"
-          " untuk Rubrik & Pedoman Penskoran, Instrumen Asesmen Proses"
-          " (Formatif), dan Lembar Kerja Murid (LKM)."
+          " untuk Rubrik & Pedoman, Instrumen Format, **Bahan Ajar**, serta"
+          " Lembar Kerja Murid (LKM)."
       )
 
       docx_file = generate_docx(
