@@ -454,69 +454,69 @@ elif menu == "📊 Rekap Semester Ganjil & Genap":
 # MENU 3: MANAJEMEN DATA SEKOLAH & SISWA
 # ----------------------------------------------------
 elif menu == "📂 Manajemen Data Sekolah & Siswa":
-    st.markdown("### 📂 Manajemen Data Sekolah, Kelas, & Siswa")
+  st.markdown("### 📂 Manajemen Data Sekolah, Kelas, & Siswa")
+  st.markdown(
+      "Download template atau upload daftar siswa Anda agar tersinkronisasi"
+      " dengan Google Spreadsheet."
+  )
+
+  tab_dl, tab_ul = st.tabs(["📥 Download Template", "📤 Upload Data Siswa"])
+
+  with tab_dl:
+    st.subheader("Template Data Siswa")
     st.markdown(
-        "Download template atau upload daftar siswa Anda agar tersinkronisasi"
-        " dengan Google Spreadsheet."
+        "Silakan unduh atau salin template resmi di bawah ini melalui Google"
+        " Drive. Template ini sudah disesuaikan agar langsung siap diisi"
+        " dengan format: **Sekolah - Kelas - No_Absen - Nama_Siswa**."
     )
 
-    tab_dl, tab_ul = st.tabs(["📥 Download Template", "📤 Upload Data Siswa"])
-
-    with tab_dl:
-        st.subheader("Template Data Siswa")
-        st.markdown(
-            "Silakan unduh atau salin template resmi di bawah ini melalui Google Drive. "
-            "Template ini sudah disesuaikan agar langsung siap diisi dengan format: **Sekolah - Kelas - No_Absen - Nama_Siswa**."
-        )
-        
-        # Tombol tautan ke Google Drive Template
-        st.markdown(
-            """
+    st.markdown(
+        """
             <a href="https://docs.google.com/spreadsheets/d/1ioL8wtVFwf4EbubJuY8ontu3k0pBLRxS/edit?usp=sharing" target="_blank">
                 <button style="background-color: #FF4B4B; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
                     🔗 Buka & Download Template (Google Sheets)
                 </button>
             </a>
             """,
-            unsafe_allow_html=True
-        )
+        unsafe_allow_html=True,
+    )
 
-    with tab_ul:
-        st.subheader("Upload Data Siswa (.xlsx)")
-        uploaded_file = st.file_uploader(
-            "Pilih file data siswa (.xlsx)", type=["xlsx"]
-        )
+  with tab_ul:
+    st.subheader("Upload Data Siswa (.xlsx)")
+    uploaded_file = st.file_uploader(
+        "Pilih file data siswa (.xlsx)", type=["xlsx"]
+    )
 
-        if uploaded_file is not None:
-            try:
-                df_upload = pd.read_excel(uploaded_file)
+    if uploaded_file is not None:
+      try:
+        df_upload = pd.read_excel(uploaded_file)
 
-                st.write("Preview Data yang akan diunggah:")
-                st.dataframe(df_upload.head())
+        st.write("Preview Data yang akan diunggah:")
+        st.dataframe(df_upload.head())
 
-                if st.button("🚀 Unggah ke Google Spreadsheet"):
-                    required_cols = ["Sekolah", "Kelas", "No_Absen", "Nama_Siswa"]
-                    if all(col in df_upload.columns for col in required_cols):
-                        _, ws_siswa = load_data_from_sheet("Data Kelas-Siswa")
-                        if ws_siswa:
-                            ws_siswa.clear()
-                            ws_siswa.append_row(required_cols)
-                            rows = df_upload[required_cols].values.tolist()
-                            ws_siswa.append_rows(rows)
-                            st.balloons()
-                            st.success(
-                                "✅ Data berhasil diunggah dan disinkronkan ke Spreadsheet Anda!"
-                            )
-                            st.rerun()
-                    else:
-                        st.error(f"❌ Kolom pada file harus lengkap: {required_cols}")
-            except Exception as e:
-                st.error(f"Terjadi kesalahan membaca file: {e}")
+        if st.button("🚀 Unggah ke Google Spreadsheet"):
+          required_cols = ["Sekolah", "Kelas", "No_Absen", "Nama_Siswa"]
+          if all(col in df_upload.columns for col in required_cols):
+            _, ws_siswa = load_data_from_sheet("Data Kelas-Siswa")
+            if ws_siswa:
+              ws_siswa.clear()
+              ws_siswa.append_row(required_cols)
+              rows = df_upload[required_cols].values.tolist()
+              ws_siswa.append_rows(rows)
+              st.balloons()
+              st.success(
+                  "✅ Data berhasil diunggah dan disinkronkan ke Spreadsheet Anda!"
+              )
+              st.rerun()
+          else:
+            st.error(f"❌ Kolom pada file harus lengkap: {required_cols}")
+      except Exception as e:
+        st.error(f"Terjadi kesalahan membaca file: {e}")
 
-    st.markdown("---")
-    st.subheader("📋 Data Siswa yang Tersimpan di Spreadsheet Anda")
-    df_existing, _ = load_data_from_sheet("Data Kelas-Siswa")
-    if not df_existing.empty:
-        st.dataframe(df_existing, use_container_width=True)
-    else:
-        st.info("Belum ada data tersimpan.")
+  st.markdown("---")
+  st.subheader("📋 Data Siswa yang Tersimpan di Spreadsheet Anda")
+  df_existing, _ = load_data_from_sheet("Data Kelas-Siswa")
+  if not df_existing.empty:
+    st.dataframe(df_existing, use_container_width=True)
+  else:
+    st.info("Belum ada data tersimpan.")
