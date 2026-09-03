@@ -55,16 +55,21 @@ st.markdown(
             border-right: 1px solid #1f2937;
         }
         
-        /* CSS TAMBAHAN: Jarak baris lebih rapat & Line Border */
-        form [data-testid="stHorizontalBlock"] {
-            border-bottom: 1px solid #1f2937;
-            padding-top: 4px;
-            padding-bottom: 4px;
-            align-items: center;
+        /* CSS PERBAIKAN: Spasi Baris Padat & Line Border Jelas */
+        div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+            border-bottom: 1px solid #2d3748 !important;
+            padding-top: 2px !important;
+            padding-bottom: 2px !important;
+            margin-bottom: 0px !important;
+            align-items: center !important;
         }
-        form [data-testid="stRadio"] {
-            margin-top: -8px;
-            margin-bottom: -8px;
+        div[data-testid="stForm"] div[data-testid="stColumn"] {
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+        }
+        div[data-testid="stForm"] div[data-testid="stRadio"] {
+            margin-top: -10px !important;
+            margin-bottom: -10px !important;
         }
     </style>
 """,
