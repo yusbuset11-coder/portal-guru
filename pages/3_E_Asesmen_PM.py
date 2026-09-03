@@ -291,16 +291,15 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown("### 📌 Menu Navigasi Asesmen")
-    menu = st.radio(
-        "Pilih Menu:",
-        [
-            "🏠 Beranda Asesmen",
-            "✨ Generator Asesmen AI",
-            "📁 Bank Soal & Asesmen Tersimpan",
-            "📊 Input dan Rekap Nilai Siswa",
-        ],
-    )
+    menu = st.selectbox(
+    "Pilih Menu Asesmen",
+    [
+        "🏠 Beranda Asesmen",
+        "🤖 Generator Asesmen AI",
+        "💾 Bank Soal & Asesmen Tersimpan",
+        "📊 Input dan Rekap Nilai Siswa",
+    ],
+)
 
 # --- FUNGSI AMAN BANK SOAL SAKTI ---
 @st.cache_data(ttl=10)
