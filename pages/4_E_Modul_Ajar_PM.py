@@ -31,7 +31,6 @@ with st.sidebar:
       unsafe_allow_html=True,
   )
 
-# Atur jarak atas agar konten naik dan tidak terpotong di bawah
 st.markdown(
     """
     <style>
@@ -44,7 +43,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Cek apakah guru sudah login melalui portal utama (app.py)
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
   st.warning(
       "⚠️ Anda belum login. Silakan kembali ke Halaman Utama (`app.py`) untuk"
@@ -52,14 +50,11 @@ if "logged_in" not in st.session_state or not st.session_state.logged_in:
   )
   st.stop()
 
-# Konfigurasi API Gemini (Mengambil dari st.secrets atau input manual)
 try:
   api_key_default = st.secrets.get("GEMINI_API_KEY", "")
 except Exception:
   api_key_default = ""
 
-# ===================================
-# Custom CSS untuk tampilan UI yang modern dan profesional
 st.markdown(
     """
     <style>
@@ -127,13 +122,11 @@ st.markdown(
 )
 
 
-# Fungsi pembantu warna latar belakang sel tabel Word
 def set_cell_background(cell, fill_color):
   shading_elm = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{fill_color}"/>')
   cell._tc.get_or_add_tcPr().append(shading_elm)
 
 
-# Fungsi pembentuk dokumen Word lengkap berbasis Tabel Matriks sesuai permintaan
 def generate_docx(
     data_ai,
     nama_sekolah,
@@ -247,23 +240,18 @@ def generate_docx(
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-  # 1. Identifikasi
   tabel_identifikasi = [
       ("Penulis Modul", nama_penulis),
       ("Satuan Pendidikan", nama_sekolah),
       ("Mata Pelajaran", mata_pelajaran),
       ("Fase / Kelas", fase_kelas),
-      (
-          "Semester / Tahun Pelajaran",
-          f"{semester} / {tahun_pelajaran}",
-      ),
+      ("Semester / Tahun Pelajaran", f"{semester} / {tahun_pelajaran}"),
       ("Materi / Topik", topik),
       ("Alokasi Waktu", alokasi_waktu),
       ("Pertemuan Ke-", pertemuan_ke),
   ]
   add_section_table("IDENTIFIKASI DAN INFORMASI UMUM", tabel_identifikasi)
 
-  # 2. Dimensi Profil Lulusan
   tabel_dpl = [
       (
           "Dimensi Profil Lulusan",
@@ -278,7 +266,6 @@ def generate_docx(
   ]
   add_section_table("DIMENSI PROFIL LULUSAN", tabel_dpl)
 
-  # 3. Tujuan Pembelajaran
   tabel_tujuan = [
       (
           "Tujuan Pembelajaran",
@@ -290,7 +277,6 @@ def generate_docx(
   ]
   add_section_table("TUJUAN PEMBELAJARAN", tabel_tujuan)
 
-  # 4. Pemahaman Bermakna & Pertanyaan Pemantik
   tabel_pemahaman = [
       (
           "Pemahaman Bermakna",
@@ -312,7 +298,6 @@ def generate_docx(
       "PEMAHAMAN BERMAKNA & PERTANYAAN PEMANTIK", tabel_pemahaman
   )
 
-  # 5. Kerangka Pembelajaran
   tabel_kerangka = [
       (
           "Praktik Pedagogis",
@@ -352,7 +337,6 @@ def generate_docx(
   ]
   add_section_table("KERANGKA PEMBELAJARAN", tabel_kerangka)
 
-  # 6. Pengalaman Belajar
   tabel_pengalaman = [
       (
           "Kegiatan Pendahuluan",
@@ -392,7 +376,6 @@ def generate_docx(
   ]
   add_section_table("PENGALAMAN BELAJAR (LANGKAH-LANGKAH)", tabel_pengalaman)
 
-  # 7. Asesmen Pembelajaran
   tabel_asesmen = [
       (
           "Asesmen Awal",
@@ -419,7 +402,6 @@ def generate_docx(
   ]
   add_section_table("ASESMEN PEMBELAJARAN", tabel_asesmen)
 
-  # Tanda Tangan
   p_sign = doc.add_paragraph()
   p_sign.alignment = WD_ALIGN_PARAGRAPH.RIGHT
   p_sign.paragraph_format.space_before = Pt(14)
@@ -429,7 +411,6 @@ def generate_docx(
   run_name.font.bold = True
   p_sign.add_run(f"\nNIP. {nip_penulis}")
 
-  # Halaman Terpisah 1: Rubrik Penilaian (Diubah Menjadi Tabel Matriks Rapi)
   doc.add_page_break()
   p_rubrik_title = doc.add_paragraph()
   p_rubrik_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -537,7 +518,6 @@ def generate_docx(
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-  # Halaman Terpisah 2: Instrumen Asesmen Proses (Formatif)
   doc.add_page_break()
   p_inst_title = doc.add_paragraph()
   p_inst_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -579,7 +559,6 @@ def generate_docx(
       inst_rows.append((label_text, str(inst_v)))
     add_section_table("LEMBAR OBSERVASI / FORMATIF KELAS", inst_rows)
 
-  # Halaman Terpisah 3: Lembar Kerja Murid (LKM)
   doc.add_page_break()
   p_lkm_title = doc.add_paragraph()
   p_lkm_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -626,10 +605,6 @@ def generate_docx(
   bio.seek(0)
   return bio
 
-
-# =====================================================================
-# TAMPILAN UTAMA (TERUSUN DI BAWAH BANNER / FULL-WIDTH STACKED)
-# =====================================================================
 
 st.markdown(
     """
