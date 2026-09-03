@@ -674,6 +674,13 @@ st.markdown(
 )
 api_key = st.text_input(
     "Masukkan Google Gemini API Key", value="", type="password"
+)  # <-- Baris 675-677
+
+st.markdown(
+    '💡 *Belum punya API Key? <a'
+    ' href="https://aistudio.google.com/app/apikey" target="_blank">Klik di'
+    ' sini untuk membuat secara mandiri & gratis</a>*',
+    unsafe_allow_html=True,
 )
 
 col_param1, col_param2 = st.columns(2)
