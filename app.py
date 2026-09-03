@@ -320,7 +320,7 @@ else:
             """
             <div class="module-card">
                 <h4 style="color: #10b981; margin-top: 0; font-size: 16px;">🔑 Panduan API Key Gemini</h4>
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 12px;">Panduan lengkap cara membuat & mendapatkan Google Gemini API Key.</p>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 12px;">Panduan untuk membuat & mendapatkan Google Gemini API Key.</p>
                 <a href="https://drive.google.com/file/d/17FhN4P0P-_sOq0vhHe7K7063mYLbBxSs/view?usp=sharing" target="_blank" style="display: inline-block; background: #059669; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; text-decoration: none; font-weight: 600;">📖 Buka Panduan PDF</a>
             </div>
             """,
