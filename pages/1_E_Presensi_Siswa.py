@@ -54,6 +54,18 @@ st.markdown(
             background-color: #111827;
             border-right: 1px solid #1f2937;
         }
+        
+        /* CSS TAMBAHAN: Jarak baris lebih rapat & Line Border */
+        form [data-testid="stHorizontalBlock"] {
+            border-bottom: 1px solid #1f2937;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            align-items: center;
+        }
+        form [data-testid="stRadio"] {
+            margin-top: -8px;
+            margin-bottom: -8px;
+        }
     </style>
 """,
     unsafe_allow_html=True,
@@ -263,7 +275,6 @@ if menu == "📝 Pencatatan Presensi Harian":
           r_cols[0].write(str(no_absen))
           r_cols[1].write(str(nama))
 
-          # Opsi status kini mencakup Dispensasi
           status = r_cols[2].radio(
               f"Status {nama}",
               ["Hadir", "Izin", "Sakit", "Alpa", "Dispensasi"],
