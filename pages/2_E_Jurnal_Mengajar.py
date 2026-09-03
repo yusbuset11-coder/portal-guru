@@ -214,7 +214,7 @@ else:
                     unsafe_allow_html=True,
                 )
 
-    elif menu_digma == "✍️ Input Jurnal Mengajar":
+    elif menu_jurnal == "✍️ Input Jurnal Mengajar":
         st.markdown(
             """
             <div class="digma-banner">
@@ -332,7 +332,7 @@ else:
                                 " Anda!"
                             )
 
-    elif menu_digma == "📚 Riwayat & Rekap Jurnal":
+    elif menu_jurnal == "📚 Riwayat & Rekap Jurnal":
         st.markdown(
             """
             <div class="digma-banner">
