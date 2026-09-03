@@ -164,10 +164,10 @@ if sh_guru is None:
         " di Master Registry."
     )
 else:
-    menu_digma = st.sidebar.selectbox(
-        "**Pilih Menu DIGMA**",
+    menu_jurnal = st.sidebar.selectbox(
+        "**Pilih Menu Jurnal**",
         [
-            "🏠 Beranda DIGMA",
+            "🏠 Beranda Jurnal",
             "✍️ Input Jurnal Mengajar",
             "📚 Riwayat & Rekap Jurnal",
         ],
@@ -186,7 +186,7 @@ else:
         unsafe_allow_html=True,
     )
 
-    if menu_digma == "🏠 Beranda DIGMA":
+    if menu_jurnal == "🏠 Beranda Jurnal":
         try:
             ws_jurnal = sh_guru.worksheet("Jurnal Mengajar")
             df_jurnal = get_clean_jurnal_dataframe(ws_jurnal)
