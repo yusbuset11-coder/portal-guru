@@ -1,14 +1,17 @@
 from datetime import datetime
 from io import BytesIO
 import json
+import re
 import docx
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
-from docx.shared import Inches, Pt, RGBColor
+from docx.shared import Inches, Pt
+from docx.shared import RGBColor as DocxRGBColor
 import google.generativeai as genai
 from pptx import Presentation
+from pptx.dml.color import RGBColor as PptxRGBColor
 from pptx.util import Inches as PptInches
 from pptx.util import Pt as PptPt
 import streamlit as st
@@ -125,31 +128,6 @@ def set_cell_background(cell, fill_color):
   cell._tc.get_or_add_tcPr().append(shading_elm)
 
 
-import re
-
-
-def clean_markdown_bullets(text):
-  """Membersihkan simbol markdown list agar tidak bertumpuk dengan bullet bawaan PPT"""
-  if not text:
-    return ""
-  # Hilangkan bullet markdown seperti -, *, • di awal baris
-  lines = text.split("\n")
-  cleaned_lines = []
-  for line in lines:
-    stripped = line.strip()
-    # Hapus awalan -, *, atau •
-    stripped_clean = re.sub(r"^([-*•]|\d+\.)\s*", "", stripped)
-    cleaned_lines.append(stripped_clean)
-  return "\n".join(cleaned_lines)
-
-
-from io import BytesIO
-import re
-from pptx import Presentation
-from pptx.dml.color import RGBColor
-from pptx.util import Inches, Pt
-
-
 def clean_markdown_bullets(text):
   """Membersihkan simbol markdown list agar tidak bertumpuk dengan bullet bawaan PPT"""
   if not text:
@@ -175,7 +153,6 @@ def generate_pptx(
   prs = Presentation()
   blank_layout = prs.slide_layouts[6]  # Layout kosong untuk kustomisasi penuh
 
-  # Helper untuk membuat background & header slide yang profesional
   def create_slide_header(slide, title_text):
     header_box = slide.shapes.add_shape(
         1,  # MsoShape.RECTANGLE
@@ -185,10 +162,10 @@ def generate_pptx(
         Inches(1.0),
     )
     header_box.fill.solid()
-    header_box.fill.fore_color.rgb = RGBColor(
+    header_box.fill.fore_color.rgb = PptxRGBColor(
         24, 43, 73
     )  # Biru Dongker Profesional
-    header_box.line.color.rgb = RGBColor(24, 43, 73)
+    header_box.line.color.rgb = PptxRGBColor(24, 43, 73)
 
     tf_h = header_box.text_frame
     tf_h.word_wrap = True
@@ -196,7 +173,7 @@ def generate_pptx(
     p_h.text = title_text
     p_h.font.size = Pt(22)
     p_h.font.bold = True
-    p_h.font.color.rgb = RGBColor(255, 255, 255)
+    p_h.font.color.rgb = PptxRGBColor(255, 255, 255)
     p_h.alignment = 1  # Center
 
     footer_box = slide.shapes.add_textbox(
@@ -208,7 +185,7 @@ def generate_pptx(
         f"Modul Pembelajaran Mendalam | {mata_pelajaran} - {fase_kelas}"
     )
     p_f.font.size = Pt(10)
-    p_f.font.color.rgb = RGBColor(120, 120, 120)
+    p_f.font.color.rgb = PptxRGBColor(120, 120, 120)
 
   # --- SLIDE 1: Cover Profesional ---
   slide1 = prs.slides.add_slide(blank_layout)
@@ -216,7 +193,9 @@ def generate_pptx(
       1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
   )
   bg1.fill.solid()
-  bg1.fill.fore_color.rgb = RGBColor(24, 43, 73)  # Full Background Biru Dongker
+  bg1.fill.fore_color.rgb = PptxRGBColor(
+      24, 43, 73
+  )  # Full Background Biru Dongker
   bg1.line.fill.background()
 
   tb1 = slide1.shapes.add_textbox(
@@ -228,13 +207,13 @@ def generate_pptx(
   p1 = tf1.paragraphs[0]
   p1.text = "BAHAN TAYANG PEMBELAJARAN"
   p1.font.size = Pt(16)
-  p1.font.color.rgb = RGBColor(255, 193, 7)  # Emas
+  p1.font.color.rgb = PptxRGBColor(255, 193, 7)  # Emas
   p1.font.bold = True
 
   p2 = tf1.add_paragraph()
   p2.text = topik
   p2.font.size = Pt(36)
-  p2.font.color.rgb = RGBColor(255, 255, 255)
+  p2.font.color.rgb = PptxRGBColor(255, 255, 255)
   p2.font.bold = True
   p2.space_before = Pt(10)
 
@@ -244,7 +223,7 @@ def generate_pptx(
       f" Pendidikan: {nama_sekolah}\nDisusun Oleh: {nama_penulis}"
   )
   p3.font.size = Pt(14)
-  p3.font.color.rgb = RGBColor(220, 224, 230)
+  p3.font.color.rgb = PptxRGBColor(220, 224, 230)
   p3.space_before = Pt(25)
 
   bahan_ajar = data_ai.get("bahan_ajar", {})
@@ -276,8 +255,8 @@ def generate_pptx(
         1, Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.9)
     )
     content_box.fill.solid()
-    content_box.fill.fore_color.rgb = RGBColor(255, 255, 255)
-    content_box.line.color.rgb = RGBColor(210, 215, 225)
+    content_box.fill.fore_color.rgb = PptxRGBColor(255, 255, 255)
+    content_box.line.color.rgb = PptxRGBColor(210, 215, 225)
 
     tf_c = content_box.text_frame
     tf_c.word_wrap = True
@@ -302,15 +281,16 @@ def generate_pptx(
 
       p_c.text = p_text
       p_c.font.size = Pt(13)
-      p_c.font.color.rgb = RGBColor(40, 40, 40)
+      p_c.font.color.rgb = PptxRGBColor(40, 40, 40)
       if p_text.endswith(":") or len(p_text) < 50 and not p_text.startswith("-"):
         p_c.font.bold = True
-        p_c.font.color.rgb = RGBColor(24, 43, 73)
+        p_c.font.color.rgb = PptxRGBColor(24, 43, 73)
 
   bio = BytesIO()
   prs.save(bio)
   bio.seek(0)
   return bio
+
 
 def generate_docx(
     data_ai,
@@ -339,7 +319,7 @@ def generate_docx(
   font = style.font
   font.name = "Arial"
   font.size = Pt(10)
-  font.color.rgb = RGBColor(51, 51, 51)
+  font.color.rgb = DocxRGBColor(51, 51, 51)
 
   p_title = doc.add_paragraph()
   p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -349,7 +329,7 @@ def generate_docx(
   run_title.font.name = "Arial"
   run_title.font.size = Pt(15)
   run_title.font.bold = True
-  run_title.font.color.rgb = RGBColor(74, 46, 33)
+  run_title.font.color.rgb = DocxRGBColor(74, 46, 33)
 
   def add_section_table(title_text, rows_data):
     table = doc.add_table(rows=len(rows_data) + 1, cols=2)
@@ -367,7 +347,7 @@ def generate_docx(
       for run in p.runs:
         run.font.bold = True
         run.font.size = Pt(10)
-        run.font.color.rgb = RGBColor(255, 255, 255)
+        run.font.color.rgb = DocxRGBColor(255, 255, 255)
 
     for idx, (label, val) in enumerate(rows_data):
       row_cells = table.rows[idx + 1].cells
@@ -384,7 +364,7 @@ def generate_docx(
         for run in p.runs:
           run.font.size = Pt(10)
           run.font.bold = True
-          run.font.color.rgb = RGBColor(51, 51, 51)
+          run.font.color.rgb = DocxRGBColor(51, 51, 51)
 
       val_str = str(val).replace("LKPD", "LKM").replace(
           "Lembar Kegiatan Murid", "Lembar Kerja Murid"
@@ -411,17 +391,17 @@ def generate_docx(
           r_prefix = p_right.add_run(prefix + " ")
           r_prefix.font.size = Pt(10)
           r_prefix.font.bold = True
-          r_prefix.font.color.rgb = RGBColor(51, 51, 51)
+          r_prefix.font.color.rgb = DocxRGBColor(51, 51, 51)
 
           r_content = p_right.add_run(content)
           r_content.font.size = Pt(10)
           r_content.font.bold = False
-          r_content.font.color.rgb = RGBColor(51, 51, 51)
+          r_content.font.color.rgb = DocxRGBColor(51, 51, 51)
         else:
           r_normal = p_right.add_run(line)
           r_normal.font.size = Pt(10)
           r_normal.font.bold = False
-          r_normal.font.color.rgb = RGBColor(51, 51, 51)
+          r_normal.font.color.rgb = DocxRGBColor(51, 51, 51)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
@@ -605,7 +585,7 @@ def generate_docx(
   r_rub_t.font.name = "Arial"
   r_rub_t.font.size = Pt(15)
   r_rub_t.font.bold = True
-  r_rub_t.font.color.rgb = RGBColor(74, 46, 33)
+  r_rub_t.font.color.rgb = DocxRGBColor(74, 46, 33)
 
   table_id_rubrik = doc.add_table(rows=3, cols=2)
   table_id_rubrik.style = "Table Grid"
@@ -635,7 +615,7 @@ def generate_docx(
   run_sub = p_sub.add_run("A. Rubrik Penilaian Kinerja / Kompetensi")
   run_sub.font.bold = True
   run_sub.font.size = Pt(10.5)
-  run_sub.font.color.rgb = RGBColor(74, 46, 33)
+  run_sub.font.color.rgb = DocxRGBColor(74, 46, 33)
 
   rubrik_data = data_ai.get("rubrik_penilaian", {})
   if isinstance(rubrik_data, dict) and rubrik_data:
@@ -670,7 +650,7 @@ def generate_docx(
         for run in p.runs:
           run.font.bold = True
           run.font.size = Pt(9.5)
-          run.font.color.rgb = RGBColor(255, 255, 255)
+          run.font.color.rgb = DocxRGBColor(255, 255, 255)
 
     for row_idx, (k, v) in enumerate(rubrik_data.items()):
       row_cells = rubrik_table.rows[row_idx + 1].cells
@@ -700,7 +680,7 @@ def generate_docx(
           for run in p.runs:
             run.font.size = Pt(9.0)
             run.font.bold = col_idx == 0
-            run.font.color.rgb = RGBColor(51, 51, 51)
+            run.font.color.rgb = DocxRGBColor(51, 51, 51)
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
@@ -713,7 +693,7 @@ def generate_docx(
   r_inst_t.font.name = "Arial"
   r_inst_t.font.size = Pt(15)
   r_inst_t.font.bold = True
-  r_inst_t.font.color.rgb = RGBColor(74, 46, 33)
+  r_inst_t.font.color.rgb = DocxRGBColor(74, 46, 33)
 
   table_id_inst = doc.add_table(rows=3, cols=2)
   table_id_inst.style = "Table Grid"
@@ -755,7 +735,7 @@ def generate_docx(
   r_bahan_t.font.name = "Arial"
   r_bahan_t.font.size = Pt(15)
   r_bahan_t.font.bold = True
-  r_bahan_t.font.color.rgb = RGBColor(74, 46, 33)
+  r_bahan_t.font.color.rgb = DocxRGBColor(74, 46, 33)
 
   table_id_bahan = doc.add_table(rows=3, cols=2)
   table_id_bahan.style = "Table Grid"
@@ -797,7 +777,7 @@ def generate_docx(
   r_lkm_t.font.name = "Arial"
   r_lkm_t.font.size = Pt(15)
   r_lkm_t.font.bold = True
-  r_lkm_t.font.color.rgb = RGBColor(74, 46, 33)
+  r_lkm_t.font.color.rgb = DocxRGBColor(74, 46, 33)
 
   table_id_lkm = doc.add_table(rows=3, cols=2)
   table_id_lkm.style = "Table Grid"
