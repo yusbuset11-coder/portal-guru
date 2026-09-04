@@ -6,3 +6,4 @@ openpyxl
 python-docx
 google-generativeai
 google-auth
+python-pptx
