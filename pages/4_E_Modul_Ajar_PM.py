@@ -143,6 +143,26 @@ def clean_markdown_bullets(text):
   return "\n".join(cleaned_lines)
 
 
+from io import BytesIO
+import re
+from pptx import Presentation
+from pptx.dml.color import RGBColor
+from pptx.util import Inches, Pt
+
+
+def clean_markdown_bullets(text):
+  """Membersihkan simbol markdown list agar tidak bertumpuk dengan bullet bawaan PPT"""
+  if not text:
+    return ""
+  lines = text.split("\n")
+  cleaned_lines = []
+  for line in lines:
+    stripped = line.strip()
+    stripped_clean = re.sub(r"^([-*•]|\d+\.)\s*", "", stripped)
+    cleaned_lines.append(stripped_clean)
+  return "\n".join(cleaned_lines)
+
+
 def generate_pptx(
     data_ai,
     mata_pelajaran,
@@ -157,7 +177,6 @@ def generate_pptx(
 
   # Helper untuk membuat background & header slide yang profesional
   def create_slide_header(slide, title_text):
-    # Tambahkan kotak header atas (warna navy/biru profesional)
     header_box = slide.shapes.add_shape(
         1,  # MsoShape.RECTANGLE
         Inches(0.8),
@@ -180,7 +199,6 @@ def generate_pptx(
     p_h.font.color.rgb = RGBColor(255, 255, 255)
     p_h.alignment = 1  # Center
 
-    # Footer kecil
     footer_box = slide.shapes.add_textbox(
         Inches(0.8), Inches(7.0), Inches(11.7), Inches(0.4)
     )
@@ -232,7 +250,6 @@ def generate_pptx(
   bahan_ajar = data_ai.get("bahan_ajar", {})
   lkm_content = data_ai.get("lkm_content", {})
 
-  # Data slide isi materi
   slides_data = [
       ("📖 Pengantar Konsep Pembelajaran", bahan_ajar.get("pengantar_konsep", "")),
       (
@@ -255,7 +272,6 @@ def generate_pptx(
     slide = prs.slides.add_slide(blank_layout)
     create_slide_header(slide, title_text)
 
-    # Kotak Kontainer Konten (Card Style putih di tengah)
     content_box = slide.shapes.add_shape(
         1, Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.9)
     )
@@ -270,7 +286,6 @@ def generate_pptx(
     tf_c.margin_top = Inches(0.4)
     tf_c.margin_bottom = Inches(0.4)
 
-    # Bersihkan markdown bullet ganda lalu masukkan per baris
     cleaned_content = clean_markdown_bullets(content_text)
     paragraphs = cleaned_content.split("\n")
 
