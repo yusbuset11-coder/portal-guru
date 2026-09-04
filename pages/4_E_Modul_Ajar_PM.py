@@ -135,69 +135,55 @@ def generate_pptx(
     alokasi_waktu,
 ):
   prs = Presentation()
+  slide_layout = prs.slide_layouts[1]  # Layout Title and Content
 
-  # Slide 1: Judul Utama
-  slide_layout = prs.slide_layouts[0]
-  slide = prs.slides.add_slide(slide_layout)
+  # Slide 1: Judul Utama Bahan Tayang untuk Siswa
+  slide_layout_title = prs.slide_layouts[0]
+  slide = prs.slides.add_slide(slide_layout_title)
   title = slide.shapes.title
   subtitle = slide.placeholders[1]
-  title.text = f"PEMBELAJARAN MENDALAM\n{topik}"
+  title.text = f"MATERI PEMBELAJARAN\n{topik}"
   subtitle.text = (
-      f"Mata Pelajaran: {mata_pelajaran}\nKelas / Fase: {fase_kelas}\nDisusun"
-      f" oleh: {nama_penulis} ({nama_sekolah})"
+      f"Mata Pelajaran: {mata_pelajaran}\nKelas / Fase: {fase_kelas}\nSatuan"
+      f" Pendidikan: {nama_sekolah}"
   )
 
-  # Slide 2: Tujuan Pembelajaran
-  slide_layout = prs.slide_layouts[1]
+  # Ambil data spesifik Bahan Ajar dan LKM dari hasil JSON AI
+  bahan_ajar = data_ai.get("bahan_ajar", {})
+  lkm_content = data_ai.get("lkm_content", {})
+
+  # Slide 2: Pengantar Konsep
   slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "🎯 Tujuan Pembelajaran"
+  slide.shapes.title.text = "📖 Pengantar Konsep"
   tf = slide.placeholders[1].text_frame
-  tf.text = data_ai.get(
-      "tujuan_pembelajaran", "Peserta didik mampu menguasai kompetensi materi."
+  tf.text = bahan_ajar.get(
+      "pengantar_konsep", "Definisi atau pengantar esensial mengenai topik."
   )
 
-  # Slide 3: Pemahaman Bermakna & Pertanyaan Pemantik
+  # Slide 3: Uraian Materi Inti
   slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "💡 Pemahaman & Pemantik"
+  slide.shapes.title.text = "📚 Uraian Materi Inti"
   tf = slide.placeholders[1].text_frame
-  tf.text = (
-      "Pemahaman Bermakna:\n"
-      + data_ai.get("pemahaman_bermakna", "-")
-      + "\n\nPertanyaan Pemantik:\n"
-      + data_ai.get("pertanyaan_pemantik", "-")
+  tf.text = bahan_ajar.get(
+      "uraian_materi_inti", "Penjelasan detail substansi materi pembelajaran."
   )
 
-  # Slide 4: Pengalaman Belajar - Pendahuluan & Memahami
+  # Slide 4: Contoh Kontekstual / Studi Kasus
   slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "📖 Pengalaman Belajar: Pendahuluan & Memahami"
+  slide.shapes.title.text = "💡 Contoh Kontekstual"
   tf = slide.placeholders[1].text_frame
-  tf.text = (
-      "Kegiatan Pendahuluan:\n"
-      + data_ai.get("kegiatan_pendahuluan", "-")
-      + "\n\nKegiatan Memahami:\n"
-      + data_ai.get("kegiatan_memahami", "-")
+  tf.text = bahan_ajar.get(
+      "contoh_kontekstual", "Penerapan nyata materi dalam kehidupan sehari-hari."
   )
 
-  # Slide 5: Pengalaman Belajar - Mengaplikasi & LKM
+  # Slide 5: Panduan Aktivitas / LKM untuk Siswa
   slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "🛠️ Aktivitas Mengaplikasi & LKM"
+  slide.shapes.title.text = "🛠️ Lembar Kerja & Aktivitas Siswa (LKM)"
   tf = slide.placeholders[1].text_frame
   tf.text = (
-      "Kegiatan Mengaplikasi:\n"
-      + data_ai.get("kegiatan_mengaplikasi", "-")
-      + "\n\nLembar Kerja Murid (LKM):\n"
-      + "Kolaborasi kelompok berbasis penyelidikan materi."
-  )
-
-  # Slide 6: Refleksi & Penutup
-  slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "✨ Refleksi & Penutup"
-  tf = slide.placeholders[1].text_frame
-  tf.text = (
-      "Kegiatan Merefleksi:\n"
-      + data_ai.get("kegiatan_merefleksi", "-")
-      + "\n\nKegiatan Penutup (Joyful):\n"
-      + data_ai.get("kegiatan_penutup", "-")
+      f"Judul LKM: {lkm_content.get('judul_lkm', topik)}\n\n"
+      f"Petunjuk Pengerjaan:\n{lkm_content.get('petunjuk_kerja', '-')}\n\n"
+      f"Tugas Analisis:\n{lkm_content.get('tugas_analisis', '-')}"
   )
 
   bio = BytesIO()
