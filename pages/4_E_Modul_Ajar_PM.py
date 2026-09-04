@@ -8,6 +8,9 @@ from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 from docx.shared import Inches, Pt, RGBColor
 import google.generativeai as genai
+from pptx import Presentation
+from pptx.util import Inches as PptInches
+from pptx.util import Pt as PptPt
 import streamlit as st
 from styles import apply_global_styles
 
@@ -122,6 +125,87 @@ def set_cell_background(cell, fill_color):
   cell._tc.get_or_add_tcPr().append(shading_elm)
 
 
+def generate_pptx(
+    data_ai,
+    mata_pelajaran,
+    fase_kelas,
+    topik,
+    nama_penulis,
+    nama_sekolah,
+    alokasi_waktu,
+):
+  prs = Presentation()
+
+  # Slide 1: Judul Utama
+  slide_layout = prs.slide_layouts[0]
+  slide = prs.slides.add_slide(slide_layout)
+  title = slide.shapes.title
+  subtitle = slide.placeholders[1]
+  title.text = f"PEMBELAJARAN MENDALAM\n{topik}"
+  subtitle.text = (
+      f"Mata Pelajaran: {mata_pelajaran}\nKelas / Fase: {fase_kelas}\nDisusun"
+      f" oleh: {nama_penulis} ({nama_sekolah})"
+  )
+
+  # Slide 2: Tujuan Pembelajaran
+  slide_layout = prs.slide_layouts[1]
+  slide = prs.slides.add_slide(slide_layout)
+  slide.shapes.title.text = "🎯 Tujuan Pembelajaran"
+  tf = slide.placeholders[1].text_frame
+  tf.text = data_ai.get(
+      "tujuan_pembelajaran", "Peserta didik mampu menguasai kompetensi materi."
+  )
+
+  # Slide 3: Pemahaman Bermakna & Pertanyaan Pemantik
+  slide = prs.slides.add_slide(slide_layout)
+  slide.shapes.title.text = "💡 Pemahaman & Pemantik"
+  tf = slide.placeholders[1].text_frame
+  tf.text = (
+      "Pemahaman Bermakna:\n"
+      + data_ai.get("pemahaman_bermakna", "-")
+      + "\n\nPertanyaan Pemantik:\n"
+      + data_ai.get("pertanyaan_pemantik", "-")
+  )
+
+  # Slide 4: Pengalaman Belajar - Pendahuluan & Memahami
+  slide = prs.slides.add_slide(slide_layout)
+  slide.shapes.title.text = "📖 Pengalaman Belajar: Pendahuluan & Memahami"
+  tf = slide.placeholders[1].text_frame
+  tf.text = (
+      "Kegiatan Pendahuluan:\n"
+      + data_ai.get("kegiatan_pendahuluan", "-")
+      + "\n\nKegiatan Memahami:\n"
+      + data_ai.get("kegiatan_memahami", "-")
+  )
+
+  # Slide 5: Pengalaman Belajar - Mengaplikasi & LKM
+  slide = prs.slides.add_slide(slide_layout)
+  slide.shapes.title.text = "🛠️ Aktivitas Mengaplikasi & LKM"
+  tf = slide.placeholders[1].text_frame
+  tf.text = (
+      "Kegiatan Mengaplikasi:\n"
+      + data_ai.get("kegiatan_mengaplikasi", "-")
+      + "\n\nLembar Kerja Murid (LKM):\n"
+      + "Kolaborasi kelompok berbasis penyelidikan materi."
+  )
+
+  # Slide 6: Refleksi & Penutup
+  slide = prs.slides.add_slide(slide_layout)
+  slide.shapes.title.text = "✨ Refleksi & Penutup"
+  tf = slide.placeholders[1].text_frame
+  tf.text = (
+      "Kegiatan Merefleksi:\n"
+      + data_ai.get("kegiatan_merefleksi", "-")
+      + "\n\nKegiatan Penutup (Joyful):\n"
+      + data_ai.get("kegiatan_penutup", "-")
+  )
+
+  bio = BytesIO()
+  prs.save(bio)
+  bio.seek(0)
+  return bio
+
+
 def generate_docx(
     data_ai,
     nama_sekolah,
@@ -136,7 +220,6 @@ def generate_docx(
     nama_kota,
     tanggal_pembuatan,
     nip_penulis,
-    link_ppt,
 ):
   doc = docx.Document()
 
@@ -245,10 +328,6 @@ def generate_docx(
       ("Materi / Topik", topik),
       ("Alokasi Waktu", alokasi_waktu),
       ("Pertemuan Ke-", pertemuan_ke),
-      (
-          "Tautan Presentasi (PPT)",
-          link_ppt if link_ppt else "Belum disertakan",
-      ),
   ]
   add_section_table("IDENTIFIKASI DAN INFORMASI UMUM", tabel_identifikasi)
 
@@ -748,18 +827,6 @@ with col_param2:
 
 st.markdown("---")
 
-st.markdown(
-    '<div class="section-header">🔗 Tautan Presentasi / Bahan Tayang</div>',
-    unsafe_allow_html=True,
-)
-link_ppt = st.text_input(
-    "Link PPT / Google Slides / Presentations.AI (Opsional)",
-    value="",
-    placeholder="https://docs.google.com/presentation/d/... atau link lainnya",
-)
-
-st.markdown("---")
-
 col_id1, col_id2 = st.columns(2)
 
 with col_id1:
@@ -790,23 +857,24 @@ with col_id2:
 
 st.markdown("---")
 
-st.markdown("### 🚀 Generator Modul Ajar Pembelajaran Mendalam")
+st.markdown("### 🚀 Generator Modul Ajar & Bahan Tayang AI")
 st.markdown(
     "Pastikan parameter dan identitas di atas sudah terisi dengan benar, lalu"
-    " klik tombol di bawah untuk mulai menyusun dokumen secara otomatis"
-    " menggunakan AI."
+    " klik tombol di bawah untuk menyusun Modul Ajar Word sekaligus Bahan"
+    " Tayang Presentasi PowerPoint otomatis menggunakan AI."
 )
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=True):
+if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True):
   if not api_key:
     st.error("Mohon masukkan Google Gemini API Key terlebih dahulu.")
   elif not topik:
     st.warning("Mohon isi topik pembelajaran.")
   else:
     with st.spinner(
-        f"{nama_penulis} sedang menyusun Modul Ajar Pembelajaran Mendalam..."
+        f"{nama_penulis} sedang menyusun Modul Ajar dan Bahan Tayang"
+        " Pembelajaran Mendalam..."
     ):
       genai.configure(api_key=api_key)
       model = genai.GenerativeModel("gemini-3.5-flash")
@@ -837,13 +905,13 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
                - Tahap Asesmen: [...]
             6. Pengalaman Belajar harus terstruktur mencakup Kegiatan Pendahuluan, Kegiatan Inti (Memahami, Mengaplikasi, Merefleksi), dan Kegiatan Penutup (refleksi joyful dan bermakna). Gunakan istilah **LKM (Lembar Kerja Murid)** (BUKAN LKPD atau Lembar Kegiatan Murid) di seluruh uraian.
             7. Asesmen Pembelajaran mencakup Asesmen Awal, Asesmen Proses (Formatif), dan Asesmen Akhir (Sumatif) beserta Rubrik Penilaian dan Pedoman Penskorannya.
-            8. **Instrumen Asesmen Proses (Formatif)**: Sediakan instrumen asesmen proses/formatif yang mendalam pada kunci `instrumen_formatif` yang terstruktur dengan sub-bagian penting bertanda titik dua agar mudah disajikan dalam bentuk tabel rapi pada halaman khusus.
-            9. **Bahan Ajar**: Sediakan materi pembelajaran/bahan bacaan yang mendalam dan komprehensif sesuai topik pada kunci `bahan_ajar` yang mencakup pengantar konsep, uraian materi inti, serta contoh kontekstual dengan format sub-bagian berlabel titik dua agar tersaji rapi sebagai halaman khusus Bahan Ajar sebelum LKM.
-            10. **LKM (Lembar Kerja Murid)**: Sediakan konten LKM yang mendalam pada kunci `lkm_content` yang mencakup judul, tujuan, petunjuk kerja, serta langkah-langkah tugas/investigasi peserta didik pada halaman terpisah paling akhir.
+            8. **Instrumen Asesmen Proses (Formatif)**: Sediakan instrumen asesmen proses/formatif yang mendalam pada kunci `instrumen_formatif`.
+            9. **Bahan Ajar**: Sediakan materi pembelajaran/bahan bacaan yang mendalam dan komprehensif sesuai topik pada kunci `bahan_ajar`.
+            10. **LKM (Lembar Kerja Murid)**: Sediakan konten LKM yang mendalam pada kunci `lkm_content`.
 
             Berikan output HANYA dalam format JSON valid yang memuat kunci-kunci berikut:
             {{
-              "dimensi_profil_lulusan": "Hanya tuliskan dimensi profil lulusan yang dipilih saja (gunakan tanda ☑) beserta uraian penerapannya. JANGAN menuliskan dimensi yang tidak dipilih.",
+              "dimensi_profil_lulusan": "Hanya tuliskan dimensi profil lulusan yang dipilih saja (gunakan tanda ☑) beserta uraian penerapannya.",
               "tujuan_pembelajaran": "Uraian tujuan pembelajaran yang spesifik, operasional, dan terukur sesuai materi.",
               "pemahaman_bermakna": "Uraian pemahaman bermakna yang mendalam terkait materi.",
               "pertanyaan_pemantik": "2 pertanyaan pemantik yang kontekstual dan menantang daya nalar kritis siswa.",
@@ -866,13 +934,6 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
                   "cukup": "Deskripsi tingkat cukup",
                   "baik": "Deskripsi tingkat baik",
                   "sangat_baik": "Deskripsi tingkat sangat baik"
-                }},
-                "kriteria_2": {{
-                  "nama_kriteria": "Nama kriteria kedua",
-                  "perlu_bimbingan": "Deskripsi...",
-                  "cukup": "Deskripsi...",
-                  "baik": "Deskripsi...",
-                  "sangat_baik": "Deskripsi..."
                 }}
               }},
               "pedoman_penskoran": {{
@@ -882,19 +943,18 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
               "instrumen_formatif": {{
                 "judul_instrumen": "Judul spesifik instrumen asesmen proses",
                 "tujuan_asesmen": "Tujuan penggunaan lembar asesmen formatif",
-                "aspek_yang_diamati": "Indikator atau aspek keaktifan/proses yang dinilai dengan format sub-bagian berlabel titik dua",
-                "pedoman_pengamatan": "Petunjuk penilaian atau rubrik ceklis observasi singkat"
+                "aspek_yang_diamati": "Indikator atau aspek keaktifan/proses yang dinilai"
               }},
               "bahan_ajar": {{
                 "pengantar_konsep": "Definisi atau pengantar esensial mengenai topik pembelajaran",
                 "uraian_materi_inti": "Penjelasan detail dan komprehensif substansi materi yang dipelajari",
-                "contoh_kontekstual": "Studi kasus atau contoh nyata pengaplikasian materi dalam kehidupan sehari-hari"
+                "contoh_kontekstual": "Studi kasus atau contoh nyata pengaplikasian materi"
               }},
               "lkm_content": {{
                 "judul_lkm": "Judul spesifik LKM",
                 "tujuan_lkm": "Tujuan pengerjaan LKM bagi peserta didik",
-                "petunjuk_kerja": "Langkah panduan keselamatan dan cara pengerjaan dengan format sub-bagian berlabel titik dua",
-                "tugas_analisis": "Rincian tugas investigasi, pertanyaan kerja, atau tabel isian praktik"
+                "petunjuk_kerja": "Langkah panduan keselamatan dan cara pengerjaan",
+                "tugas_analisis": "Rincian tugas investigasi atau pertanyaan kerja"
               }}
             }}
             """
@@ -915,13 +975,16 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
       except Exception:
         data_ai = {}
 
-      st.success("🎉 Modul Ajar Sesuai Sistematika Baru Berhasil Disusun!")
+      st.success(
+          "🎉 Modul Ajar dan Bahan Tayang Presentasi Berhasil Disusun AI!"
+      )
       st.info(
-          "Dokumen Word (.docx) siap diunduh lengkap dengan halaman terpisah"
-          " untuk Rubrik & Pedoman, Instrumen Format, **Bahan Ajar**, serta"
-          " Lembar Kerja Murid (LKM)."
+          "Silakan unduh dokumen Word (.docx) untuk kelengkapan administrasi"
+          " serta file PowerPoint (.pptx) untuk bahan tayang mengajar di"
+          " kelas."
       )
 
+      # Buat File Word dan PPTX
       docx_file = generate_docx(
           data_ai,
           nama_sekolah,
@@ -936,15 +999,36 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
           nama_kota,
           tanggal_pembuatan,
           nip_penulis,
-          link_ppt,
       )
 
-      st.download_button(
-          label="📥 Unduh Modul Ajar Pembelajaran Mendalam (.docx)",
-          data=docx_file,
-          file_name=f"Modul_Ajar_{topik.replace(' ', '_')}.docx",
-          mime=(
-              "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          ),
-          use_container_width=True,
+      pptx_file = generate_pptx(
+          data_ai,
+          mata_pelajaran,
+          fase_kelas,
+          topik,
+          nama_penulis,
+          nama_sekolah,
+          alokasi_waktu,
       )
+
+      col_down1, col_down2 = st.columns(2)
+      with col_down1:
+        st.download_button(
+            label="📥 Unduh Modul Ajar (.docx)",
+            data=docx_file,
+            file_name=f"Modul_Ajar_{topik.replace(' ', '_')}.docx",
+            mime=(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ),
+            use_container_width=True,
+        )
+      with col_down2:
+        st.download_button(
+            label="📥 Unduh Bahan Tayang PPT (.pptx)",
+            data=pptx_file,
+            file_name=f"Bahan_Tayang_{topik.replace(' ', '_')}.pptx",
+            mime=(
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            ),
+            use_container_width=True,
+        )
