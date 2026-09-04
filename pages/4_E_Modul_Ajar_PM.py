@@ -25,6 +25,10 @@ st.set_page_config(
 )
 apply_global_styles()
 
+# Inisialisasi Session State untuk Riwayat Modul Tersimpan
+if "riwayat_modul" not in st.session_state:
+  st.session_state.riwayat_modul = []
+
 with st.sidebar:
   st.markdown(
       f"""
@@ -154,12 +158,17 @@ def generate_pptx(
   blank_layout = prs.slide_layouts[6]  # Layout kosong untuk kustomisasi penuh
 
   def create_slide_header(slide, title_text):
+    # Background untuk slide isi (warna abu-abu kebiruan profesional)
+    bg_slide = slide.shapes.add_shape(
+        1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
+    )
+    bg_slide.fill.solid()
+    bg_slide.fill.fore_color.rgb = PptxRGBColor(240, 243, 248)
+    bg_slide.line.fill.background()
+
+    # Header Box
     header_box = slide.shapes.add_shape(
-        1,  # MsoShape.RECTANGLE
-        Inches(0.8),
-        Inches(0.5),
-        Inches(11.7),
-        Inches(1.0),
+        1, Inches(0.8), Inches(0.5), Inches(11.7), Inches(1.0)
     )
     header_box.fill.solid()
     header_box.fill.fore_color.rgb = PptxRGBColor(
@@ -169,6 +178,7 @@ def generate_pptx(
 
     tf_h = header_box.text_frame
     tf_h.word_wrap = True
+    tf_h.margin_left = Inches(0.4)
     p_h = tf_h.paragraphs[0]
     p_h.text = title_text
     p_h.font.size = Pt(22)
@@ -193,9 +203,7 @@ def generate_pptx(
       1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
   )
   bg1.fill.solid()
-  bg1.fill.fore_color.rgb = PptxRGBColor(
-      24, 43, 73
-  )  # Full Background Biru Dongker
+  bg1.fill.fore_color.rgb = PptxRGBColor(24, 43, 73)  # Full Background Biru
   bg1.line.fill.background()
 
   tb1 = slide1.shapes.add_textbox(
@@ -251,6 +259,7 @@ def generate_pptx(
     slide = prs.slides.add_slide(blank_layout)
     create_slide_header(slide, title_text)
 
+    # Kotak konten putih dengan margin kiri yang aman agar tidak terpotong
     content_box = slide.shapes.add_shape(
         1, Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.9)
     )
@@ -260,10 +269,12 @@ def generate_pptx(
 
     tf_c = content_box.text_frame
     tf_c.word_wrap = True
-    tf_c.margin_left = Inches(0.4)
-    tf_c.margin_right = Inches(0.4)
-    tf_c.margin_top = Inches(0.4)
-    tf_c.margin_bottom = Inches(0.4)
+    tf_c.margin_left = (
+        Inches(0.6)
+    )  # Diperbesar dari 0.4 agar teks kiri tidak mepet/terpotong
+    tf_c.margin_right = Inches(0.6)
+    tf_c.margin_top = Inches(0.5)
+    tf_c.margin_bottom = Inches(0.5)
 
     cleaned_content = clean_markdown_bullets(content_text)
     paragraphs = cleaned_content.split("\n")
@@ -1064,11 +1075,6 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
       st.success(
           "🎉 Modul Ajar dan Bahan Tayang Presentasi Berhasil Disusun AI!"
       )
-      st.info(
-          "Silakan unduh dokumen Word (.docx) untuk kelengkapan administrasi"
-          " serta file PowerPoint (.pptx) untuk bahan tayang mengajar di"
-          " kelas."
-      )
 
       # Buat File Word dan PPTX
       docx_file = generate_docx(
@@ -1097,6 +1103,16 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
           alokasi_waktu,
       )
 
+      # Simpan ke Session State Riwayat
+      st.session_state.riwayat_modul.append({
+          "tanggal": datetime.today().strftime("%Y-%m-%d"),
+          "mata_pelajaran": mata_pelajaran,
+          "materi": topik,
+          "fase": fase_kelas,
+          "docx_data": docx_file.getvalue(),
+          "pptx_data": pptx_file.getvalue(),
+      })
+
       col_down1, col_down2 = st.columns(2)
       with col_down1:
         st.download_button(
@@ -1106,6 +1122,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
             mime=(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             ),
+            key="latest_docx",
             use_container_width=True,
         )
       with col_down2:
@@ -1116,5 +1133,73 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
             mime=(
                 "application/vnd.openxmlformats-officedocument.presentationml.presentation"
             ),
+            key="latest_pptx",
             use_container_width=True,
+        )
+
+# --- TABEL RIWAYAT / DAFTAR MODUL AJAR & BAHAN TAYANG TERSIMPAN ---
+st.markdown("---")
+st.markdown(
+    '<div class="section-header">📂 Daftar Modul Ajar & Bahan Tayang'
+    " Tersimpan</div>",
+    unsafe_allow_html=True,
+)
+st.markdown(
+    "Daftar arsip modul ajar dan bahan tayang yang pernah Anda buat dan"
+    " simpan. Klik tombol Unduh di kolom aksi untuk mengunduh kembali dokumen."
+)
+
+if not st.session_state.riwayat_modul:
+  st.info(
+      "Belum ada riwayat modul ajar atau bahan tayang yang di-generate pada"
+      " sesi ini."
+  )
+else:
+  st.markdown("<br>", unsafe_allow_html=True)
+  # Header Tabel
+  header_cols = st.columns([0.6, 1.5, 2.5, 2.5, 1.5])
+  with header_cols[0]:
+    st.markdown("**No.**")
+  with header_cols[1]:
+    st.markdown("**Tanggal**")
+  with header_cols[2]:
+    st.markdown("**Mata Pelajaran**")
+  with header_cols[3]:
+    st.markdown("**Materi**")
+  with header_cols[4]:
+    st.markdown("**Aksi Unduh**")
+
+  st.markdown("---")
+
+  for idx, item in enumerate(st.session_state.riwayat_modul):
+    row_cols = st.columns([0.6, 1.5, 2.5, 2.5, 1.5])
+    with row_cols[0]:
+      st.markdown(f"{idx + 1}")
+    with row_cols[1]:
+      st.markdown(f"{item['tanggal']}")
+    with row_cols[2]:
+      st.markdown(f"{item['mata_pelajaran']}")
+    with row_cols[3]:
+      st.markdown(f"{item['materi']} ({item['fase']})")
+    with row_cols[4]:
+      sub_col1, sub_col2 = st.columns(2)
+      with sub_col1:
+        st.download_button(
+            label="📄 Word",
+            data=item["docx_data"],
+            file_name=f"Modul_Ajar_{item['materi'].replace(' ', '_')}.docx",
+            mime=(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ),
+            key=f"hist_docx_{idx}",
+        )
+      with sub_col2:
+        st.download_button(
+            label="📊 PPT",
+            data=item["pptx_data"],
+            file_name=f"Bahan_Tayang_{item['materi'].replace(' ', '_')}.pptx",
+            mime=(
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            ),
+            key=f"hist_pptx_{idx}",
         )
