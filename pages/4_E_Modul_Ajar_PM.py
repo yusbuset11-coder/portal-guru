@@ -1,6 +1,8 @@
+import base64
 from datetime import datetime
 from io import BytesIO
 import json
+import os
 import re
 import docx
 from docx.enum.table import WD_TABLE_ALIGNMENT
@@ -17,6 +19,49 @@ from pptx.util import Pt as PptPt
 import streamlit as st
 from styles import apply_global_styles
 
+HISTORY_FILE = "riwayat_modul_storage.json"
+
+
+def load_history():
+  if os.path.exists(HISTORY_FILE):
+    try:
+      with open(HISTORY_FILE, "r") as f:
+        data = json.load(f)
+        return [
+            {
+                "tanggal": x["tanggal"],
+                "mata_pelajaran": x["mata_pelajaran"],
+                "materi": x["materi"],
+                "fase": x["fase"],
+                "docx_data": base64.b64decode(x["docx_b64"]),
+                "pptx_data": base64.b64decode(x["pptx_b64"]),
+            }
+            for x in data
+        ]
+    except Exception:
+      pass
+  return []
+
+
+def save_history(riwayat):
+  try:
+    data = [
+        {
+            "tanggal": x["tanggal"],
+            "mata_pelajaran": x["mata_pelajaran"],
+            "materi": x["materi"],
+            "fase": x["fase"],
+            "docx_b64": base64.b64encode(x["docx_data"]).decode("utf-8"),
+            "pptx_b64": base64.b64encode(x["pptx_data"]).decode("utf-8"),
+        }
+        for x in riwayat
+    ]
+    with open(HISTORY_FILE, "w") as f:
+      json.dump(data, f)
+  except Exception:
+    pass
+
+
 # Konfigurasi Halaman
 st.set_page_config(
     page_title="Otomatisasi Penyusunan Modul Ajar PM",
@@ -25,9 +70,9 @@ st.set_page_config(
 )
 apply_global_styles()
 
-# Inisialisasi Session State untuk Riwayat Modul Tersimpan
+# Inisialisasi Session State untuk Riwayat Modul Tersimpan (Memuat dari file)
 if "riwayat_modul" not in st.session_state:
-  st.session_state.riwayat_modul = []
+  st.session_state.riwayat_modul = load_history()
 
 with st.sidebar:
   st.markdown(
@@ -157,7 +202,6 @@ def generate_pptx(
   blank_layout = prs.slide_layouts[6]
 
   def create_slide_header(slide, title_text):
-    # Background slide isi (abu-abu kebiruan profesional)
     bg_slide = slide.shapes.add_shape(
         1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
     )
@@ -165,14 +209,11 @@ def generate_pptx(
     bg_slide.fill.fore_color.rgb = PptxRGBColor(240, 243, 248)
     bg_slide.line.fill.background()
 
-    # Header Box
     header_box = slide.shapes.add_shape(
         1, Inches(0.8), Inches(0.5), Inches(11.7), Inches(0.9)
     )
     header_box.fill.solid()
-    header_box.fill.fore_color.rgb = PptxRGBColor(
-        24, 43, 73
-    )  # Biru Dongker Profesional
+    header_box.fill.fore_color.rgb = PptxRGBColor(24, 43, 73)
     header_box.line.color.rgb = PptxRGBColor(24, 43, 73)
 
     tf_h = header_box.text_frame
@@ -183,7 +224,7 @@ def generate_pptx(
     p_h.font.size = PptPt(20)
     p_h.font.bold = True
     p_h.font.color.rgb = PptxRGBColor(255, 255, 255)
-    p_h.alignment = 1  # Center
+    p_h.alignment = 1
 
     footer_box = slide.shapes.add_textbox(
         Inches(0.8), Inches(7.05), Inches(11.7), Inches(0.35)
@@ -196,7 +237,6 @@ def generate_pptx(
     p_f.font.size = PptPt(10)
     p_f.font.color.rgb = PptxRGBColor(110, 120, 135)
 
-  # --- SLIDE 1: Cover Profesional ---
   slide1 = prs.slides.add_slide(blank_layout)
   bg1 = slide1.shapes.add_shape(
       1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
@@ -258,7 +298,6 @@ def generate_pptx(
     slide = prs.slides.add_slide(blank_layout)
     create_slide_header(slide, title_text)
 
-    # Kotak konten putih dengan margin optimal agar tampak rapi dan presentabel
     content_box = slide.shapes.add_shape(
         1, Inches(0.8), Inches(1.6), Inches(11.7), Inches(5.25)
     )
@@ -287,7 +326,6 @@ def generate_pptx(
         p_c = tf_c.add_paragraph()
         p_c.space_before = Pt(6)
 
-      # Pemformatan agar teks layak presentasi (sub-judul / poin)
       is_sub = (
           p_text.endswith(":")
           or (len(p_text) < 45 and not p_text.startswith("-"))
@@ -594,7 +632,6 @@ def generate_docx(
   run_name.font.bold = True
   p_sign.add_run(f"\nNIP. {nip_penulis}")
 
-  # HALAMAN 2: RUBRIK PENILAIAN
   doc.add_page_break()
   p_rubrik_title = doc.add_paragraph()
   p_rubrik_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -702,7 +739,6 @@ def generate_docx(
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-  # HALAMAN 3: INSTRUMEN ASESMEN PROSES (FORMATIF)
   doc.add_page_break()
   p_inst_title = doc.add_paragraph()
   p_inst_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -744,7 +780,6 @@ def generate_docx(
       inst_rows.append((label_text, str(inst_v)))
     add_section_table("LEMBAR OBSERVASI / FORMATIF KELAS", inst_rows)
 
-  # HALAMAN 4: BAHAN AJAR
   doc.add_page_break()
   p_bahan_title = doc.add_paragraph()
   p_bahan_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -786,7 +821,6 @@ def generate_docx(
       bahan_rows.append((label_text, str(b_v)))
     add_section_table("URAIAN MATERI & KONSEP PEMBELAJARAN", bahan_rows)
 
-  # HALAMAN 5: LEMBAR KERJA MURID (LKM)
   doc.add_page_break()
   p_lkm_title = doc.add_paragraph()
   p_lkm_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -1082,7 +1116,6 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
           "🎉 Modul Ajar dan Bahan Tayang Presentasi Berhasil Disusun AI!"
       )
 
-      # Buat File Word dan PPTX
       docx_file = generate_docx(
           data_ai,
           nama_sekolah,
@@ -1109,7 +1142,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
           alokasi_waktu,
       )
 
-      # Simpan ke Session State Riwayat
+      # Simpan ke Session State & Simpan ke File JSON secara Permanen
       st.session_state.riwayat_modul.append({
           "tanggal": datetime.today().strftime("%Y-%m-%d"),
           "mata_pelajaran": mata_pelajaran,
@@ -1118,6 +1151,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
           "docx_data": docx_file.getvalue(),
           "pptx_data": pptx_file.getvalue(),
       })
+      save_history(st.session_state.riwayat_modul)
 
       col_down1, col_down2 = st.columns(2)
       with col_down1:
@@ -1212,4 +1246,5 @@ else:
       with sub_col3:
         if st.button("🗑️", key=f"hist_del_{idx}", help="Hapus baris ini"):
           st.session_state.riwayat_modul.pop(idx)
+          save_history(st.session_state.riwayat_modul)
           st.rerun()
