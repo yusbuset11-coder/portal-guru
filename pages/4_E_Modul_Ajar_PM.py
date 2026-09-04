@@ -133,7 +133,6 @@ def set_cell_background(cell, fill_color):
 
 
 def clean_markdown_bullets(text):
-  """Membersihkan simbol markdown list agar tidak bertumpuk dengan bullet bawaan PPT"""
   if not text:
     return ""
   lines = text.split("\n")
@@ -155,10 +154,10 @@ def generate_pptx(
     alokasi_waktu,
 ):
   prs = Presentation()
-  blank_layout = prs.slide_layouts[6]  # Layout kosong untuk kustomisasi penuh
+  blank_layout = prs.slide_layouts[6]
 
   def create_slide_header(slide, title_text):
-    # Background untuk slide isi (warna abu-abu kebiruan profesional)
+    # Background slide isi (abu-abu kebiruan profesional)
     bg_slide = slide.shapes.add_shape(
         1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
     )
@@ -168,7 +167,7 @@ def generate_pptx(
 
     # Header Box
     header_box = slide.shapes.add_shape(
-        1, Inches(0.8), Inches(0.5), Inches(11.7), Inches(1.0)
+        1, Inches(0.8), Inches(0.5), Inches(11.7), Inches(0.9)
     )
     header_box.fill.solid()
     header_box.fill.fore_color.rgb = PptxRGBColor(
@@ -181,21 +180,21 @@ def generate_pptx(
     tf_h.margin_left = Inches(0.4)
     p_h = tf_h.paragraphs[0]
     p_h.text = title_text
-    p_h.font.size = Pt(22)
+    p_h.font.size = PptPt(20)
     p_h.font.bold = True
     p_h.font.color.rgb = PptxRGBColor(255, 255, 255)
     p_h.alignment = 1  # Center
 
     footer_box = slide.shapes.add_textbox(
-        Inches(0.8), Inches(7.0), Inches(11.7), Inches(0.4)
+        Inches(0.8), Inches(7.05), Inches(11.7), Inches(0.35)
     )
     tf_f = footer_box.text_frame
     p_f = tf_f.paragraphs[0]
     p_f.text = (
         f"Modul Pembelajaran Mendalam | {mata_pelajaran} - {fase_kelas}"
     )
-    p_f.font.size = Pt(10)
-    p_f.font.color.rgb = PptxRGBColor(120, 120, 120)
+    p_f.font.size = PptPt(10)
+    p_f.font.color.rgb = PptxRGBColor(110, 120, 135)
 
   # --- SLIDE 1: Cover Profesional ---
   slide1 = prs.slides.add_slide(blank_layout)
@@ -203,36 +202,36 @@ def generate_pptx(
       1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
   )
   bg1.fill.solid()
-  bg1.fill.fore_color.rgb = PptxRGBColor(24, 43, 73)  # Full Background Biru
+  bg1.fill.fore_color.rgb = PptxRGBColor(24, 43, 73)
   bg1.line.fill.background()
 
   tb1 = slide1.shapes.add_textbox(
-      Inches(1.5), Inches(2.2), Inches(10.3), Inches(3.5)
+      Inches(1.5), Inches(2.0), Inches(10.3), Inches(4.0)
   )
   tf1 = tb1.text_frame
   tf1.word_wrap = True
 
   p1 = tf1.paragraphs[0]
   p1.text = "BAHAN TAYANG PEMBELAJARAN"
-  p1.font.size = Pt(16)
-  p1.font.color.rgb = PptxRGBColor(255, 193, 7)  # Emas
+  p1.font.size = PptPt(15)
+  p1.font.color.rgb = PptxRGBColor(255, 193, 7)
   p1.font.bold = True
 
   p2 = tf1.add_paragraph()
   p2.text = topik
-  p2.font.size = Pt(36)
+  p2.font.size = PptPt(32)
   p2.font.color.rgb = PptxRGBColor(255, 255, 255)
   p2.font.bold = True
-  p2.space_before = Pt(10)
+  p2.space_before = Pt(12)
 
   p3 = tf1.add_paragraph()
   p3.text = (
       f"Mata Pelajaran: {mata_pelajaran} | Kelas/Fase: {fase_kelas}\nSatuan"
       f" Pendidikan: {nama_sekolah}\nDisusun Oleh: {nama_penulis}"
   )
-  p3.font.size = Pt(14)
-  p3.font.color.rgb = PptxRGBColor(220, 224, 230)
-  p3.space_before = Pt(25)
+  p3.font.size = PptPt(13)
+  p3.font.color.rgb = PptxRGBColor(215, 222, 235)
+  p3.space_before = Pt(22)
 
   bahan_ajar = data_ai.get("bahan_ajar", {})
   lkm_content = data_ai.get("lkm_content", {})
@@ -259,22 +258,20 @@ def generate_pptx(
     slide = prs.slides.add_slide(blank_layout)
     create_slide_header(slide, title_text)
 
-    # Kotak konten putih dengan margin kiri yang aman agar tidak terpotong
+    # Kotak konten putih dengan margin optimal agar tampak rapi dan presentabel
     content_box = slide.shapes.add_shape(
-        1, Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.9)
+        1, Inches(0.8), Inches(1.6), Inches(11.7), Inches(5.25)
     )
     content_box.fill.solid()
     content_box.fill.fore_color.rgb = PptxRGBColor(255, 255, 255)
-    content_box.line.color.rgb = PptxRGBColor(210, 215, 225)
+    content_box.line.color.rgb = PptxRGBColor(205, 212, 225)
 
     tf_c = content_box.text_frame
     tf_c.word_wrap = True
-    tf_c.margin_left = (
-        Inches(0.6)
-    )  # Diperbesar dari 0.4 agar teks kiri tidak mepet/terpotong
-    tf_c.margin_right = Inches(0.6)
-    tf_c.margin_top = Inches(0.5)
-    tf_c.margin_bottom = Inches(0.5)
+    tf_c.margin_left = Inches(0.55)
+    tf_c.margin_right = Inches(0.55)
+    tf_c.margin_top = Inches(0.45)
+    tf_c.margin_bottom = Inches(0.45)
 
     cleaned_content = clean_markdown_bullets(content_text)
     paragraphs = cleaned_content.split("\n")
@@ -288,14 +285,24 @@ def generate_pptx(
         first_para = False
       else:
         p_c = tf_c.add_paragraph()
-        p_c.space_before = Pt(8)
+        p_c.space_before = Pt(6)
 
-      p_c.text = p_text
-      p_c.font.size = Pt(13)
-      p_c.font.color.rgb = PptxRGBColor(40, 40, 40)
-      if p_text.endswith(":") or len(p_text) < 50 and not p_text.startswith("-"):
+      # Pemformatan agar teks layak presentasi (sub-judul / poin)
+      is_sub = (
+          p_text.endswith(":")
+          or (len(p_text) < 45 and not p_text.startswith("-"))
+      )
+
+      if is_sub:
+        p_c.text = p_text
+        p_c.font.size = PptPt(13.5)
         p_c.font.bold = True
         p_c.font.color.rgb = PptxRGBColor(24, 43, 73)
+        p_c.space_before = Pt(10)
+      else:
+        p_c.text = "• " + p_text
+        p_c.font.size = PptPt(12.5)
+        p_c.font.color.rgb = PptxRGBColor(45, 55, 72)
 
   bio = BytesIO()
   prs.save(bio)
@@ -956,9 +963,8 @@ st.markdown("---")
 
 st.markdown("### 🚀 Generator Modul Ajar & Bahan Tayang AI")
 st.markdown(
-    "Pastikan parameter dan identitas di atas sudah terisi dengan benar, lalu"
-    " klik tombol di bawah untuk menyusun Modul Ajar Word sekaligus Bahan"
-    " Tayang Presentasi PowerPoint otomatis menggunakan AI."
+    "Pastikan parameter dan identitas sudah terisi dengan benar, lalu"
+    " klik tombol di bawah untuk menyusun Modul Ajar dan PPt"
 )
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -974,7 +980,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
         " Pembelajaran Mendalam..."
     ):
       genai.configure(api_key=api_key)
-      model = genai.GenerativeModel("gemini-3.5-flash")
+      model = genai.GenerativeModel("gemini-2.5-flash")
 
       prompt = f"""
             Bertindaklah sebagai pakar kurikulum profesional. Buatkan konten Modul Ajar Berbasis Pembelajaran Mendalam (Deep Learning) yang **SANGAT LENGKAP, DETAIL, DAN KOMPREHENSIF** untuk:
@@ -1145,8 +1151,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 st.markdown(
-    "Daftar arsip modul ajar dan bahan tayang yang pernah Anda buat dan"
-    " simpan. Klik tombol Unduh di kolom aksi untuk mengunduh kembali dokumen."
+    "Klik tombol Unduh di kolom aksi untuk mengunduh kembali dokumen"
 )
 
 if not st.session_state.riwayat_modul:
@@ -1156,8 +1161,8 @@ if not st.session_state.riwayat_modul:
   )
 else:
   st.markdown("<br>", unsafe_allow_html=True)
-  # Header Tabel
-  header_cols = st.columns([0.6, 1.5, 2.5, 2.5, 1.5])
+  # Lebar kolom disesuaikan agar Tanggal dan Mata Pelajaran lebih rapi & proporsional
+  header_cols = st.columns([0.5, 1.1, 1.8, 3.1, 1.5])
   with header_cols[0]:
     st.markdown("**No.**")
   with header_cols[1]:
@@ -1172,7 +1177,7 @@ else:
   st.markdown("---")
 
   for idx, item in enumerate(st.session_state.riwayat_modul):
-    row_cols = st.columns([0.6, 1.5, 2.5, 2.5, 1.5])
+    row_cols = st.columns([0.5, 1.1, 1.8, 3.1, 1.5])
     with row_cols[0]:
       st.markdown(f"{idx + 1}")
     with row_cols[1]:
