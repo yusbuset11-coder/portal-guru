@@ -980,7 +980,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
         " Pembelajaran Mendalam..."
     ):
       genai.configure(api_key=api_key)
-      model = genai.GenerativeModel("gemini-2.5-flash")
+      model = genai.GenerativeModel("gemini-3.5-flash")
 
       prompt = f"""
             Bertindaklah sebagai pakar kurikulum profesional. Buatkan konten Modul Ajar Berbasis Pembelajaran Mendalam (Deep Learning) yang **SANGAT LENGKAP, DETAIL, DAN KOMPREHENSIF** untuk:
