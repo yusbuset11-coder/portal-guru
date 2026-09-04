@@ -11,7 +11,7 @@ import google.generativeai as genai
 import streamlit as st
 from styles import apply_global_styles
 
-# Konfigurasi Halaman[cite: 5]
+# Konfigurasi Halaman
 st.set_page_config(
     page_title="Otomatisasi Penyusunan Modul Ajar PM",
     page_icon="📚",
@@ -561,7 +561,7 @@ def generate_docx(
       inst_rows.append((label_text, str(inst_v)))
     add_section_table("LEMBAR OBSERVASI / FORMATIF KELAS", inst_rows)
 
-  # HALAMAN 4: BAHAN AJAR (BARU DITAMBAHKAN)
+  # HALAMAN 4: BAHAN AJAR
   doc.add_page_break()
   p_bahan_title = doc.add_paragraph()
   p_bahan_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -674,7 +674,7 @@ st.markdown(
 )
 api_key = st.text_input(
     "Masukkan Google Gemini API Key", value="", type="password"
-)  # <-- Baris 675-677
+)
 
 st.markdown(
     '💡 *Belum punya API Key? <a'
@@ -797,7 +797,7 @@ if st.button("🚀 Buat Modul Ajar Pembelajaran Mendalam", use_container_width=T
         f"{nama_penulis} sedang menyusun Modul Ajar Pembelajaran Mendalam..."
     ):
       genai.configure(api_key=api_key)
-      model = genai.GenerativeModel("gemini-3.5-flash")
+      model = genai.GenerativeModel("gemini-1.5-flash")
 
       prompt = f"""
           Bertindaklah sebagai pakar kurikulum profesional. Buatkan konten Modul Ajar Berbasis Pembelajaran Mendalam (Deep Learning) yang **SANGAT LENGKAP, DETAIL, DAN KOMPREHENSIF** untuk:
