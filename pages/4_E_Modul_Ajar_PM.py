@@ -1161,8 +1161,7 @@ if not st.session_state.riwayat_modul:
   )
 else:
   st.markdown("<br>", unsafe_allow_html=True)
-  # Lebar kolom disesuaikan agar Tanggal dan Mata Pelajaran lebih rapi & proporsional
-  header_cols = st.columns([0.5, 1.1, 1.8, 3.1, 1.5])
+  header_cols = st.columns([0.4, 1.0, 1.8, 2.9, 1.9])
   with header_cols[0]:
     st.markdown("**No.**")
   with header_cols[1]:
@@ -1172,12 +1171,12 @@ else:
   with header_cols[3]:
     st.markdown("**Materi**")
   with header_cols[4]:
-    st.markdown("**Aksi Unduh**")
+    st.markdown("**Aksi**")
 
   st.markdown("---")
 
   for idx, item in enumerate(st.session_state.riwayat_modul):
-    row_cols = st.columns([0.5, 1.1, 1.8, 3.1, 1.5])
+    row_cols = st.columns([0.4, 1.0, 1.8, 2.9, 1.9])
     with row_cols[0]:
       st.markdown(f"{idx + 1}")
     with row_cols[1]:
@@ -1187,24 +1186,30 @@ else:
     with row_cols[3]:
       st.markdown(f"{item['materi']} ({item['fase']})")
     with row_cols[4]:
-      sub_col1, sub_col2 = st.columns(2)
+      sub_col1, sub_col2, sub_col3 = st.columns(3)
       with sub_col1:
         st.download_button(
-            label="📄 Word",
+            label="📄",
             data=item["docx_data"],
             file_name=f"Modul_Ajar_{item['materi'].replace(' ', '_')}.docx",
             mime=(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             ),
             key=f"hist_docx_{idx}",
+            help="Unduh Word",
         )
       with sub_col2:
         st.download_button(
-            label="📊 PPT",
+            label="📊",
             data=item["pptx_data"],
             file_name=f"Bahan_Tayang_{item['materi'].replace(' ', '_')}.pptx",
             mime=(
                 "application/vnd.openxmlformats-officedocument.presentationml.presentation"
             ),
             key=f"hist_pptx_{idx}",
+            help="Unduh PPT",
         )
+      with sub_col3:
+        if st.button("🗑️", key=f"hist_del_{idx}", help="Hapus baris ini"):
+          st.session_state.riwayat_modul.pop(idx)
+          st.rerun()
