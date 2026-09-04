@@ -125,6 +125,24 @@ def set_cell_background(cell, fill_color):
   cell._tc.get_or_add_tcPr().append(shading_elm)
 
 
+import re
+
+
+def clean_markdown_bullets(text):
+  """Membersihkan simbol markdown list agar tidak bertumpuk dengan bullet bawaan PPT"""
+  if not text:
+    return ""
+  # Hilangkan bullet markdown seperti -, *, • di awal baris
+  lines = text.split("\n")
+  cleaned_lines = []
+  for line in lines:
+    stripped = line.strip()
+    # Hapus awalan -, *, atau •
+    stripped_clean = re.sub(r"^([-*•]|\d+\.)\s*", "", stripped)
+    cleaned_lines.append(stripped_clean)
+  return "\n".join(cleaned_lines)
+
+
 def generate_pptx(
     data_ai,
     mata_pelajaran,
@@ -135,62 +153,149 @@ def generate_pptx(
     alokasi_waktu,
 ):
   prs = Presentation()
-  slide_layout = prs.slide_layouts[1]  # Layout Title and Content
+  blank_layout = prs.slide_layouts[6]  # Layout kosong untuk kustomisasi penuh
 
-  # Slide 1: Judul Utama Bahan Tayang untuk Siswa
-  slide_layout_title = prs.slide_layouts[0]
-  slide = prs.slides.add_slide(slide_layout_title)
-  title = slide.shapes.title
-  subtitle = slide.placeholders[1]
-  title.text = f"MATERI PEMBELAJARAN\n{topik}"
-  subtitle.text = (
-      f"Mata Pelajaran: {mata_pelajaran}\nKelas / Fase: {fase_kelas}\nSatuan"
-      f" Pendidikan: {nama_sekolah}"
+  # Helper untuk membuat background & header slide yang profesional
+  def create_slide_header(slide, title_text):
+    # Tambahkan kotak header atas (warna navy/biru profesional)
+    header_box = slide.shapes.add_shape(
+        1,  # MsoShape.RECTANGLE
+        Inches(0.8),
+        Inches(0.5),
+        Inches(11.7),
+        Inches(1.0),
+    )
+    header_box.fill.solid()
+    header_box.fill.fore_color.rgb = RGBColor(
+        24, 43, 73
+    )  # Biru Dongker Profesional
+    header_box.line.color.rgb = RGBColor(24, 43, 73)
+
+    tf_h = header_box.text_frame
+    tf_h.word_wrap = True
+    p_h = tf_h.paragraphs[0]
+    p_h.text = title_text
+    p_h.font.size = Pt(22)
+    p_h.font.bold = True
+    p_h.font.color.rgb = RGBColor(255, 255, 255)
+    p_h.alignment = 1  # Center
+
+    # Footer kecil
+    footer_box = slide.shapes.add_textbox(
+        Inches(0.8), Inches(7.0), Inches(11.7), Inches(0.4)
+    )
+    tf_f = footer_box.text_frame
+    p_f = tf_f.paragraphs[0]
+    p_f.text = (
+        f"Modul Pembelajaran Mendalam | {mata_pelajaran} - {fase_kelas}"
+    )
+    p_f.font.size = Pt(10)
+    p_f.font.color.rgb = RGBColor(120, 120, 120)
+
+  # --- SLIDE 1: Cover Profesional ---
+  slide1 = prs.slides.add_slide(blank_layout)
+  bg1 = slide1.shapes.add_shape(
+      1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
   )
+  bg1.fill.solid()
+  bg1.fill.fore_color.rgb = RGBColor(24, 43, 73)  # Full Background Biru Dongker
+  bg1.line.fill.background()
 
-  # Ambil data spesifik Bahan Ajar dan LKM dari hasil JSON AI
+  tb1 = slide1.shapes.add_textbox(
+      Inches(1.5), Inches(2.2), Inches(10.3), Inches(3.5)
+  )
+  tf1 = tb1.text_frame
+  tf1.word_wrap = True
+
+  p1 = tf1.paragraphs[0]
+  p1.text = "BAHAN TAYANG PEMBELAJARAN"
+  p1.font.size = Pt(16)
+  p1.font.color.rgb = RGBColor(255, 193, 7)  # Emas
+  p1.font.bold = True
+
+  p2 = tf1.add_paragraph()
+  p2.text = topik
+  p2.font.size = Pt(36)
+  p2.font.color.rgb = RGBColor(255, 255, 255)
+  p2.font.bold = True
+  p2.space_before = Pt(10)
+
+  p3 = tf1.add_paragraph()
+  p3.text = (
+      f"Mata Pelajaran: {mata_pelajaran} | Kelas/Fase: {fase_kelas}\nSatuan"
+      f" Pendidikan: {nama_sekolah}\nDisusun Oleh: {nama_penulis}"
+  )
+  p3.font.size = Pt(14)
+  p3.font.color.rgb = RGBColor(220, 224, 230)
+  p3.space_before = Pt(25)
+
   bahan_ajar = data_ai.get("bahan_ajar", {})
   lkm_content = data_ai.get("lkm_content", {})
 
-  # Slide 2: Pengantar Konsep
-  slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "📖 Pengantar Konsep"
-  tf = slide.placeholders[1].text_frame
-  tf.text = bahan_ajar.get(
-      "pengantar_konsep", "Definisi atau pengantar esensial mengenai topik."
-  )
+  # Data slide isi materi
+  slides_data = [
+      ("📖 Pengantar Konsep Pembelajaran", bahan_ajar.get("pengantar_konsep", "")),
+      (
+          "📚 Uraian Materi Inti & Konsep",
+          bahan_ajar.get("uraian_materi_inti", ""),
+      ),
+      (
+          "💡 Contoh Kontekstual & Studi Kasus",
+          bahan_ajar.get("contoh_kontekstual", ""),
+      ),
+      (
+          "🛠️ Lembar Kerja & Aktivitas Siswa (LKM)",
+          f"Judul LKM: {lkm_content.get('judul_lkm', topik)}\n\nPetunjuk"
+          f" Kerja:\n{lkm_content.get('petunjuk_kerja', '')}\n\nTugas"
+          f" Analisis:\n{lkm_content.get('tugas_analisis', '')}",
+      ),
+  ]
 
-  # Slide 3: Uraian Materi Inti
-  slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "📚 Uraian Materi Inti"
-  tf = slide.placeholders[1].text_frame
-  tf.text = bahan_ajar.get(
-      "uraian_materi_inti", "Penjelasan detail substansi materi pembelajaran."
-  )
+  for title_text, content_text in slides_data:
+    slide = prs.slides.add_slide(blank_layout)
+    create_slide_header(slide, title_text)
 
-  # Slide 4: Contoh Kontekstual / Studi Kasus
-  slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "💡 Contoh Kontekstual"
-  tf = slide.placeholders[1].text_frame
-  tf.text = bahan_ajar.get(
-      "contoh_kontekstual", "Penerapan nyata materi dalam kehidupan sehari-hari."
-  )
+    # Kotak Kontainer Konten (Card Style putih di tengah)
+    content_box = slide.shapes.add_shape(
+        1, Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.9)
+    )
+    content_box.fill.solid()
+    content_box.fill.fore_color.rgb = RGBColor(255, 255, 255)
+    content_box.line.color.rgb = RGBColor(210, 215, 225)
 
-  # Slide 5: Panduan Aktivitas / LKM untuk Siswa
-  slide = prs.slides.add_slide(slide_layout)
-  slide.shapes.title.text = "🛠️ Lembar Kerja & Aktivitas Siswa (LKM)"
-  tf = slide.placeholders[1].text_frame
-  tf.text = (
-      f"Judul LKM: {lkm_content.get('judul_lkm', topik)}\n\n"
-      f"Petunjuk Pengerjaan:\n{lkm_content.get('petunjuk_kerja', '-')}\n\n"
-      f"Tugas Analisis:\n{lkm_content.get('tugas_analisis', '-')}"
-  )
+    tf_c = content_box.text_frame
+    tf_c.word_wrap = True
+    tf_c.margin_left = Inches(0.4)
+    tf_c.margin_right = Inches(0.4)
+    tf_c.margin_top = Inches(0.4)
+    tf_c.margin_bottom = Inches(0.4)
+
+    # Bersihkan markdown bullet ganda lalu masukkan per baris
+    cleaned_content = clean_markdown_bullets(content_text)
+    paragraphs = cleaned_content.split("\n")
+
+    first_para = True
+    for p_text in paragraphs:
+      if not p_text.strip():
+        continue
+      if first_para:
+        p_c = tf_c.paragraphs[0]
+        first_para = False
+      else:
+        p_c = tf_c.add_paragraph()
+        p_c.space_before = Pt(8)
+
+      p_c.text = p_text
+      p_c.font.size = Pt(13)
+      p_c.font.color.rgb = RGBColor(40, 40, 40)
+      if p_text.endswith(":") or len(p_text) < 50 and not p_text.startswith("-"):
+        p_c.font.bold = True
+        p_c.font.color.rgb = RGBColor(24, 43, 73)
 
   bio = BytesIO()
   prs.save(bio)
   bio.seek(0)
   return bio
-
 
 def generate_docx(
     data_ai,
