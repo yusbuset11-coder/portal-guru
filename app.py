@@ -3,7 +3,7 @@ import gspread
 import pandas as pd
 import streamlit as st
 from google.oauth2.service_account import Credentials
-from styles import apply_global_styles
+from styles import apply_global_styles, render_sidebar
 
 # --- KONFIGURASI HALAMAN UTAMA ---
 st.set_page_config(
@@ -36,62 +36,8 @@ if "guru_nama" not in st.session_state:
 if "spreadsheet_id" not in st.session_state:
   st.session_state.spreadsheet_id = ""
 
-# --- SIDEBAR UTAMA (URUTAN SESUAI PERMINTAAN) ---
-with st.sidebar:
-  # 1. Logo + Teks "PASTI" (Paling Atas)
-  st.markdown(
-      """
-        <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 10px;">
-            <img src="https://lh3.googleusercontent.com/d/15rUWzaqM_86lF2ht8atJmmyPocUPxl_z" style="width: 32px; height: auto;">
-            <span style="color: #38bdf8; font-size: 20px; font-weight: bold; letter-spacing: 1px;">PASTI</span>
-        </div>
-        """,
-      unsafe_allow_html=True,
-  )
-
-  st.markdown(
-      "<hr style='margin: 5px 0 15px 0; border-color: #1e293b;'>",
-      unsafe_allow_html=True,
-  )
-
-  # 2. Urutan Halaman (Menu Navigasi Manual)
-  st.page_link("app.py", label="App (Beranda)", icon="🏠")
-  st.page_link(
-      "pages/1_E_Presensi_Siswa.py", label="E Presensi Siswa", icon="📋"
-  )
-  st.page_link(
-      "pages/2_E_Jurnal_Mengajar.py", label="E Jurnal Mengajar", icon="📖"
-  )
-  st.page_link("pages/3_E_Asesmen_PM.py", label="E Asesmen PM", icon="📊")
-  st.page_link("pages/4_E_Modul_Ajar_PM.py", label="E Modul Ajar PM", icon="📑")
-
-  st.markdown(
-      "<hr style='margin: 15px 0; border-color: #1e293b;'>",
-      unsafe_allow_html=True,
-  )
-
-  # 3. Profil & 5. Log Out (Hanya tampil jika sudah login)
-  if st.session_state.logged_in:
-    # 3. Profil
-    st.markdown(
-        f"""
-        <div class="user-profile-box">
-            <span style="font-size: 24px;">👨‍💻</span><br>
-            <b style="color: #facc15; font-size: 14px;">{st.session_state.guru_nama}</b><br>
-            <span style="color: #94a3b8; font-size: 11px;">Sesi Aktif & Terverifikasi</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # 4. Menu Navigasi Tambahan (Jika ada, dapat disisipkan di sini)
-
-    # 5. Tombol Log Out (Paling Bawah)
-    if st.button("🚪 Keluar / Logout", use_container_width=True):
-      st.session_state.logged_in = False
-      st.session_state.guru_nama = ""
-      st.session_state.spreadsheet_id = ""
-      st.rerun()
+# --- PANGGIL SIDEBAR UTAMA ---
+render_sidebar()
 
 # ID Master Registry Pusat
 MASTER_REGISTRY_ID = "1mgN63xzrLt__5b9-gBw8dIWYP3RRgNdagUiTurFZdgg"
