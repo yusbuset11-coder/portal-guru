@@ -2,13 +2,24 @@ import streamlit as st
 
 
 def apply_global_styles():
-  st.markdown(
-      """
+    st.markdown(
+        """
         <style>
             /* --- SIDEBAR UTAMA (SERAGAM & KONTRAST) --- */
             [data-testid="stSidebar"] {
                 background-color: #07090e !important;
                 border-right: 2px solid #1e293b !important;
+            }
+            
+            /* Mengatur kontainer sidebar menjadi Flexbox agar posisi elemen bisa diatur */
+            [data-testid="stSidebar"] > div:first-child {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            /* Memindahkan menu navigasi bawaan Streamlit ke bagian paling bawah */
+            [data-testid="stSidebarNav"] {
+                order: 99 !important;
             }
 
             /* --- KOTAK PROFIL / USER BOX SERAGAM (GLOBAL) --- */
@@ -48,5 +59,5 @@ def apply_global_styles():
             }
         </style>
         """,
-      unsafe_allow_html=True,
-  )
+        unsafe_allow_html=True,
+    )
