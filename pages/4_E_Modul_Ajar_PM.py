@@ -1096,7 +1096,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
             }}
             """
 
-      response = model.generate_content(prompt)
+      response = model.generate_content(prompt, request_options={"timeout": 120})
       text_resp = response.text.strip()
 
       if text_resp.startswith("```json"):
