@@ -556,7 +556,7 @@ with tab_bank:
                                     2. Jika jenis soal adalah Pilihan Ganda, gunakan {aturan_opsi}.
                                     3. Berikan kunci jawaban yang jelas serta pembahasan mendalam untuk setiap soal."""
 
-                                    model = genai.GenerativeModel("gemini-1.5-flash")
+                                    model = genai.GenerativeModel("gemini-3.5-flash")
                                     response = model.generate_content(prompt)
                                     content_text = response.text
 
@@ -653,11 +653,13 @@ with tab_rekap:
     with col_r2:
         r_materi = st.text_input("Materi / Topik", value=st.session_state.val_materi, placeholder="Contoh: Teks LHO", key="rekap_materi")
 
+        # --- PERBAIKAN UTAMA: Filter data siswa berdasarkan sekolah dan kelas yang dipilih ---
         siswa_filtered = [
             r for r in master_data 
             if str(r.get("Sekolah", "")).strip() == r_sekolah and str(r.get("Kelas", "")).strip() == r_kelas
         ]
 
+        # Buat list untuk menampung data absen dan mapping nama yang akurat
         mapping_absen_nama = {}
         for r in siswa_filtered:
             try:
@@ -676,6 +678,7 @@ with tab_rekap:
         list_absen = sorted(list(mapping_absen_nama.keys()))
         r_no_absen = st.selectbox("Pilih No. Absen Siswa", list_absen, key="rekap_absen")
 
+        # Ambil nama siswa secara dinamis berdasarkan nomor absen yang sedang dipilih
         r_nama_siswa = mapping_absen_nama.get(r_no_absen, "")
         st.text_input("Nama Siswa (Otomatis dari Spreadsheet)", value=r_nama_siswa, disabled=True, key="rekap_nama_disp")
 
@@ -690,7 +693,7 @@ with tab_rekap:
 
     if st.button("💾 Simpan Nilai ke Google Sheets", use_container_width=True, key="btn_simpan_rekap"):
         if not r_mapel or not r_nama_siswa:
-            st.warning("Mohon lengkapi Mata Pelajaran dan pastikan Nama Siswa terpilih.")
+            st.warning("⚠️ Mohon lengkapi Mata Pelajaran dan pastikan Nama Siswa terpilih.")
         else:
             try:
                 ss = gc.open_by_key(user_spreadsheet_id)
