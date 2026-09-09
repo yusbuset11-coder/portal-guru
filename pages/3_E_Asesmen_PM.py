@@ -277,7 +277,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- SIDEBAR NAVIGASI ---
+# --- SIDEBAR INFORMASI PROFIL SAJA (TANPA MENU SELECTBOX) ---
 with st.sidebar:
     st.markdown(
         f"""
@@ -289,17 +289,8 @@ with st.sidebar:
         """,
         unsafe_allow_html=True,
     )
-
     st.markdown("---")
-    menu = st.selectbox(
-    "Pilih Menu Asesmen",
-    [
-        "🏠 Beranda Asesmen",
-        "✨ Generator Asesmen AI",
-        "📁 Bank Soal & Asesmen Tersimpan",
-        "📊 Input dan Rekap Nilai Siswa",
-    ],
-)
+    st.info("💡 **Tips:** Navigasi menu asesmen kini tersedia dalam bentuk tab di area utama halaman agar lebih fleksibel.")
 
 # --- FUNGSI AMAN BANK SOAL SAKTI ---
 @st.cache_data(ttl=10)
@@ -318,26 +309,34 @@ def get_clean_bank_soal_dataframe(sheet_id):
     except Exception as e:
         return pd.DataFrame()
 
-# --- MENU 1: BERANDA ASESMEN ---
-if menu == "🏠 Beranda Asesmen":
+# --- NAVIGASI MENGGUNAKAN TAB DI HALAMAN UTAMA ---
+tab_beranda, tab_generator, tab_bank, tab_rekap = st.tabs([
+    "🏠 Beranda Asesmen", 
+    "✨ Generator Asesmen AI", 
+    "📁 Bank Soal & Asesmen Tersimpan", 
+    "📊 Input dan Rekap Nilai Siswa"
+])
+
+# --- TAB 1: BERANDA ASESMEN ---
+with tab_beranda:
     st.write("Gunakan kecerdasan buatan untuk merancang soal asesmen formatif, sumatif, kisi-kisi, serta rubrik penilaian secara cepat dan akurat.")
 
     with st.container(border=True):
         st.markdown("### **✨ Fitur Unggulan Asesmen**")
-        st.markdown("* **Generator Soal Otomatis:** Buat soal Pilihan Ganda dan Essay berdasarkan Capaian Pembelajaran (CP) atau materi spesifik dengan Pendekatan Pembelajaran Mendalam.")
-        st.markdown("* **Kunci Jawaban & Pembahasan:** Dilengkapi opsi pembahasan mendalam untuk setiap butir soal.")
-        st.markdown("* **Penyimpanan Cloud & Word Profesional:** Simpan ringkasan asesmen ke Google Spreadsheet dan unduh dokumen Word siap cetak.")
-        st.markdown("* **Rekap Nilai Siswa:** Kelola dan sinkronkan rekap nilai siswa langsung terhubung ke database kelas masing-masing.")
+        st.markdown("* **Generator Soal Otomatis:** Buat soal Pilihan Ganda dan Essay berdasarkan Capaian Pembelajaran (CP) atau materi spesifik dengan Pendekatan Pembelajaran Mendalam[cite: 1].")
+        st.markdown("* **Kunci Jawaban & Pembahasan:** Dilengkapi opsi pembahasan mendalam untuk setiap butir soal[cite: 1].")
+        st.markdown("* **Penyimpanan Cloud & Word Profesional:** Simpan ringkasan asesmen ke Google Spreadsheet dan unduh dokumen Word siap cetak[cite: 1].")
+        st.markdown("* **Rekap Nilai Siswa:** Kelola dan sinkronkan rekap nilai siswa langsung terhubung ke database kelas masing-masing[cite: 1].")
 
-# --- MENU 2: GENERATOR ASESMEN AI ---
-elif menu == "✨ Generator Asesmen AI":
+# --- TAB 2: GENERATOR ASESMEN AI ---
+with tab_generator:
     st.subheader("Parameter Pembuatan Soal & Asesmen (Pendekatan PM)")
 
     col1, col2 = st.columns(2)
     with col1:
-        mapel = st.text_input("Mata Pelajaran", placeholder="Contoh: Bahasa Indonesia")
+        mapel = st.text_input("Mata Pelajaran", placeholder="Contoh: Bahasa Indonesia", key="input_mapel_gen")
     with col2:
-        materi = st.text_input("Materi / Topik", placeholder="Contoh: Mengidentifikasi Makna Kata")
+        materi = st.text_input("Materi / Topik", placeholder="Contoh: Mengidentifikasi Makna Kata", key="input_materi_gen")
 
     col3, col4, col5 = st.columns(3)
     with col3:
@@ -374,18 +373,19 @@ elif menu == "✨ Generator Asesmen AI":
         else:
             sub_asesmen_options = ["Tulis", "Lisan", "Tugas", "Praktik", "Proyek", "Produk"]
 
-        sub_asesmen = st.selectbox("Bentuk / Sub Jenis Asesmen", sub_asesmen_options)
+        sub_asesmen = st.selectbox("Bentuk / Sub Jenis Asesmen", sub_asesmen_options, key="gen_sub_jenis")
 
     col8, col9, col10 = st.columns(3)
     with col8:
-        jumlah_soal = st.number_input("Jumlah Butir Soal", min_value=1, max_value=20, value=5)
+        jumlah_soal = st.number_input("Jumlah Butir Soal", min_value=1, max_value=20, value=5, key="gen_jml_soal")
     with col9:
         jenis_soal = st.selectbox(
             "Jenis Soal",
             ["Pilihan Ganda", "Uraian (Esai)", "Jawaban Singkat", "Benar - Salah", "Menjodohkan"],
+            key="gen_jns_soal"
         )
     with col10:
-        kesulitan = st.selectbox("Tingkat Kesulitan", ["Mudah", "Sedang", "Sulit"], index=1)
+        kesulitan = st.selectbox("Tingkat Kesulitan", ["Mudah", "Sedang", "Sulit"], index=1, key="gen_kesulitan")
 
     if jenjang == "SD":
         aturan_opsi = "3 opsi (A sampai C)"
@@ -394,7 +394,7 @@ elif menu == "✨ Generator Asesmen AI":
     else:
         aturan_opsi = "5 opsi (A sampai E)"
 
-    if st.button("✨ Buat Instrumen Asesmen dengan Gemini AI 🚀", use_container_width=True):
+    if st.button("✨ Buat Instrumen Asesmen dengan Gemini AI 🚀", use_container_width=True, key="btn_buat_ai"):
         if jenjang == "-- Pilih Jenjang --" or not mapel or not materi:
             st.warning("Mohon lengkapi Mata Pelajaran, Materi, dan pilih Jenjang terlebih dahulu!")
         else:
@@ -454,10 +454,11 @@ elif menu == "✨ Generator Asesmen AI":
                 file_name=f"{st.session_state.judul_soal}.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 use_container_width=True,
+                key="dl_word_gen"
             )
 
         with col_dl2:
-            if st.button("💾 Simpan ke Bank Soal Spreadsheet", use_container_width=True):
+            if st.button("💾 Simpan ke Bank Soal Spreadsheet", use_container_width=True, key="btn_simpan_bank"):
                 if user_spreadsheet_id:
                     with st.spinner("Menyimpan ke Google Sheets..."):
                         try:
@@ -493,8 +494,8 @@ elif menu == "✨ Generator Asesmen AI":
                         except Exception as e:
                             st.error(f"Gagal menyimpan ke spreadsheet: {e}")
 
-# --- MENU 3: BANK SOAL & ASESMEN TERSIMPAN ---
-elif menu == "📁 Bank Soal & Asesmen Tersimpan":
+# --- TAB 3: BANK SOAL & ASESMEN TERSIMPAN ---
+with tab_bank:
     st.subheader("📁 **Bank Soal & Asesmen Tersimpan**")
     st.write("Daftar arsip ringkasan asesmen yang pernah Anda buat dan simpan. Klik tombol **Unduh Soal** pada kolom aksi untuk men-generate dan mengunduh dokumen Word siap cetak.")
 
@@ -591,8 +592,8 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                             )
                     st.markdown("---")
 
-# --- MENU 4: INPUT DAN REKAP NILAI SISWA ---
-elif menu == "📊 Input dan Rekap Nilai Siswa":
+# --- TAB 4: INPUT DAN REKAP NILAI SISWA ---
+with tab_rekap:
     st.subheader("Simpan & Rekap Nilai Hasil Asesmen")
 
     if not user_spreadsheet_id:
@@ -634,9 +635,9 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
     col_r1, col_r2 = st.columns(2)
 
     with col_r1:
-        tanggal_input = st.date_input("Pilih Tanggal", value=datetime.now())
-        r_mapel = st.text_input("Mata Pelajaran", value=st.session_state.val_mapel, placeholder="Contoh: Bahasa Indonesia")
-        r_sekolah = st.selectbox("Pilih Sekolah", daftar_sekolah, key="input_sekolah")
+        tanggal_input = st.date_input("Pilih Tanggal", value=datetime.now(), key="rekap_tgl")
+        r_mapel = st.text_input("Mata Pelajaran", value=st.session_state.val_mapel, placeholder="Contoh: Bahasa Indonesia", key="rekap_mapel")
+        r_sekolah = st.selectbox("Pilih Sekolah", daftar_sekolah, key="input_sekolah_rekap")
 
         kelas_filtered = [r for r in master_data if str(r.get("Sekolah", "")).strip() == r_sekolah]
         daftar_kelas = []
@@ -648,11 +649,11 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
         if not daftar_kelas:
             daftar_kelas = ["X TKR-1", "X DKV-1"]
 
-        r_kelas = st.selectbox("Pilih Kelas", sorted(daftar_kelas), key="input_kelas")
-        r_jenis = st.selectbox("Jenis Asesmen", ["Asesmen Formatif", "Asesmen Sumatif"], key="input_jenis")
+        r_kelas = st.selectbox("Pilih Kelas", sorted(daftar_kelas), key="input_kelas_rekap")
+        r_jenis = st.selectbox("Jenis Asesmen", ["Asesmen Formatif", "Asesmen Sumatif"], key="input_jenis_rekap")
 
     with col_r2:
-        r_materi = st.text_input("Materi / Topik", value=st.session_state.val_materi, placeholder="Contoh: Teks LHO")
+        r_materi = st.text_input("Materi / Topik", value=st.session_state.val_materi, placeholder="Contoh: Teks LHO", key="rekap_materi")
 
         siswa_filtered = [
             r for r in master_data 
@@ -675,21 +676,21 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
             mapping_absen_nama = {1: "Siswa 1", 2: "Siswa 2"}
 
         list_absen = sorted(list(mapping_absen_nama.keys()))
-        r_no_absen = st.selectbox("Pilih No. Absen Siswa", list_absen)
+        r_no_absen = st.selectbox("Pilih No. Absen Siswa", list_absen, key="rekap_absen")
 
         r_nama_siswa = mapping_absen_nama.get(r_no_absen, "")
-        st.text_input("Nama Siswa (Otomatis dari Spreadsheet)", value=r_nama_siswa, disabled=True)
+        st.text_input("Nama Siswa (Otomatis dari Spreadsheet)", value=r_nama_siswa, disabled=True, key="rekap_nama_disp")
 
-        r_nilai = st.number_input("Nilai Siswa", min_value=0, max_value=100, value=80)
+        r_nilai = st.number_input("Nilai Siswa", min_value=0, max_value=100, value=80, key="rekap_nilai_num")
 
         if r_jenis == "Asesmen Formatif":
             sub_asesmen_input_options = ["Formatif Tertulis", "Formatif Tidak Tertulis"]
         else:
             sub_asesmen_input_options = ["Tulis", "Lisan", "Tugas", "Praktik", "Proyek", "Produk"]
 
-        r_sub_jenis = st.selectbox("Bentuk / Sub Jenis Asesmen", sub_asesmen_input_options, key="input_sub_jenis")
+        r_sub_jenis = st.selectbox("Bentuk / Sub Jenis Asesmen", sub_asesmen_input_options, key="input_sub_jenis_rekap")
 
-    if st.button("💾 Simpan Nilai ke Google Sheets", use_container_width=True):
+    if st.button("💾 Simpan Nilai ke Google Sheets", use_container_width=True, key="btn_simpan_rekap"):
         if not r_mapel or not r_nama_siswa:
             st.warning("Mohon lengkapi Mata Pelajaran dan pastikan Nama Siswa terpilih.")
         else:
@@ -722,4 +723,58 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
                 st.success(f"🎉 Nilai untuk **{r_nama_siswa}** (Absen: {r_no_absen}) berhasil disimpan ke spreadsheet pribadi Anda!")
                 st.balloons()
             except Exception as e:
-                st.error(f"Gagal menyimpan nilai ke spreadsheet: {e}")
+                st.error(f"Gagal menyimpan ke database: {e}")
+
+    # --- BAGIAN MENU UNDUH / EXPORT REKAP NILAI ---
+    st.markdown("---")
+    st.subheader("📥 Unduh Rekap Nilai Siswa")
+    st.markdown("Pilih filter sekolah, kelas, dan mata pelajaran untuk mengunduh rekap nilai ke dalam format Excel.")
+
+    try:
+        ss_rekap = gc.open_by_key(user_spreadsheet_id)
+        ws_rekap = ss_rekap.worksheet("Rekap_Nilai")
+        all_rekap_rows = ws_rekap.get_all_values()
+        if len(all_rekap_rows) > 1:
+            df_rekap = pd.DataFrame(all_rekap_rows[1:], columns=all_rekap_rows[0])
+        else:
+            df_rekap = pd.DataFrame()
+    except:
+        df_rekap = pd.DataFrame()
+
+    if not df_rekap.empty:
+        list_dl_sekolah = df_rekap["Sekolah"].unique().tolist() if "Sekolah" in df_rekap.columns else daftar_sekolah
+        dl_sekolah = st.selectbox("Filter Sekolah untuk Unduh", list_dl_sekolah, key="dl_sek")
+
+        df_filtered_sek = df_rekap[df_rekap["Sekolah"] == dl_sekolah] if "Sekolah" in df_rekap.columns else df_rekap
+        list_dl_kelas = df_filtered_sek["Kelas"].unique().tolist() if "Kelas" in df_filtered_sek.columns else []
+        dl_kelas = st.selectbox("Filter Kelas untuk Unduh", list_dl_kelas if list_dl_kelas else ["Semua Kelas"], key="dl_kls")
+
+        df_filtered_kls = df_filtered_sek[df_filtered_sek["Kelas"] == dl_kelas] if dl_kelas != "Semua Kelas" else df_filtered_sek
+        list_dl_mapel = df_filtered_kls["Mata Pelajaran"].unique().tolist() if "Mata Pelajaran" in df_filtered_kls.columns else []
+        dl_mapel = st.selectbox("Filter Mata Pelajaran untuk Unduh", list_dl_mapel if list_dl_mapel else ["Semua Mapel"], key="dl_mpl")
+
+        df_final_dl = df_filtered_kls
+        if dl_mapel != "Semua Mapel":
+            df_final_dl = df_final_dl[df_final_dl["Mata Pelajaran"] == dl_mapel]
+
+        st.write(f"📊 Menemukan **{len(df_final_dl)}** data nilai sesuai filter yang dipilih.")
+        if not df_final_dl.empty:
+            st.dataframe(df_final_dl, use_container_width=True)
+
+            output_excel = BytesIO()
+            with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
+                df_final_dl.to_excel(writer, index=False, sheet_name="Rekap_Nilai")
+            output_excel.seek(0)
+
+            st.download_button(
+                label="📥 Download Data Rekap Terpilih (.xlsx)",
+                data=output_excel,
+                file_name=f"Rek_Nilai_{dl_sekolah}_{dl_kelas}_{dl_mapel}.xlsx".replace(" ", "_"),
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True,
+                key="btn_dl_excel_rekap"
+            )
+        else:
+            st.info("Tidak ada data nilai yang cocok dengan kombinasi filter tersebut.")
+    else:
+        st.info("Belum ada data rekap nilai yang tersimpan di spreadsheet Anda. Silakan simpan beberapa nilai terlebih dahulu.")
