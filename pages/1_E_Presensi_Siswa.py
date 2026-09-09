@@ -19,10 +19,6 @@ st.markdown(
             padding-top: 1.5rem;
             padding-bottom: 1rem;
         }
-        .stApp {
-            background-color: #0e1117;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
         .main-header-card {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             padding: 18px 22px;
@@ -51,7 +47,7 @@ st.markdown(
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
-        /* PERBAIKAN SIDEBAR & KONTRAS TEKS DI MODE TERANG/GELAP */
+        /* SIDEBAR KONSISTEN & KONTRAS DI MODE TERANG/GELAP */
         [data-testid="stSidebar"] {
             background-color: #0f172a !important;
             border-right: 1px solid #1f2937;
@@ -74,7 +70,7 @@ st.markdown(
             margin-bottom: 20px;
         }
         
-        /* CSS PERBAIKAN: Spasi Baris Padat & Line Border Jelas */
+        /* CSS SPASI & GARIS TABEL FORM */
         div[data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
             border-bottom: 1px solid #2d3748 !important;
             padding-top: 2px !important;
