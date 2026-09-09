@@ -291,16 +291,15 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown("### 📌 Menu Navigasi Asesmen")
-    menu = st.radio(
-        "Pilih Menu:",
-        [
-            "🏠 Beranda Asesmen",
-            "✨ Generator Asesmen AI",
-            "📁 Bank Soal & Asesmen Tersimpan",
-            "📊 Input dan Rekap Nilai Siswa",
-        ],
-    )
+    menu = st.selectbox(
+    "Pilih Menu Asesmen",
+    [
+        "🏠 Beranda Asesmen",
+        "✨ Generator Asesmen AI",
+        "📁 Bank Soal & Asesmen Tersimpan",
+        "📊 Input dan Rekap Nilai Siswa",
+    ],
+)
 
 # --- FUNGSI AMAN BANK SOAL SAKTI ---
 @st.cache_data(ttl=10)
@@ -408,7 +407,7 @@ elif menu == "✨ Generator Asesmen AI":
                     2. Jika jenis soal adalah Pilihan Ganda, gunakan {aturan_opsi}.
                     3. Berikan kunci jawaban yang jelas serta pembahasan mendalam untuk setiap soal."""
 
-                    model = genai.GenerativeModel("gemini-3.5-flash")
+                    model = genai.GenerativeModel("gemini-1.5-flash")
                     response = model.generate_content(prompt)
 
                     st.session_state.generated_soal = response.text
@@ -540,7 +539,6 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                     row_cols[4].write(jenis_asesmen)
                     
                     with row_cols[5]:
-                        # Tombol Unduh Soal interaktif untuk setiap baris
                         btn_key = f"dl_bank_{idx}"
                         if st.button("📥 Unduh Soal", key=btn_key, use_container_width=True):
                             with st.spinner("⏳ Menyiapkan dokumen Word dari arsip..."):
@@ -559,7 +557,7 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                                     2. Jika jenis soal adalah Pilihan Ganda, gunakan {aturan_opsi}.
                                     3. Berikan kunci jawaban yang jelas serta pembahasan mendalam untuk setiap soal."""
 
-                                    model = genai.GenerativeModel("gemini-3.5-flash")
+                                    model = genai.GenerativeModel("gemini-1.5-flash")
                                     response = model.generate_content(prompt)
                                     content_text = response.text
 
@@ -582,7 +580,6 @@ elif menu == "📁 Bank Soal & Asesmen Tersimpan":
                                 except Exception as e:
                                     st.error(f"Gagal membuat dokumen: {e}")
 
-                        # Jika file sudah di-generate, tampilkan tombol unduh file yang sesungguhnya
                         if f"file_bytes_{idx}" in st.session_state:
                             st.download_button(
                                 label="💾 Simpan File Word",
@@ -725,57 +722,4 @@ elif menu == "📊 Input dan Rekap Nilai Siswa":
                 st.success(f"🎉 Nilai untuk **{r_nama_siswa}** (Absen: {r_no_absen}) berhasil disimpan ke spreadsheet pribadi Anda!")
                 st.balloons()
             except Exception as e:
-                st.error(f"Gagal menyimpan ke database: {e}")
-
-    # --- BAGIAN MENU UNDUH / EXPORT REKAP NILAI ---
-    st.markdown("---")
-    st.subheader("📥 Unduh Rekap Nilai Siswa")
-    st.markdown("Pilih filter sekolah, kelas, dan mata pelajaran untuk mengunduh rekap nilai ke dalam format Excel.")
-
-    try:
-        ss_rekap = gc.open_by_key(user_spreadsheet_id)
-        ws_rekap = ss_rekap.worksheet("Rekap_Nilai")
-        all_rekap_rows = ws_rekap.get_all_values()
-        if len(all_rekap_rows) > 1:
-            df_rekap = pd.DataFrame(all_rekap_rows[1:], columns=all_rekap_rows[0])
-        else:
-            df_rekap = pd.DataFrame()
-    except:
-        df_rekap = pd.DataFrame()
-
-    if not df_rekap.empty:
-        list_dl_sekolah = df_rekap["Sekolah"].unique().tolist() if "Sekolah" in df_rekap.columns else daftar_sekolah
-        dl_sekolah = st.selectbox("Filter Sekolah untuk Unduh", list_dl_sekolah, key="dl_sek")
-
-        df_filtered_sek = df_rekap[df_rekap["Sekolah"] == dl_sekolah] if "Sekolah" in df_rekap.columns else df_rekap
-        list_dl_kelas = df_filtered_sek["Kelas"].unique().tolist() if "Kelas" in df_filtered_sek.columns else []
-        dl_kelas = st.selectbox("Filter Kelas untuk Unduh", list_dl_kelas if list_dl_kelas else ["Semua Kelas"], key="dl_kls")
-
-        df_filtered_kls = df_filtered_sek[df_filtered_sek["Kelas"] == dl_kelas] if dl_kelas != "Semua Kelas" else df_filtered_sek
-        list_dl_mapel = df_filtered_kls["Mata Pelajaran"].unique().tolist() if "Mata Pelajaran" in df_filtered_kls.columns else []
-        dl_mapel = st.selectbox("Filter Mata Pelajaran untuk Unduh", list_dl_mapel if list_dl_mapel else ["Semua Mapel"], key="dl_mpl")
-
-        df_final_dl = df_filtered_kls
-        if dl_mapel != "Semua Mapel":
-            df_final_dl = df_final_dl[df_final_dl["Mata Pelajaran"] == dl_mapel]
-
-        st.write(f"📊 Menemukan **{len(df_final_dl)}** data nilai sesuai filter yang dipilih.")
-        if not df_final_dl.empty:
-            st.dataframe(df_final_dl, use_container_width=True)
-
-            output_excel = BytesIO()
-            with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
-                df_final_dl.to_excel(writer, index=False, sheet_name="Rekap_Nilai")
-            output_excel.seek(0)
-
-            st.download_button(
-                label="📥 Download Data Rekap Terpilih (.xlsx)",
-                data=output_excel,
-                file_name=f"Rek_Nilai_{dl_sekolah}_{dl_kelas}_{dl_mapel}.xlsx".replace(" ", "_"),
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True,
-            )
-        else:
-            st.info("Tidak ada data nilai yang cocok dengan kombinasi filter tersebut.")
-    else:
-        st.info("Belum ada data rekap nilai yang tersimpan di spreadsheet Anda. Silakan simpan beberapa nilai terlebih dahulu.")
+                st.error(f"Gagal menyimpan nilai ke spreadsheet: {e}")
