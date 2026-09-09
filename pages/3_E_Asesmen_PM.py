@@ -277,7 +277,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- SIDEBAR INFORMASI PROFIL SAJA (TIPS DIHAPUS) ---
+# --- SIDEBAR INFORMASI PROFIL SAJA ---
 with st.sidebar:
     st.markdown(
         f"""
@@ -321,10 +321,10 @@ with tab_beranda:
 
     with st.container(border=True):
         st.markdown("### **✨ Fitur Unggulan Asesmen**")
-        st.markdown("* **Generator Soal Otomatis:** Buat soal Pilihan Ganda dan Essay berdasarkan Capaian Pembelajaran (CP) atau materi spesifik dengan Pendekatan Pembelajaran Mendalam[cite: 1].")
-        st.markdown("* **Kunci Jawaban & Pembahasan:** Dilengkapi opsi pembahasan mendalam untuk setiap butir soal[cite: 1].")
-        st.markdown("* **Penyimpanan Cloud & Word Profesional:** Simpan ringkasan asesmen ke Google Spreadsheet dan unduh dokumen Word siap cetak[cite: 1].")
-        st.markdown("* **Rekap Nilai Siswa:** Kelola dan sinkronkan rekap nilai siswa langsung terhubung ke database kelas masing-masing[cite: 1].")
+        st.markdown("* **Generator Soal Otomatis:** Buat soal Pilihan Ganda dan Essay berdasarkan Capaian Pembelajaran (CP) atau materi spesifik dengan Pendekatan Pembelajaran Mendalam.")
+        st.markdown("* **Kunci Jawaban & Pembahasan:** Dilengkapi opsi pembahasan mendalam untuk setiap butir soal.")
+        st.markdown("* **Penyimpanan Cloud & Word Profesional:** Simpan ringkasan asesmen ke Google Spreadsheet dan unduh dokumen Word siap cetak.")
+        st.markdown("* **Rekap Nilai Siswa:** Kelola dan sinkronkan rekap nilai siswa langsung terhubung ke database kelas masing-masing.")
 
 # --- TAB 2: GENERATOR ASESMEN AI ---
 with tab_generator:
@@ -653,24 +653,29 @@ with tab_rekap:
     with col_r2:
         r_materi = st.text_input("Materi / Topik", value=st.session_state.val_materi, placeholder="Contoh: Teks LHO", key="rekap_materi")
 
-        # --- PERBAIKAN UTAMA: Filter data siswa berdasarkan sekolah dan kelas yang dipilih ---
+        # --- FILTER & MAPPING ABSEN & NAMA SISWA YANG KUAT & DINAMIS ---
         siswa_filtered = [
             r for r in master_data 
             if str(r.get("Sekolah", "")).strip() == r_sekolah and str(r.get("Kelas", "")).strip() == r_kelas
         ]
 
-        # Buat list untuk menampung data absen dan mapping nama yang akurat
         mapping_absen_nama = {}
-        for r in siswa_filtered:
+        for idx, r in enumerate(siswa_filtered, start=1):
             try:
-                absen_raw = r.get("No_Absen", r.get("No Absen", 1))
+                # Mengambil kolom absen dengan berbagai kemungkinan penamaan di spreadsheet
+                absen_raw = r.get("No_Absen", r.get("No Absen", r.get("No", r.get("Nomor", idx))))
                 nama_raw = r.get("Nama_Siswa", r.get("Nama Siswa", r.get("Nama", "")))
-                absen = int(absen_raw)
+                
+                try:
+                    absen = int(absen_raw)
+                except:
+                    absen = idx
+                    
                 nama = str(nama_raw).strip()
                 if nama:
                     mapping_absen_nama[absen] = nama
             except:
-                continue
+                mapping_absen_nama[idx] = f"Siswa {idx}"
 
         if not mapping_absen_nama:
             mapping_absen_nama = {1: "Siswa 1", 2: "Siswa 2"}
@@ -678,9 +683,12 @@ with tab_rekap:
         list_absen = sorted(list(mapping_absen_nama.keys()))
         r_no_absen = st.selectbox("Pilih No. Absen Siswa", list_absen, key="rekap_absen")
 
-        # Ambil nama siswa secara dinamis berdasarkan nomor absen yang sedang dipilih
+        # Mengambil nama siswa secara dinamis berdasarkan nomor absen
         r_nama_siswa = mapping_absen_nama.get(r_no_absen, "")
-        st.text_input("Nama Siswa (Otomatis dari Spreadsheet)", value=r_nama_siswa, disabled=True, key="rekap_nama_disp")
+        
+        # PERBAIKAN: Memperbarui session_state text input agar nilainya ikut berubah secara real-time
+        st.session_state["rekap_nama_disp"] = r_nama_siswa
+        st.text_input("Nama Siswa (Otomatis dari Spreadsheet)", disabled=True, key="rekap_nama_disp")
 
         r_nilai = st.number_input("Nilai Siswa", min_value=0, max_value=100, value=80, key="rekap_nilai_num")
 
