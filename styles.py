@@ -9,6 +9,16 @@ def apply_global_styles():
             [data-testid="stSidebar"] {
                 background-color: #07090e !important;
                 border-right: 2px solid #1e293b !important;
+                color: #ffffff !important;
+            }
+
+            /* Paksa seluruh teks, label, dan link di dalam sidebar agar selalu terang */
+            [data-testid="stSidebar"] p, 
+            [data-testid="stSidebar"] span, 
+            [data-testid="stSidebar"] label, 
+            [data-testid="stSidebar"] div,
+            [data-testid="stSidebar"] a {
+                color: #e2e8f0 !important;
             }
 
             /* --- KOTAK PROFIL / USER BOX SERAGAM (GLOBAL) --- */
