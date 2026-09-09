@@ -52,9 +52,23 @@ def apply_global_styles():
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
 
-            /* --- WARNA TEKS UTAMA --- */
+            /* --- WARNA TEKS UTAMA & KONTEN (AMAN DI LIGHT MODE) --- */
             h1, h2, h3, h4 {
                 color: #ffffff !important;
+            }
+
+            .main .block-container p, 
+            .main .block-container span, 
+            .main .block-container label, 
+            .main .block-container div {
+                color: #e2e8f0 !important;
+            }
+
+            /* Khusus Radio Button / Tombol Navigasi di Halaman Utama */
+            .stRadio label, 
+            div[data-baseweb="radio"] label,
+            div[data-baseweb="radio"] span {
+                color: #e2e8f0 !important;
             }
         </style>
         """,
