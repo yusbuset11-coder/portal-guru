@@ -277,7 +277,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- SIDEBAR INFORMASI PROFIL SAJA (TANPA MENU SELECTBOX) ---
+# --- SIDEBAR INFORMASI PROFIL SAJA (TIPS DIHAPUS) ---
 with st.sidebar:
     st.markdown(
         f"""
@@ -289,8 +289,6 @@ with st.sidebar:
         """,
         unsafe_allow_html=True,
     )
-    st.markdown("---")
-    st.info("💡 **Tips:** Navigasi menu asesmen kini tersedia dalam bentuk tab di area utama halaman agar lebih fleksibel.")
 
 # --- FUNGSI AMAN BANK SOAL SAKTI ---
 @st.cache_data(ttl=10)
