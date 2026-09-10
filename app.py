@@ -259,12 +259,18 @@ if not st.session_state.logged_in:
                     ]
 
                     if not matched.empty:
-                        st.session_state.logged_in = True
-                        st.session_state.guru_nama = matched.iloc[0]["Nama_Guru"]
-                        st.session_state.spreadsheet_id = matched.iloc[0]["Spreadsheet_ID"]
-                        st.success(
-                            f"🎉 Selamat datang, {st.session_state.guru_nama}! Berhasil masuk."
-                        )
+                        # Cek status akun terlebih dahulu
+                        status_akun = str(matched.iloc[0].get("Status", "")).strip().upper()
+            
+                        if status_akun != "AKTIF":
+                            st.error("❌ Maaf, akun Anda berstatus TIDAK AKTIF. Silakan hubungi administrator.")
+                        else:
+                            st.session_state.logged_in = True
+                            st.session_state.guru_nama = matched.iloc[0]["Nama_Guru"]
+                            st.session_state.spreadsheet_id = matched.iloc[0]["Spreadsheet_ID"]
+                            st.success(
+                                f"✨ Selamat datang, {st.session_state.guru_nama}! Berhasil masuk."
+                            )
                         st.rerun()
                     else:
                         st.error(
