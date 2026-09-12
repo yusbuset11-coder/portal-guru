@@ -338,7 +338,7 @@ else:
       else:
         with st.container(border=True):
           st.markdown("#### **🔍 Filter Riwayat Jurnal**")
-          # Diperbarui menjadi 3 kolom agar filter Sekolah, Kelas, dan Mata Pelajaran sejajar
+          # 3 kolom sejajar untuk Sekolah, Kelas, dan Mata Pelajaran
           col_f1, col_f2, col_f3 = st.columns(3)
 
           # 1. Filter Sekolah
@@ -399,19 +399,35 @@ else:
               df_filtered_j["Mata_Pelajaran"] == sel_mapel_j
           ]
 
-        # Mengatur agar nomor urut/indeks tabel dimulai dari angka 1
+        # Mengatur agar nomor urut/indeks tampilan Streamlit dimulai dari angka 1
         if not df_filtered_j.empty:
           df_filtered_j.index = range(1, len(df_filtered_j) + 1)
 
         with st.container(border=True):
           st.dataframe(df_filtered_j, use_container_width=True)
 
-        # Tombol Download Excel Jurnal
+        # Tombol Download Excel Jurnal (Auto-Fit & index=False agar rapi)
         output_jurnal = io.BytesIO()
         with pd.ExcelWriter(output_jurnal, engine="openpyxl") as writer:
           df_filtered_j.to_excel(
-              writer, index=True, sheet_name="Jurnal_Mengajar"
+              writer, index=False, sheet_name="Jurnal_Mengajar"
           )
+
+          # Otomatis menyesuaikan lebar kolom Excel
+          worksheet = writer.sheets["Jurnal_Mengajar"]
+          for col in worksheet.columns:
+            max_length = 0
+            column_letter = col[0].column_letter
+            for cell in col:
+              try:
+                if cell.value:
+                  max_length = max(max_length, len(str(cell.value)))
+              except:
+                pass
+            worksheet.column_dimensions[column_letter].width = max(
+                max_length + 4, 12
+            )
+
         excel_jurnal_data = output_jurnal.getvalue()
 
         st.download_button(
