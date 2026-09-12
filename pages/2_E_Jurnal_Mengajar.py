@@ -314,7 +314,9 @@ else:
               apply_sheet_formatting(ws_jurnal, len(all_jurnal_data), 7)
 
               st.balloons()
-              st.success("🎉 Jurnal mengajar berhasil disimpan ke database Anda!")
+              st.success(
+                  "🎉 Jurnal mengajar berhasil disimpan ke database Anda!"
+              )
 
   elif menu_jurnal == "📚 Riwayat & Rekap Jurnal":
     st.markdown(
@@ -336,8 +338,10 @@ else:
       else:
         with st.container(border=True):
           st.markdown("#### **🔍 Filter Riwayat Jurnal**")
-          col_f1, col_f2 = st.columns(2)
+          # Diperbarui menjadi 3 kolom agar filter Sekolah, Kelas, dan Mata Pelajaran sejajar
+          col_f1, col_f2, col_f3 = st.columns(3)
 
+          # 1. Filter Sekolah
           schools_j = (
               df_jurnal["Sekolah"].unique().tolist()
               if "Sekolah" in df_jurnal.columns
@@ -347,6 +351,7 @@ else:
               "**🏫 Filter Sekolah**", ["Semua Sekolah"] + schools_j
           )
 
+          # 2. Filter Kelas berdasarkan pilihan Sekolah
           if sel_sch_j != "Semua Sekolah":
             classes_j = (
                 df_jurnal[df_jurnal["Sekolah"] == sel_sch_j]["Kelas"]
@@ -365,11 +370,34 @@ else:
               "**📚 Filter Kelas**", ["Semua Kelas"] + classes_j
           )
 
+          # 3. Filter Mata Pelajaran berdasarkan pilihan Sekolah & Kelas yang aktif
+          df_temp_mapel = df_jurnal.copy()
+          if sel_sch_j != "Semua Sekolah":
+            df_temp_mapel = df_temp_mapel[
+                df_temp_mapel["Sekolah"] == sel_sch_j
+            ]
+          if sel_cls_j != "Semua Kelas":
+            df_temp_mapel = df_temp_mapel[df_temp_mapel["Kelas"] == sel_cls_j]
+
+          mapels_j = (
+              df_temp_mapel["Mata_Pelajaran"].unique().tolist()
+              if "Mata_Pelajaran" in df_temp_mapel.columns
+              else []
+          )
+          sel_mapel_j = col_f3.selectbox(
+              "**📖 Filter Mata Pelajaran**", ["Semua Mapel"] + mapels_j
+          )
+
+        # Penerapan filter ke DataFrame utama
         df_filtered_j = df_jurnal.copy()
         if sel_sch_j != "Semua Sekolah":
           df_filtered_j = df_filtered_j[df_filtered_j["Sekolah"] == sel_sch_j]
         if sel_cls_j != "Semua Kelas":
           df_filtered_j = df_filtered_j[df_filtered_j["Kelas"] == sel_cls_j]
+        if sel_mapel_j != "Semua Mapel":
+          df_filtered_j = df_filtered_j[
+              df_filtered_j["Mata_Pelajaran"] == sel_mapel_j
+          ]
 
         # Mengatur agar nomor urut/indeks tabel dimulai dari angka 1
         if not df_filtered_j.empty:
