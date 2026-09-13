@@ -199,18 +199,20 @@ def generate_pptx(
     alokasi_waktu,
 ):
   prs = Presentation()
+  prs.slide_width = PptInches(13.333)
+  prs.slide_height = PptInches(7.5)
   blank_layout = prs.slide_layouts[6]
 
   def create_slide_header(slide, title_text):
     bg_slide = slide.shapes.add_shape(
-        1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
+        1, PptInches(0), PptInches(0), PptInches(13.333), PptInches(7.5)
     )
     bg_slide.fill.solid()
     bg_slide.fill.fore_color.rgb = PptxRGBColor(240, 243, 248)
     bg_slide.line.fill.background()
 
     header_box = slide.shapes.add_shape(
-        1, Inches(0.8), Inches(0.5), Inches(11.7), Inches(0.9)
+        1, PptInches(0.8), PptInches(0.5), PptInches(11.733), PptInches(0.9)
     )
     header_box.fill.solid()
     header_box.fill.fore_color.rgb = PptxRGBColor(24, 43, 73)
@@ -218,7 +220,7 @@ def generate_pptx(
 
     tf_h = header_box.text_frame
     tf_h.word_wrap = True
-    tf_h.margin_left = Inches(0.4)
+    tf_h.margin_left = PptInches(0.4)
     p_h = tf_h.paragraphs[0]
     p_h.text = title_text
     p_h.font.size = PptPt(20)
@@ -227,7 +229,7 @@ def generate_pptx(
     p_h.alignment = 1
 
     footer_box = slide.shapes.add_textbox(
-        Inches(0.8), Inches(7.05), Inches(11.7), Inches(0.35)
+        PptInches(0.8), PptInches(7.05), PptInches(11.733), PptInches(0.35)
     )
     tf_f = footer_box.text_frame
     p_f = tf_f.paragraphs[0]
@@ -237,32 +239,33 @@ def generate_pptx(
     p_f.font.size = PptPt(10)
     p_f.font.color.rgb = PptxRGBColor(110, 120, 135)
 
+  # Slide 1: Cover
   slide1 = prs.slides.add_slide(blank_layout)
   bg1 = slide1.shapes.add_shape(
-      1, Inches(0), Inches(0), Inches(13.3), Inches(7.5)
+      1, PptInches(0), PptInches(0), PptInches(13.333), PptInches(7.5)
   )
   bg1.fill.solid()
   bg1.fill.fore_color.rgb = PptxRGBColor(24, 43, 73)
   bg1.line.fill.background()
 
   tb1 = slide1.shapes.add_textbox(
-      Inches(1.5), Inches(2.0), Inches(10.3), Inches(4.0)
+      PptInches(1.5), PptInches(2.0), PptInches(10.333), PptInches(4.0)
   )
   tf1 = tb1.text_frame
   tf1.word_wrap = True
 
   p1 = tf1.paragraphs[0]
-  p1.text = "BAHAN TAYANG PEMBELAJARAN"
+  p1.text = "BAHAN TAYANG PEMBELAJARAN MENDALAM"
   p1.font.size = PptPt(15)
   p1.font.color.rgb = PptxRGBColor(255, 193, 7)
   p1.font.bold = True
 
   p2 = tf1.add_paragraph()
   p2.text = topik
-  p2.font.size = PptPt(32)
+  p2.font.size = PptPt(30)
   p2.font.color.rgb = PptxRGBColor(255, 255, 255)
   p2.font.bold = True
-  p2.space_before = Pt(12)
+  p2.space_before = PptPt(12)
 
   p3 = tf1.add_paragraph()
   p3.text = (
@@ -271,13 +274,16 @@ def generate_pptx(
   )
   p3.font.size = PptPt(13)
   p3.font.color.rgb = PptxRGBColor(215, 222, 235)
-  p3.space_before = Pt(22)
+  p3.space_before = PptPt(22)
 
   bahan_ajar = data_ai.get("bahan_ajar", {})
   lkm_content = data_ai.get("lkm_content", {})
 
   slides_data = [
-      ("📖 Pengantar Konsep Pembelajaran", bahan_ajar.get("pengantar_konsep", "")),
+      (
+          "📖 Pengantar Konsep Pembelajaran",
+          bahan_ajar.get("pengantar_konsep", ""),
+      ),
       (
           "📚 Uraian Materi Inti & Konsep",
           bahan_ajar.get("uraian_materi_inti", ""),
@@ -298,49 +304,127 @@ def generate_pptx(
     slide = prs.slides.add_slide(blank_layout)
     create_slide_header(slide, title_text)
 
-    content_box = slide.shapes.add_shape(
-        1, Inches(0.8), Inches(1.6), Inches(11.7), Inches(5.25)
-    )
-    content_box.fill.solid()
-    content_box.fill.fore_color.rgb = PptxRGBColor(255, 255, 255)
-    content_box.line.color.rgb = PptxRGBColor(205, 212, 225)
-
-    tf_c = content_box.text_frame
-    tf_c.word_wrap = True
-    tf_c.margin_left = Inches(0.55)
-    tf_c.margin_right = Inches(0.55)
-    tf_c.margin_top = Inches(0.45)
-    tf_c.margin_bottom = Inches(0.45)
-
     cleaned_content = clean_markdown_bullets(content_text)
-    paragraphs = cleaned_content.split("\n")
+    blocks = [b.strip() for b in cleaned_content.split("\n\n") if b.strip()]
+    if not blocks:
+      blocks = [cleaned_content]
 
-    first_para = True
-    for p_text in paragraphs:
-      if not p_text.strip():
-        continue
-      if first_para:
-        p_c = tf_c.paragraphs[0]
-        first_para = False
-      else:
-        p_c = tf_c.add_paragraph()
-        p_c.space_before = Pt(6)
-
-      is_sub = (
-          p_text.endswith(":")
-          or (len(p_text) < 45 and not p_text.startswith("-"))
+    if len(blocks) == 1:
+      card = slide.shapes.add_shape(
+          1, PptInches(0.8), PptInches(1.6), PptInches(11.733), PptInches(5.25)
       )
+      card.fill.solid()
+      card.fill.fore_color.rgb = PptxRGBColor(255, 255, 255)
+      card.line.color.rgb = PptxRGBColor(205, 212, 225)
 
-      if is_sub:
-        p_c.text = p_text
-        p_c.font.size = PptPt(13.5)
-        p_c.font.bold = True
-        p_c.font.color.rgb = PptxRGBColor(24, 43, 73)
-        p_c.space_before = Pt(10)
-      else:
-        p_c.text = "• " + p_text
-        p_c.font.size = PptPt(12.5)
-        p_c.font.color.rgb = PptxRGBColor(45, 55, 72)
+      tf_c = card.text_frame
+      tf_c.word_wrap = True
+      tf_c.margin_left = PptInches(0.6)
+      tf_c.margin_right = PptInches(0.6)
+      tf_c.margin_top = PptInches(0.5)
+      tf_c.margin_bottom = PptInches(0.5)
+
+      lines = blocks[0].split("\n")
+      first = True
+      for line in lines:
+        if not line.strip():
+          continue
+        if first:
+          p = tf_c.paragraphs[0]
+          first = False
+        else:
+          p = tf_c.add_paragraph()
+          p.space_before = PptPt(6)
+
+        if line.endswith(":") or (len(line) < 50 and not line.startswith("-")):
+          p.text = line
+          p.font.size = PptPt(14)
+          p.font.bold = True
+          p.font.color.rgb = PptxRGBColor(24, 43, 73)
+          p.space_before = PptPt(10)
+        else:
+          p.text = "• " + line
+          p.font.size = PptPt(12.5)
+          p.font.color.rgb = PptxRGBColor(45, 55, 72)
+    else:
+      mid = len(blocks) // 2
+      left_blocks = blocks[:mid] if mid > 0 else blocks
+      right_blocks = blocks[mid:] if mid > 0 else []
+
+      card_l = slide.shapes.add_shape(
+          1, PptInches(0.8), PptInches(1.6), PptInches(5.7), PptInches(5.25)
+      )
+      card_l.fill.solid()
+      card_l.fill.fore_color.rgb = PptxRGBColor(255, 255, 255)
+      card_l.line.color.rgb = PptxRGBColor(205, 212, 225)
+      tf_l = card_l.text_frame
+      tf_l.word_wrap = True
+      tf_l.margin_left = PptInches(0.4)
+      tf_l.margin_right = PptInches(0.4)
+      tf_l.margin_top = PptInches(0.4)
+      tf_l.margin_bottom = PptInches(0.4)
+
+      first_l = True
+      for block in left_blocks:
+        lines = block.split("\n")
+        for line in lines:
+          if not line.strip():
+            continue
+          if first_l:
+            p = tf_l.paragraphs[0]
+            first_l = False
+          else:
+            p = tf_l.add_paragraph()
+            p.space_before = PptPt(4)
+          if line.endswith(":") or (len(line) < 45 and not line.startswith("-")):
+            p.text = line
+            p.font.size = PptPt(13)
+            p.font.bold = True
+            p.font.color.rgb = PptxRGBColor(24, 43, 73)
+            p.space_before = PptPt(8)
+          else:
+            p.text = "• " + line
+            p.font.size = PptPt(11.5)
+            p.font.color.rgb = PptxRGBColor(45, 55, 72)
+
+      if right_blocks:
+        card_r = slide.shapes.add_shape(
+            1, PptInches(6.833), PptInches(1.6), PptInches(5.7), PptInches(5.25)
+        )
+        card_r.fill.solid()
+        card_r.fill.fore_color.rgb = PptxRGBColor(245, 247, 250)
+        card_r.line.color.rgb = PptxRGBColor(205, 212, 225)
+        tf_r = card_r.text_frame
+        tf_r.word_wrap = True
+        tf_r.margin_left = PptInches(0.4)
+        tf_r.margin_right = PptInches(0.4)
+        tf_r.margin_top = PptInches(0.4)
+        tf_r.margin_bottom = PptInches(0.4)
+
+        first_r = True
+        for block in right_blocks:
+          lines = block.split("\n")
+          for line in lines:
+            if not line.strip():
+              continue
+            if first_r:
+              p = tf_r.paragraphs[0]
+              first_r = False
+            else:
+              p = tf_r.add_paragraph()
+              p.space_before = PptPt(4)
+            if line.endswith(":") or (
+                len(line) < 45 and not line.startswith("-")
+            ):
+              p.text = line
+              p.font.size = PptPt(13)
+              p.font.bold = True
+              p.font.color.rgb = PptxRGBColor(24, 43, 73)
+              p.space_before = PptPt(8)
+            else:
+              p.text = "• " + line
+              p.font.size = PptPt(11.5)
+              p.font.color.rgb = PptxRGBColor(45, 55, 72)
 
   bio = BytesIO()
   prs.save(bio)
@@ -1142,7 +1226,6 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
           alokasi_waktu,
       )
 
-      # Simpan ke Session State & Simpan ke File JSON secara Permanen
       st.session_state.riwayat_modul.append({
           "tanggal": datetime.today().strftime("%Y-%m-%d"),
           "mata_pelajaran": mata_pelajaran,
