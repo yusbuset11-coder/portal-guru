@@ -70,7 +70,6 @@ st.set_page_config(
 )
 apply_global_styles()
 
-# Inisialisasi Session State untuk Riwayat Modul Tersimpan (Memuat dari file)
 if "riwayat_modul" not in st.session_state:
   st.session_state.riwayat_modul = load_history()
 
@@ -527,28 +526,27 @@ def generate_docx(
         if not line_stripped:
           continue
 
-        # Membersihkan nomor urut (misal: "1. ", "2. ") agar tampil bersih tanpa nomor
-        line_clean_num = re.sub(r"^\d+\.\s*", "", line_stripped)
+        # --- PEMBERSIHAN TEKS (MENGHAPUS NOMOR & TANDA BINTANG) ---
+        line_clean_text = line_stripped.replace("**", "")
+        line_clean_text = re.sub(
+            r"^(\d+[\.\)]\s*|[-\*\•]\s*)+", "", line_clean_text
+        )
 
-        if ":" in line_clean_num:
-          parts = line_clean_num.split(":", 1)
-          prefix_raw = parts[0].strip()
+        if ":" in line_clean_text:
+          parts = line_clean_text.split(":", 1)
+          prefix = parts[0].strip() + ":"
           content = parts[1].strip()
-
-          prefix = prefix_raw.replace("**", "") + ":"
 
           r_prefix = p_right.add_run(prefix + " ")
           r_prefix.font.size = Pt(10)
           r_prefix.font.bold = True
           r_prefix.font.color.rgb = DocxRGBColor(51, 51, 51)
 
-          content_clean = content.replace("**", "")
-          r_content = p_right.add_run(content_clean)
+          r_content = p_right.add_run(content)
           r_content.font.size = Pt(10)
           r_content.font.bold = False
           r_content.font.color.rgb = DocxRGBColor(51, 51, 51)
         else:
-          line_clean_text = line_clean_num.replace("**", "")
           r_normal = p_right.add_run(line_clean_text)
           r_normal.font.size = Pt(10)
           r_normal.font.bold = False
@@ -659,30 +657,31 @@ def generate_docx(
           "Kegiatan Pendahuluan",
           data_ai.get(
               "kegiatan_pendahuluan",
-              "Penyambutan, SOP pembukaan, berbaris, berdoa, dan"
-              " pancingan/apersepsi.",
+              "Orientasi & Pengkondisian: Guru membuka kelas dengan salam"
+              " hangat dan berdoa bersama.",
           ),
       ),
       (
           "Kegiatan Inti (Memahami)",
           data_ai.get(
               "kegiatan_memahami",
-              "Eksplorasi bahan main dan pemantik gagasan awal oleh guru.",
+              "Eksplorasi Awal: Eksplorasi bahan main dan pemantik gagasan awal"
+              " oleh guru.",
           ),
       ),
       (
           "Kegiatan Inti (Mengaplikasi)",
           data_ai.get(
               "kegiatan_mengaplikasi",
-              "Pijakan main (pilihan main anak) menggunakan LKM/Lembar"
-              " Aktivitas Anak.",
+              "Pijakan Main: Pilihan main anak menggunakan Lembar Aktivitas"
+              " Anak.",
           ),
       ),
       (
           "Kegiatan Inti (Merefleksi)",
           data_ai.get(
               "kegiatan_merefleksi",
-              "Recalling (bercerita pengalaman main), penguatan konsep"
+              "Recalling: Bercerita pengalaman main dan penguatan konsep"
               " positif.",
           ),
       ),
@@ -690,8 +689,8 @@ def generate_docx(
           "Kegiatan Penutup",
           data_ai.get(
               "kegiatan_penutup",
-              "Pesan moral, doa penutup, SOP penjemputan dengan penuh"
-              " kegembiraan.",
+              "Refleksi & Doa: Pesan moral, doa penutup, dan penjemputan"
+              " dengan gembira.",
           ),
       ),
   ]
@@ -1173,7 +1172,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
                - Tahap Perencanaan: [...]
                - Tahap Pelaksanaan: [...]
                - Tahap Asesmen: [...]
-            6. Pengalaman Belajar harus terstruktur mencakup Kegiatan Pendahuluan, Kegiatan Inti (Memahami, Mengaplikasi, Merefleksi), dan Kegiatan Penutup (refleksi joyful dan bermakna). 
+            6. Pengalaman Belajar (Kegiatan Pendahuluan, Memahami, Mengaplikasi, Merefleksi, Kegiatan Penutup) **JANGAN** menggunakan nomor urut (seperti 1., 2., dst) atau tanda bintang ganda (**). Tuliskan langsung dengan format label judul diikuti titik dua, contoh: `Orientasi & Pengkondisian: Guru membuka...`
             7. Asesmen Pembelajaran mencakup Asesmen Awal, Asesmen Proses (Formatif), dan Asesmen Akhir (Sumatif) beserta Rubrik Penilaian dan Pedoman Penskorannya.
             8. **Instrumen Asesmen Proses (Formatif)**: Sediakan instrumen asesmen mendalam pada kunci `instrumen_formatif`.
             9. **Bahan Ajar**: Sediakan materi pembelajaran/bahan bacaan yang mendalam sesuai topik pada kunci `bahan_ajar`.
@@ -1189,11 +1188,11 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
               "kemitraan_pembelajaran": "Kemitraan Lingkungan Sekolah: [Isi]\\nKemitraan Lingkungan Luar Sekolah: [Isi]",
               "lingkungan_belajar": "Ruang Fisik: [Isi]\\nRuang Virtual: [Isi]\\nBudaya Belajar: [Isi]",
               "pemanfaatan_digital": "Tahap Perencanaan: [Isi]\\nTahap Pelaksanaan: [Isi]\\nTahap Asesmen: [Isi]",
-              "kegiatan_pendahuluan": "Langkah rinci kegiatan pendahuluan (orientasi, apersepsi, asesmen awal).",
-              "kegiatan_memahami": "Langkah rinci kegiatan inti pada tahap Memahami.",
-              "kegiatan_mengaplikasi": "Langkah rinci kegiatan inti pada tahap Mengaplikasi menggunakan LKM.",
-              "kegiatan_merefleksi": "Langkah rinci kegiatan inti pada tahap Merefleksi dan presentasi/bercerita.",
-              "kegiatan_penutup": "Langkah rinci kegiatan penutup yang joyful dan bermakna.",
+              "kegiatan_pendahuluan": "Orientasi & Pengkondisian: [Isi]\\nApersepsi & Motivasi: [Isi]",
+              "kegiatan_memahami": "Eksplorasi Konsep: [Isi]\\nDiskusi Interaktif: [Isi]",
+              "kegiatan_mengaplikasi": "Penerapan Praktik: [Isi]\\nPengerjaan LKM: [Isi]",
+              "kegiatan_merefleksi": "Refleksi Pemahaman: [Isi]\\nPenguatan Positif: [Isi]",
+              "kegiatan_penutup": "Kesimpulan Bersama: [Isi]\\nDoa & Penutup: [Isi]",
               "asesmen_awal": "Uraian asesmen awal untuk cek kesiapan belajar.",
               "asesmen_formatif": "Uraian asesmen proses/formatif pemantauan partisipasi.",
               "asesmen_sumatif": "Uraian asesmen akhir/sumatif evaluasi unjuk kerja.",
