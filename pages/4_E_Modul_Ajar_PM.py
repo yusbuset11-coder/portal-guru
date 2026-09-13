@@ -523,22 +523,33 @@ def generate_docx(
         p_right.paragraph_format.line_spacing = 1.15
         p_right.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
-        if ":" in line:
-          parts = line.split(":", 1)
-          prefix = parts[0].strip() + ":"
+        line_stripped = line.strip()
+        if not line_stripped:
+          continue
+
+        # Membersihkan nomor urut (misal: "1. ", "2. ") agar tampil bersih tanpa nomor
+        line_clean_num = re.sub(r"^\d+\.\s*", "", line_stripped)
+
+        if ":" in line_clean_num:
+          parts = line_clean_num.split(":", 1)
+          prefix_raw = parts[0].strip()
           content = parts[1].strip()
+
+          prefix = prefix_raw.replace("**", "") + ":"
 
           r_prefix = p_right.add_run(prefix + " ")
           r_prefix.font.size = Pt(10)
           r_prefix.font.bold = True
           r_prefix.font.color.rgb = DocxRGBColor(51, 51, 51)
 
-          r_content = p_right.add_run(content)
+          content_clean = content.replace("**", "")
+          r_content = p_right.add_run(content_clean)
           r_content.font.size = Pt(10)
           r_content.font.bold = False
           r_content.font.color.rgb = DocxRGBColor(51, 51, 51)
         else:
-          r_normal = p_right.add_run(line)
+          line_clean_text = line_clean_num.replace("**", "")
+          r_normal = p_right.add_run(line_clean_text)
           r_normal.font.size = Pt(10)
           r_normal.font.bold = False
           r_normal.font.color.rgb = DocxRGBColor(51, 51, 51)
