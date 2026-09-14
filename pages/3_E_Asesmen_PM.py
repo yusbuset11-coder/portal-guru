@@ -263,27 +263,31 @@ def generate_professional_word_document(
       doc.add_paragraph().paragraph_format.space_after = Pt(4)
 
   for line in lines:
-      line_str = line.strip()
-      if not line_str:
-        if in_callout:
-          flush_callout()
-          in_callout = False
-        continue
+    line_str = line.strip()
+    if not line_str:
+      if in_callout:
+        flush_callout()
+        in_callout = False
+      continue
 
-      # Membersihkan tanda bintang di awal baris
-      if line_str.startswith("* "):
-        line_str = line_str[2:].strip()
-      elif line_str.startswith("*"):
-        line_str = line_str[1:].strip()
+    # Membersihkan tanda bintang di awal baris
+    if line_str.startswith("* "):
+      line_str = line_str[2:].strip()
+    elif line_str.startswith("*"):
+      line_str = line_str[1:].strip()
 
-      if line_str.startswith(">"):
-        in_callout = True
-        callout_buffer.append(line_str)
-        continue
-      else:
-        if in_callout:
-          flush_callout()
-          in_callout = False
+    if line_str.startswith(">"):
+      in_callout = True
+      callout_buffer.append(line_str)
+      continue
+    else:
+      if in_callout:
+        flush_callout()
+        in_callout = False
+
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.line_spacing = 1.15
 
     if (
         line_str.startswith("SOAL")
@@ -304,11 +308,19 @@ def generate_professional_word_document(
     elif line_str.startswith("Kunci Jawaban"):
       p.paragraph_format.space_before = Pt(4)
       add_markdown_run(
-          p, line_str, font_size=10.5, color_rgb=RGBColor(10, 128, 67), bold=True
+          p,
+          line_str,
+          font_size=10.5,
+          color_rgb=RGBColor(10, 128, 67),
+          bold=True,
       )
     elif line_str.startswith("Pembahasan"):
       add_markdown_run(
-          p, line_str, font_size=10.5, color_rgb=RGBColor(180, 83, 9), bold=True
+          p,
+          line_str,
+          font_size=10.5,
+          color_rgb=RGBColor(180, 83, 9),
+          bold=True,
       )
     elif (
         line_str.startswith("A.")
