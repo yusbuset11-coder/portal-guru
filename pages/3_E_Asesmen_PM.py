@@ -263,28 +263,27 @@ def generate_professional_word_document(
       doc.add_paragraph().paragraph_format.space_after = Pt(4)
 
   for line in lines:
-  line_str = line.strip()
-  if not line_str:
-    if in_callout:
-      flush_callout()
-      in_callout = False
-    continue
+      line_str = line.strip()
+      if not line_str:
+        if in_callout:
+          flush_callout()
+          in_callout = False
+        continue
 
-  # --- TAMBAHKAN KODE INI UNTUK MEMBERSIHKAN TANDA BINTANG DI AWAL BARIS ---
-  if line_str.startswith("* "):
-    line_str = line_str[2:].strip()
-  elif line_str.startswith("*"):
-    line_str = line_str[1:].strip()
-  # ------------------------------------------------------------------------
+      # Membersihkan tanda bintang di awal baris
+      if line_str.startswith("* "):
+        line_str = line_str[2:].strip()
+      elif line_str.startswith("*"):
+        line_str = line_str[1:].strip()
 
-  if line_str.startswith(">"):
-    in_callout = True
-    callout_buffer.append(line_str)
-    continue
-  else:
-    if in_callout:
-      flush_callout()
-      in_callout = False
+      if line_str.startswith(">"):
+        in_callout = True
+        callout_buffer.append(line_str)
+        continue
+      else:
+        if in_callout:
+          flush_callout()
+          in_callout = False
 
     if (
         line_str.startswith("SOAL")
