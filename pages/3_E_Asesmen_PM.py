@@ -270,6 +270,17 @@ def generate_professional_word_document(
         in_callout = False
       continue
 
+    # Filter pengaman: abaikan judul atau metadata berulang dari AI
+    if "INSTRUMEN ASESMEN" in line_str.upper() or (
+        line_str.startswith("**Mata Pelajaran")
+        or line_str.startswith("*Mata Pelajaran")
+        or line_str.startswith("**Fase")
+        or line_str.startswith("*Fase")
+        or line_str.startswith("**Materi")
+        or line_str.startswith("*Materi")
+    ):
+      continue
+
     # Membersihkan tanda bintang di awal baris
     if line_str.startswith("* "):
       line_str = line_str[2:].strip()
@@ -412,7 +423,7 @@ tab_beranda, tab_generator, tab_bank, tab_rekap = st.tabs([
 # --- TAB 1: BERANDA ASESMEN ---
 with tab_beranda:
   st.write(
-      "Gunakan kecerdasan buatan untuk merancang soal asesmen formatif,"
+      "Gunakan kecerdasan buatan untuk merancang soal asesmen formativ,"
       " sumatif, kisi-kisi, serta rubrik penilaian secara cepat dan akurat."
   )
 
@@ -551,7 +562,9 @@ with tab_generator:
           "⏳ Sedang merancang instrumen asesmen mendalam dengan Gemini AI..."
       ):
         try:
-          prompt = f"""Bertindaklah sebagai pakar kurikulum dan penyusun instrumen asesmen profesional. Buatkan {jumlah_soal} butir soal dengan bentuk **{jenis_soal}**, dalam bentuk asesmen {sub_asesmen} ({jenis_asesmen}) untuk Mata Pelajaran: {mapel}, Materi/Topik: {materi}, Jenjang: {jenjang} ({fase}, {kelas}), dengan tingkat kesulitan {kesulitan}. 
+          prompt = f"""Bertindaklah sebagai pakar kurikulum dan penyusun instrumen asesmen profesional. Buatkan HANYA {jumlah_soal} butir soal beserta kunci jawaban dan pembahasannya dengan bentuk **{jenis_soal}**, dalam bentuk asesmen {sub_asesmen} ({jenis_asesmen}) untuk Mata Pelajaran: {mapel}, Materi/Topik: {materi}, Jenjang: {jenjang} ({fase}, {kelas}), dengan tingkat kesulitan {kesulitan}. 
+                    
+                    PENTING: Jangan tuliskan kembali judul, pengantar, atau tabel metadata di awal teks. Langsung mulai dari butir soal nomor 1 (misal: SOAL 1 atau 1.).
                     
                     Ketentuan Khusus:
                     1. Gunakan pendekatan Pembelajaran Mendalam (Deep Learning) yang merangsang berpikir kritis dan kontekstual.
@@ -726,7 +739,9 @@ with tab_bank:
                   else:
                     aturan_opsi = "5 opsi (A sampai E)"
 
-                  prompt = f"""Bertindaklah sebagai pakar kurikulum dan penyusun instrumen asesmen profesional. Buatkan {jumlah_soal} butir soal dengan bentuk **{jenis_soal}**, dalam bentuk asesmen {sub_asesmen} ({jenis_asesmen}) untuk Mata Pelajaran: {mapel}, Materi/Topik: {materi}, Jenjang: {jenjang} ({fase}, {kelas}). 
+                  prompt = f"""Bertindaklah sebagai pakar kurikulum dan penyusun instrumen asesmen profesional. Buatkan HANYA {jumlah_soal} butir soal beserta kunci jawaban dan pembahasannya dengan bentuk **{jenis_soal}**, dalam bentuk asesmen {sub_asesmen} ({jenis_asesmen}) untuk Mata Pelajaran: {mapel}, Materi/Topik: {materi}, Jenjang: {jenjang} ({fase}, {kelas}). 
+                                    
+                                    PENTING: Jangan tuliskan kembali judul, pengantar, atau tabel metadata di awal teks. Langsung mulai dari butir soal nomor 1.
                                     
                                     Ketentuan Khusus:
                                     1. Gunakan pendekatan Pembelajaran Mendalam (Deep Learning) yang merangsang berpikir kritis dan kontekstual.
