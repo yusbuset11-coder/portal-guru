@@ -121,7 +121,7 @@ def add_markdown_run(
     bold=False,
     italic=False,
 ):
-  parts = re.split(r"(\*\*.*?\*\*))", text)
+  parts = re.split(r"(\*\*.*?\*\*)", text)
   for part in parts:
     if not part:
       continue
