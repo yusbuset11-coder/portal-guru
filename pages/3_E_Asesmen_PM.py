@@ -1,5 +1,6 @@
 from datetime import datetime
 from io import BytesIO
+import re
 import docx
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -110,6 +111,34 @@ def set_callout_borders(cell, border_color="1B365D"):
   tcPr.append(tcBorders)
 
 
+# --- FUNGSI PARSER MARKDOWN & WARNA HITAM PEKAT ---
+def add_markdown_run(
+    p,
+    text,
+    font_name="Cambria",
+    font_size=10.5,
+    color_rgb=RGBColor(0, 0, 0),
+    bold=False,
+    italic=False,
+):
+  parts = re.split(r"(\*\*.*?\*\*))", text)
+  for part in parts:
+    if not part:
+      continue
+    run = p.add_run()
+    run.font.name = font_name
+    run.font.size = Pt(font_size)
+    run.font.color.rgb = color_rgb
+    run.font.bold = bold
+    run.font.italic = italic
+
+    if part.startswith("**") and part.endswith("**"):
+      run.text = part[2:-2]
+      run.font.bold = True
+    else:
+      run.text = part
+
+
 # --- FUNGSI PEMBUAT WORD PROFESIONAL & EYE-CATCHING ---
 def generate_professional_word_document(
     mapel,
@@ -180,7 +209,7 @@ def generate_professional_word_document(
     r_v = p_v.add_run(str(val))
     r_v.font.name = "Cambria"
     r_v.font.size = Pt(10)
-    r_v.font.color.rgb = RGBColor(51, 65, 85)
+    r_v.font.color.rgb = RGBColor(0, 0, 0)  # Hitam pekat
 
     set_cell_margins(cell_key, 80, 80, 120, 120)
     set_cell_margins(cell_val, 80, 80, 120, 120)
@@ -221,11 +250,15 @@ def generate_professional_word_document(
           p = c.add_paragraph()
         p.paragraph_format.space_after = Pt(3)
         p.paragraph_format.line_spacing = 1.15
-        r = p.add_run(text_line.replace(">", "").strip())
-        r.font.name = "Cambria"
-        r.font.size = Pt(10)
-        r.font.italic = True
-        r.font.color.rgb = RGBColor(51, 65, 85)
+        callout_text = text_line.replace(">", "").strip()
+        add_markdown_run(
+            p,
+            callout_text,
+            font_size=10,
+            color_rgb=RGBColor(0, 0, 0),
+            bold=False,
+            italic=True,
+        )
       callout_buffer = []
       doc.add_paragraph().paragraph_format.space_after = Pt(4)
 
@@ -258,24 +291,23 @@ def generate_professional_word_document(
       if "---" in line_str:
         continue
       p.paragraph_format.space_before = Pt(10)
-      run = p.add_run(line_str.replace("#", "").strip())
-      run.font.name = "Cambria"
-      run.font.size = Pt(11)
-      run.font.bold = True
-      run.font.color.rgb = RGBColor(27, 54, 93)
+      clean_line = line_str.replace("#", "").strip()
+      add_markdown_run(
+          p,
+          clean_line,
+          font_size=11,
+          color_rgb=RGBColor(27, 54, 93),
+          bold=True,
+      )
     elif line_str.startswith("Kunci Jawaban"):
       p.paragraph_format.space_before = Pt(4)
-      run = p.add_run(line_str)
-      run.font.name = "Cambria"
-      run.font.size = Pt(10.5)
-      run.font.bold = True
-      run.font.color.rgb = RGBColor(10, 128, 67)
+      add_markdown_run(
+          p, line_str, font_size=10.5, color_rgb=RGBColor(10, 128, 67), bold=True
+      )
     elif line_str.startswith("Pembahasan"):
-      run = p.add_run(line_str)
-      run.font.name = "Cambria"
-      run.font.size = Pt(10.5)
-      run.font.bold = True
-      run.font.color.rgb = RGBColor(180, 83, 9)
+      add_markdown_run(
+          p, line_str, font_size=10.5, color_rgb=RGBColor(180, 83, 9), bold=True
+      )
     elif (
         line_str.startswith("A.")
         or line_str.startswith("B.")
@@ -284,15 +316,21 @@ def generate_professional_word_document(
         or line_str.startswith("E.")
     ):
       p.paragraph_format.left_indent = Inches(0.25)
-      run = p.add_run(line_str)
-      run.font.name = "Cambria"
-      run.font.size = Pt(10.5)
-      run.font.color.rgb = RGBColor(51, 65, 85)
+      add_markdown_run(
+          p,
+          line_str,
+          font_size=10.5,
+          color_rgb=RGBColor(0, 0, 0),
+          bold=False,
+      )
     else:
-      run = p.add_run(line_str)
-      run.font.name = "Cambria"
-      run.font.size = Pt(10.5)
-      run.font.color.rgb = RGBColor(51, 65, 85)
+      add_markdown_run(
+          p,
+          line_str,
+          font_size=10.5,
+          color_rgb=RGBColor(0, 0, 0),
+          bold=False,
+      )
 
   if in_callout:
     flush_callout()
@@ -796,7 +834,9 @@ with tab_rekap:
     if not daftar_kelas:
       daftar_kelas = ["X TKR-1", "X DKV-1"]
 
-    r_kelas = st.selectbox("Pilih Kelas", sorted(daftar_kelas), key="input_kelas_rekap")
+    r_kelas = st.selectbox(
+        "Pilih Kelas", sorted(daftar_kelas), key="input_kelas_rekap"
+    )
     r_jenis = st.selectbox(
         "Jenis Asesmen",
         ["Asesmen Formatif", "Asesmen Sumatif"],
@@ -1012,9 +1052,7 @@ with tab_rekap:
       # --- Tombol Download dengan Auto-Fit Kolom & index=False ---
       output_excel = BytesIO()
       with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
-        df_final_dl.to_excel(
-            writer, index=False, sheet_name="Rekap_Nilai"
-        )
+        df_final_dl.to_excel(writer, index=False, sheet_name="Rekap_Nilai")
 
         # Otomatis merapikan lebar kolom di Excel
         worksheet = writer.sheets["Rekap_Nilai"]
