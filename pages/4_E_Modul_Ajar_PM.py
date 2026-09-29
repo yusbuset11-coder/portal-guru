@@ -445,6 +445,7 @@ def generate_docx(
     nama_kota,
     tanggal_pembuatan,
     nip_penulis,
+    jenjang_pendidikan,
 ):
   doc = docx.Document()
 
@@ -460,11 +461,25 @@ def generate_docx(
   font.size = Pt(10)
   font.color.rgb = DocxRGBColor(51, 51, 51)
 
+  # Menyesuaikan istilah otomatis berdasarkan jenjang pendidikan
+  if jenjang_pendidikan == "PAUD / TK":
+    t_modul = "RPPH PEMBELAJARAN MENDALAM"
+    t_rubrik = "RUBRIK PENILAIAN PERKEMBANGAN ANAK (CEKLIS / CATATAN ANEKDOT)"
+    t_observasi = "INSTRUMEN OBSERVASI HARIAN / CATATAN ANEKDOT"
+    t_bahan = "BAHAN AJAR & MATERI KEGIATAN MAIN"
+    t_lkm = "LEMBAR AKTIVITAS / LEMBAR KERJA ANAK (LKA)"
+  else:
+    t_modul = "MODUL AJAR PEMBELAJARAN MENDALAM"
+    t_rubrik = "RUBRIK PENILAIAN"
+    t_observasi = "INSTRUMEN OBSERVASI"
+    t_bahan = "BAHAN AJAR"
+    t_lkm = "LEMBAR KERJA MURID (LKM)"
+
   p_title = doc.add_paragraph()
   p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
   p_title.paragraph_format.space_before = Pt(0)
   p_title.paragraph_format.space_after = Pt(12)
-  run_title = p_title.add_run("MODUL AJAR / RPPH PEMBELAJARAN MENDALAM")
+  run_title = p_title.add_run(t_modul)
   run_title.font.name = "Arial"
   run_title.font.size = Pt(15)
   run_title.font.bold = True
@@ -526,7 +541,6 @@ def generate_docx(
         if not line_stripped:
           continue
 
-        # --- PEMBERSIHAN TEKS (MENGHAPUS NOMOR & TANDA BINTANG) ---
         line_clean_text = line_stripped.replace("**", "")
         line_clean_text = re.sub(
             r"^(\d+[\.\)]\s*|[-\*\•]\s*)+", "", line_clean_text
@@ -734,9 +748,7 @@ def generate_docx(
   p_rubrik_title = doc.add_paragraph()
   p_rubrik_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
   p_rubrik_title.paragraph_format.space_after = Pt(12)
-  r_rub_t = p_rubrik_title.add_run(
-      "RUBRIK PENILAIAN PERKEMBANGAN ANAK (CEKLIS / CATATAN ANEKDOT)"
-  )
+  r_rub_t = p_rubrik_title.add_run(t_rubrik)
   r_rub_t.font.name = "Arial"
   r_rub_t.font.size = Pt(14)
   r_rub_t.font.bold = True
@@ -843,9 +855,7 @@ def generate_docx(
   p_inst_title = doc.add_paragraph()
   p_inst_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
   p_inst_title.paragraph_format.space_after = Pt(12)
-  r_inst_t = p_inst_title.add_run(
-      "INSTRUMEN OBSERVASI HARIAN / CATATAN ANEKDOT"
-  )
+  r_inst_t = p_inst_title.add_run(t_observasi)
   r_inst_t.font.name = "Arial"
   r_inst_t.font.size = Pt(14)
   r_inst_t.font.bold = True
@@ -886,7 +896,7 @@ def generate_docx(
   p_bahan_title = doc.add_paragraph()
   p_bahan_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
   p_bahan_title.paragraph_format.space_after = Pt(12)
-  r_bahan_t = p_bahan_title.add_run("BAHAN AJAR & MATERI KEGIATAN MAIN")
+  r_bahan_t = p_bahan_title.add_run(t_bahan)
   r_bahan_t.font.name = "Arial"
   r_bahan_t.font.size = Pt(14)
   r_bahan_t.font.bold = True
@@ -927,7 +937,7 @@ def generate_docx(
   p_lkm_title = doc.add_paragraph()
   p_lkm_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
   p_lkm_title.paragraph_format.space_after = Pt(12)
-  r_lkm_t = p_lkm_title.add_run("LEMBAR AKTIVITAS / LEMBAR KERJA ANAK (LKM)")
+  r_lkm_t = p_lkm_title.add_run(t_lkm)
   r_lkm_t.font.name = "Arial"
   r_lkm_t.font.size = Pt(14)
   r_lkm_t.font.bold = True
@@ -1260,6 +1270,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
           nama_kota,
           tanggal_pembuatan,
           nip_penulis,
+          jenjang_pendidikan,  # Diteruskan ke fungsi docx
       )
 
       pptx_file = generate_pptx(
