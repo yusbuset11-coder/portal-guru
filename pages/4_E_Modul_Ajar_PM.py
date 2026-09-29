@@ -179,13 +179,44 @@ def set_cell_background(cell, fill_color):
 def clean_markdown_bullets(text):
   if not text:
     return ""
-  lines = text.split("\n")
+  lines = str(text).split("\n")
   cleaned_lines = []
   for line in lines:
     stripped = line.strip()
     stripped_clean = re.sub(r"^([-*•]|\d+\.)\s*", "", stripped)
     cleaned_lines.append(stripped_clean)
   return "\n".join(cleaned_lines)
+
+
+def parse_ai_json(text_resp):
+  """Fungsi pembantu untuk mem-parsing JSON dari AI dengan aman dan tangguh."""
+  if not text_resp:
+    return {}
+  
+  # Coba bersihkan blok markdown
+  cleaned = text_resp.strip()
+  if cleaned.startswith("```json"):
+    cleaned = cleaned[7:]
+  if cleaned.startswith("```"):
+    cleaned = cleaned[3:]
+  if cleaned.endswith("```"):
+    cleaned = cleaned[:-3]
+  cleaned = cleaned.strip()
+
+  try:
+    return json.loads(cleaned)
+  except Exception:
+    pass
+
+  # Fallback menggunakan Regex untuk mencari kurung kurawal JSON
+  try:
+    match = re.search(r"\{.*\}", text_resp, re.DOTALL)
+    if match:
+      return json.loads(match.group(0))
+  except Exception:
+    pass
+
+  return {}
 
 
 def generate_pptx(
@@ -276,20 +307,25 @@ def generate_pptx(
   p3.space_before = PptPt(22)
 
   bahan_ajar = data_ai.get("bahan_ajar", {})
+  if not isinstance(bahan_ajar, dict):
+    bahan_ajar = {}
+    
   lkm_content = data_ai.get("lkm_content", {})
+  if not isinstance(lkm_content, dict):
+    lkm_content = {}
 
   slides_data = [
       (
           "📖 Pengantar Konsep Pembelajaran",
-          bahan_ajar.get("pengantar_konsep", ""),
+          str(bahan_ajar.get("pengantar_konsep", "")),
       ),
       (
           "📚 Uraian Materi Inti & Konsep",
-          bahan_ajar.get("uraian_materi_inti", ""),
+          str(bahan_ajar.get("uraian_materi_inti", "")),
       ),
       (
           "💡 Contoh Kontekstual & Studi Kasus",
-          bahan_ajar.get("contoh_kontekstual", ""),
+          str(bahan_ajar.get("contoh_kontekstual", "")),
       ),
       (
           "🛠️ Lembar Kerja & Aktivitas Siswa (LKM)",
@@ -447,6 +483,9 @@ def generate_docx(
     nip_penulis,
     jenjang_pendidikan,
 ):
+  if not isinstance(data_ai, dict):
+    data_ai = {}
+
   doc = docx.Document()
 
   for section in doc.sections:
@@ -486,6 +525,8 @@ def generate_docx(
   run_title.font.color.rgb = DocxRGBColor(74, 46, 33)
 
   def add_section_table(title_text, rows_data):
+    if not rows_data:
+      return
     table = doc.add_table(rows=len(rows_data) + 1, cols=2)
     table.style = "Table Grid"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -505,7 +546,7 @@ def generate_docx(
 
     for idx, (label, val) in enumerate(rows_data):
       row_cells = table.rows[idx + 1].cells
-      row_cells[0].text = label
+      row_cells[0].text = str(label)
       row_cells[0].width = Inches(2.3)
       row_cells[1].width = Inches(4.2)
       set_cell_background(row_cells[0], "F5EBE0")
@@ -785,69 +826,81 @@ def generate_docx(
   run_sub.font.color.rgb = DocxRGBColor(74, 46, 33)
 
   rubrik_data = data_ai.get("rubrik_penilaian", {})
-  if isinstance(rubrik_data, dict) and rubrik_data:
-    rubrik_table = doc.add_table(rows=len(rubrik_data) + 1, cols=5)
-    rubrik_table.style = "Table Grid"
-    rubrik_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+  if rubrik_data:
+    rubrik_items = []
+    if isinstance(rubrik_data, dict):
+      rubrik_items = list(rubrik_data.items())
+    elif isinstance(rubrik_data, list):
+      for idx_r, item_r in enumerate(rubrik_data):
+        if isinstance(item_r, dict):
+          k_name = item_r.get("nama_kriteria", f"Kriteria {idx_r+1}")
+          rubrik_items.append((k_name, item_r))
+        else:
+          rubrik_items.append((str(item_r), {}))
 
-    hdr_cells = rubrik_table.rows[0].cells
-    headers = [
-        "Lingkup Perkembangan",
-        "Belum Muncul",
-        "Mulai Muncul",
-        "Berkembang Sesuai Harapan",
-        "Sangat Berkembang",
-    ]
-    col_widths = [
-        Inches(1.5),
-        Inches(1.25),
-        Inches(1.25),
-        Inches(1.25),
-        Inches(1.25),
-    ]
+    if rubrik_items:
+      rubrik_table = doc.add_table(rows=len(rubrik_items) + 1, cols=5)
+      rubrik_table.style = "Table Grid"
+      rubrik_table.alignment = WD_TABLE_ALIGNMENT.CENTER
 
-    for idx, text_hdr in enumerate(headers):
-      hdr_cells[idx].text = text_hdr
-      hdr_cells[idx].width = col_widths[idx]
-      set_cell_background(hdr_cells[idx], "5A3825")
-      for p in hdr_cells[idx].paragraphs:
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p.paragraph_format.space_before = Pt(4)
-        p.paragraph_format.space_after = Pt(4)
-        for run in p.runs:
-          run.font.bold = True
-          run.font.size = Pt(9.5)
-          run.font.color.rgb = DocxRGBColor(255, 255, 255)
+      hdr_cells = rubrik_table.rows[0].cells
+      headers = [
+          "Lingkup Perkembangan",
+          "Belum Muncul",
+          "Mulai Muncul",
+          "Berkembang Sesuai Harapan",
+          "Sangat Berkembang",
+      ]
+      col_widths = [
+          Inches(1.5),
+          Inches(1.25),
+          Inches(1.25),
+          Inches(1.25),
+          Inches(1.25),
+      ]
 
-    for row_idx, (k, v) in enumerate(rubrik_data.items()):
-      row_cells = rubrik_table.rows[row_idx + 1].cells
-      if isinstance(v, dict):
-        nama = v.get("nama_kriteria", k)
-        pb = v.get("perlu_bimbingan", "-")
-        c = v.get("cukup", "-")
-        b = v.get("baik", "-")
-        sb = v.get("sangat_baik", "-")
-      else:
-        nama = str(k)
-        pb, c, b, sb = str(v), "", "", ""
-
-      row_values = [nama, pb, c, b, sb]
-      for col_idx, val_text in enumerate(row_values):
-        row_cells[col_idx].text = str(val_text)
-        row_cells[col_idx].width = col_widths[col_idx]
-
-        if col_idx == 0:
-          set_cell_background(row_cells[col_idx], "F5EBE0")
-
-        for p in row_cells[col_idx].paragraphs:
+      for idx, text_hdr in enumerate(headers):
+        hdr_cells[idx].text = text_hdr
+        hdr_cells[idx].width = col_widths[idx]
+        set_cell_background(hdr_cells[idx], "5A3825")
+        for p in hdr_cells[idx].paragraphs:
+          p.alignment = WD_ALIGN_PARAGRAPH.CENTER
           p.paragraph_format.space_before = Pt(4)
           p.paragraph_format.space_after = Pt(4)
-          p.paragraph_format.line_spacing = 1.15
-          p.alignment = WD_ALIGN_PARAGRAPH.LEFT
           for run in p.runs:
-            run.font.size = Pt(9.0)
-            run.font.bold = col_idx == 0
-            run.font.color.rgb = DocxRGBColor(51, 51, 51)
+            run.font.bold = True
+            run.font.size = Pt(9.5)
+            run.font.color.rgb = DocxRGBColor(255, 255, 255)
+
+      for row_idx, (k, v) in enumerate(rubrik_items):
+        row_cells = rubrik_table.rows[row_idx + 1].cells
+        if isinstance(v, dict):
+          nama = v.get("nama_kriteria", k)
+          pb = v.get("perlu_bimbingan", "-")
+          c = v.get("cukup", "-")
+          b = v.get("baik", "-")
+          sb = v.get("sangat_baik", "-")
+        else:
+          nama = str(k)
+          pb, c, b, sb = str(v), "", "", ""
+
+        row_values = [nama, pb, c, b, sb]
+        for col_idx, val_text in enumerate(row_values):
+          row_cells[col_idx].text = str(val_text)
+          row_cells[col_idx].width = col_widths[col_idx]
+
+          if col_idx == 0:
+            set_cell_background(row_cells[col_idx], "F5EBE0")
+
+          for p in row_cells[col_idx].paragraphs:
+            p.paragraph_format.space_before = Pt(4)
+            p.paragraph_format.space_after = Pt(4)
+            p.paragraph_format.line_spacing = 1.15
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            for run in p.runs:
+              run.font.size = Pt(9.0)
+              run.font.bold = col_idx == 0
+              run.font.color.rgb = DocxRGBColor(51, 51, 51)
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
@@ -885,12 +938,24 @@ def generate_docx(
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
   instrumen_data = data_ai.get("instrumen_formatif", {})
-  if isinstance(instrumen_data, dict) and instrumen_data:
+  if instrumen_data:
     inst_rows = []
-    for inst_k, inst_v in instrumen_data.items():
-      label_text = inst_k.replace("_", " ").title()
-      inst_rows.append((label_text, str(inst_v)))
-    add_section_table("LEMBAR OBSERVASI / CATATAN PERKEMBANGAN", inst_rows)
+    if isinstance(instrumen_data, dict):
+      for inst_k, inst_v in instrumen_data.items():
+        label_text = str(inst_k).replace("_", " ").title()
+        inst_rows.append((label_text, str(inst_v)))
+    elif isinstance(instrumen_data, list):
+      for idx_i, item_i in enumerate(instrumen_data):
+        if isinstance(item_i, dict):
+          for k_i, v_i in item_i.items():
+            inst_rows.append((str(k_i).replace("_", " ").title(), str(v_i)))
+        else:
+          inst_rows.append((f"Poin {idx_i+1}", str(item_i)))
+    elif isinstance(instrumen_data, str):
+      inst_rows.append(("Instrumen Formatif", instrumen_data))
+      
+    if inst_rows:
+      add_section_table("LEMBAR OBSERVASI / CATATAN PERKEMBANGAN", inst_rows)
 
   doc.add_page_break()
   p_bahan_title = doc.add_paragraph()
@@ -926,12 +991,24 @@ def generate_docx(
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
   bahan_data = data_ai.get("bahan_ajar", {})
-  if isinstance(bahan_data, dict) and bahan_data:
+  if bahan_data:
     bahan_rows = []
-    for b_k, b_v in bahan_data.items():
-      label_text = b_k.replace("_", " ").title()
-      bahan_rows.append((label_text, str(b_v)))
-    add_section_table("URAIAN MATERI & PIJAKAN LINGKUNGAN", bahan_rows)
+    if isinstance(bahan_data, dict):
+      for b_k, b_v in bahan_data.items():
+        label_text = str(b_k).replace("_", " ").title()
+        bahan_rows.append((label_text, str(b_v)))
+    elif isinstance(bahan_data, list):
+      for idx_b, item_b in enumerate(bahan_data):
+        if isinstance(item_b, dict):
+          for k_b, v_b in item_b.items():
+            bahan_rows.append((str(k_b).replace("_", " ").title(), str(v_b)))
+        else:
+          bahan_rows.append((f"Materi {idx_b+1}", str(item_b)))
+    elif isinstance(bahan_data, str):
+      bahan_rows.append(("Uraian Materi", bahan_data))
+
+    if bahan_rows:
+      add_section_table("URAIAN MATERI & PIJAKAN LINGKUNGAN", bahan_rows)
 
   doc.add_page_break()
   p_lkm_title = doc.add_paragraph()
@@ -967,12 +1044,24 @@ def generate_docx(
 
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
   lkm_data = data_ai.get("lkm_content", {})
-  if isinstance(lkm_data, dict) and lkm_data:
+  if lkm_data:
     lkm_rows = []
-    for lkm_k, lkm_v in lkm_data.items():
-      label_text = lkm_k.replace("_", " ").title()
-      lkm_rows.append((label_text, str(lkm_v)))
-    add_section_table("STRUKTUR LEMBAR AKTIVITAS ANAK", lkm_rows)
+    if isinstance(lkm_data, dict):
+      for lkm_k, lkm_v in lkm_data.items():
+        label_text = str(lkm_k).replace("_", " ").title()
+        lkm_rows.append((label_text, str(lkm_v)))
+    elif isinstance(lkm_data, list):
+      for idx_l, item_l in enumerate(lkm_data):
+        if isinstance(item_l, dict):
+          for k_l, v_l in item_l.items():
+            lkm_rows.append((str(k_l).replace("_", " ").title(), str(v_l)))
+        else:
+          lkm_rows.append((f"Aktivitas {idx_l+1}", str(item_l)))
+    elif isinstance(lkm_data, str):
+      lkm_rows.append(("Lembar Kerja", lkm_data))
+
+    if lkm_rows:
+      add_section_table("STRUKTUR LEMBAR AKTIVITAS ANAK", lkm_rows)
 
   bio = BytesIO()
   doc.save(bio)
@@ -1007,7 +1096,7 @@ api_key = st.text_input(
 
 st.markdown(
     '💡 *Belum punya API Key? <a'
-    ' href="https://aistudio.google.com/app/apikey" target="_blank">Klik di'
+    ' href="[https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)" target="_blank">Klik di'
     ' sini untuk membuat secara mandiri & gratis</a>*',
     unsafe_allow_html=True,
 )
@@ -1152,7 +1241,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
         f"{nama_penulis} sedang menyusun dokumen Pembelajaran Mendalam..."
     ):
       genai.configure(api_key=api_key)
-      model = genai.GenerativeModel("gemini-3.5-flash")
+      model = genai.GenerativeModel("gemini-1.5-flash")
 
       prompt = f"""
             Bertindaklah sebagai pakar kurikulum profesional. Buatkan konten Modul Ajar / RPPH Berbasis Pembelajaran Mendalam (Deep Learning) yang **SANGAT LENGKAP, DETAIL, DAN KOMPREHENSIF** untuk:
@@ -1238,21 +1327,14 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
             }}
             """
 
-      response = model.generate_content(prompt, request_options={"timeout": 120})
-      text_resp = response.text.strip()
-
-      if text_resp.startswith("```json"):
-        text_resp = text_resp[7:]
-      if text_resp.startswith("```"):
-        text_resp = text_resp[3:]
-      if text_resp.endswith("```"):
-        text_resp = text_resp[:-3]
-      text_resp = text_resp.strip()
-
       try:
-        data_ai = json.loads(text_resp)
-      except Exception:
-        data_ai = {}
+        response = model.generate_content(prompt, request_options={"timeout": 120})
+        text_resp = response.text.strip()
+      except Exception as e:
+        st.error(f"Gagal terhubung ke Gemini API: {e}")
+        st.stop()
+
+      data_ai = parse_ai_json(text_resp)
 
       st.success("🎉 Modul Ajar dan Bahan Tayang Berhasil Disusun AI!")
 
@@ -1270,7 +1352,7 @@ if st.button("🚀 Buat Modul Ajar & Bahan Tayang PPT", use_container_width=True
           nama_kota,
           tanggal_pembuatan,
           nip_penulis,
-          jenjang_pendidikan,  # Diteruskan ke fungsi docx
+          jenjang_pendidikan,
       )
 
       pptx_file = generate_pptx(
