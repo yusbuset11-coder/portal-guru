@@ -1061,7 +1061,7 @@ def generate_docx(
       lkm_rows.append(("Lembar Kerja", lkm_data))
 
     if lkm_rows:
-      add_section_table("STRUKTUR LEMBAR AKTIVITAS ANAK", lkm_rows)
+      add_section_table("STRUKTUR LEMBAR AKTIVITAS MURID", lkm_rows)
 
   bio = BytesIO()
   doc.save(bio)
