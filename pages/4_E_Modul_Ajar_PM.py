@@ -820,7 +820,7 @@ def generate_docx(
   doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
   p_sub = doc.add_paragraph()
-  run_sub = p_sub.add_run("A. Indikator Ketercapaian Perkembangan Anak")
+  run_sub = p_sub.add_run("A. Indikator Ketercapaian Perkembangan Murid")
   run_sub.font.bold = True
   run_sub.font.size = Pt(10.5)
   run_sub.font.color.rgb = DocxRGBColor(74, 46, 33)
